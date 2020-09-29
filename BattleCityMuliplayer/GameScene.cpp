@@ -14,6 +14,7 @@
 bool GameScene::init()
 {
 	//StartSound = Sound::create(_T("../sound/StartGame.mp3"));
+
 	win = true;
 	counter = 0;
 	EnemyNumber = 3;

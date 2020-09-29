@@ -39,9 +39,9 @@ bool MyWindow::Create()
 	m_hwnd = CreateWindowEx(NULL,
 		WindowClassName,
 		WindowClassName,
-		WS_POPUP,
+		WS_OVERLAPPEDWINDOW,
 		0, 0,
-		width, Height,
+		650, 500,
 		NULL,
 		NULL,
 		m_hInstance,
@@ -89,6 +89,7 @@ int MyWindow::getWindowwidth()
 
 LRESULT CALLBACK MyWindow::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	MyRender::getInstance()->HandleWindowsEvents(hwnd, msg, wParam, lParam);
 	if (msg == WM_DESTROY)
 	{
 		PostQuitMessage(0);
@@ -185,6 +186,7 @@ void MyWindow::Update(DWORD ElapsedTime)
 	GameManager::getInstance()->getScene()->DrawAllActive();
 	GameManager::getInstance()->getScene()->DrawAllStatic();
 	frame->GetFont()->DrawText(NULL, Text, -1, &rect, DT_TOP | DT_RIGHT, D3DXCOLOR(0.0f, 0.0f, 0.0f, 255.0f));
+	MyRender::getInstance()->updateGUI();
 	MyRender::getInstance()->getDevice()->EndScene();
 	MyRender::getInstance()->getDevice()->Present(NULL, NULL, NULL, NULL);
 	if (ElapsedTime < 1000 / FRAME)

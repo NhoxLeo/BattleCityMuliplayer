@@ -22,6 +22,10 @@
 #include <d3dx9.h>
 #include <dinput.h>
 //#include "bass.h"
+//
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
 
 //#pragma  comment(lib,"bass.lib")
 #pragma comment(lib,"Dinput8.lib")
@@ -118,11 +122,5 @@ static __TYPE__* create() \
 			    } \
 }
 
-/********************************************************
-	*  @brief    :	×ªÂëº¯Êý
-	*  @input	 :
-	*  @output	 :
-	*  @return   :  
-	*  @author   :	Alex
-	********************************************************/
+
 #endif // !COMMON_H
