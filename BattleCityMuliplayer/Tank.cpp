@@ -166,7 +166,7 @@ void Tank::Update()
 	}
 	if (Timer > 2*FRAME)
 	{
-		dirctionRenderRet();
+		directionRenderRet();
 	}
 	if (InvincibleTimer%20 == 1)
 	{	
@@ -364,7 +364,7 @@ void Tank::setTankTexture()
 	}
 }
 
-void Tank::dirctionRenderRet()
+void Tank::directionRenderRet()
 {
 	if (!m_boom)
 	{
