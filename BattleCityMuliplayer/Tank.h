@@ -41,7 +41,7 @@ public:
 
 	void removeBullet(Bullet* b);
 	
-	void dirctionRenderRet();
+	void directionRenderRet();
 
 	int getTimer(){ return Timer; }
 
