@@ -16,6 +16,9 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{550fcdbf-9d00-4dab-b107-50b7e0b74c7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{58b24370-f175-49b4-b8dd-54dbfd2134ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.h">

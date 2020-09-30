@@ -1,13 +1,12 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-/**************************************************************************
-*  @file	 : common.h
-*  @version  : ver  1.0
-*  @author   : Alex
-*  @date     : 
-*  @brief    : 各个头文件的包含以及相关宏的定义
-**************************************************************************/
+
+//#define WIN32_LEAN_AND_MEAN
+//#define _WINSOCKAPI_
+//#include <WinSock2.h>
+//#include <Ws2tcpip.h>
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -15,19 +14,16 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
-#include <dsound.h>
-#include <Mmreg.h>
+//#include <Mmreg.h>
 
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dinput.h>
-//#include "bass.h"
-//
+
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 
-//#pragma  comment(lib,"bass.lib")
 #pragma comment(lib,"Dinput8.lib")
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
@@ -35,6 +31,7 @@
 #pragma message("FDraw.h-->Linking with ddraw.lib")
 //#pragma comment(lib,"ddraw.lib")
 #pragma  comment(lib,"DXGuid.lib")
+//#pragma comment(lib, "Ws2_32.lib")
 
 using namespace std;
 
