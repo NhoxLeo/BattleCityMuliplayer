@@ -40,7 +40,7 @@ bool ModuleNetworkingClient::isRunning() const
 }
 
 bool ModuleNetworkingClient::update()
-{
+{ 
 	if (state == ClientState::Start)
 	{
 		// TODO(jesus): Send the player name to the server
