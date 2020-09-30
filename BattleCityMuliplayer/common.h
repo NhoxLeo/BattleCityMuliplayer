@@ -1,17 +1,17 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 
-//#define _WINSOCKAPI_
-//#define WIN32_LEAN_AND_MEAN
-//#include <WinSock2.h>
-//#include <Ws2tcpip.h>
+#define _WINSOCKAPI_
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <windows.h>
 
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include <cassert>
+
 #include <windowsx.h>
 #include <tchar.h>
 //#include <Mmreg.h>
@@ -24,6 +24,7 @@
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 
+#pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib,"Dinput8.lib")
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
@@ -31,7 +32,6 @@
 #pragma message("FDraw.h-->Linking with ddraw.lib")
 //#pragma comment(lib,"ddraw.lib")
 #pragma  comment(lib,"DXGuid.lib")
-//#pragma comment(lib, "Ws2_32.lib")
 
 using namespace std;
 
@@ -119,5 +119,3 @@ static __TYPE__* create() \
 			    } \
 }
 
-
-#endif // !COMMON_H

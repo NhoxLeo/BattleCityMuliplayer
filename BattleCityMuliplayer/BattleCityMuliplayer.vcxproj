@@ -170,8 +170,13 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapScene.h" />
+    <ClInclude Include="Module.h" />
+    <ClInclude Include="ModuleNetworking.h" />
+    <ClInclude Include="ModuleNetworkingClient.h" />
+    <ClInclude Include="ModuleNetworkingServer.h" />
     <ClInclude Include="MyRender.h" />
     <ClInclude Include="MyWindow.h" />
+    <ClInclude Include="Networks.h" />
     <ClInclude Include="OverScene.h" />
     <ClInclude Include="Ref.h" />
     <ClInclude Include="ReleaseManager.h" />
@@ -205,8 +210,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapScene.cpp" />
+    <ClCompile Include="ModuleNetworking.cpp" />
+    <ClCompile Include="ModuleNetworkingClient.cpp" />
+    <ClCompile Include="ModuleNetworkingServer.cpp" />
     <ClCompile Include="MyRender.cpp" />
     <ClCompile Include="MyWindow.cpp" />
+    <ClCompile Include="Networks.cpp" />
     <ClCompile Include="OverScene.cpp" />
     <ClCompile Include="Ref.cpp" />
     <ClCompile Include="ReleaseManager.cpp" />

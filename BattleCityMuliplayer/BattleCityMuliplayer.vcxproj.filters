@@ -129,6 +129,21 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Networks.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleNetworking.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Module.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleNetworkingServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleNetworkingClient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Action.cpp">
@@ -229,6 +244,18 @@
     </ClCompile>
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Networks.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleNetworking.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleNetworkingServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleNetworkingClient.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
