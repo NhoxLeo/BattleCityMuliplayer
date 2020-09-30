@@ -2,16 +2,16 @@
 #define COMMON_H
 
 
-//#define WIN32_LEAN_AND_MEAN
 //#define _WINSOCKAPI_
-//#include <WinSock2.h>
-//#include <Ws2tcpip.h>
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
+#include <windows.h>
 
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include <cassert>
-#include <windows.h>
 #include <windowsx.h>
 #include <tchar.h>
 //#include <Mmreg.h>
