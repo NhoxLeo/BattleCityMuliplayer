@@ -3,9 +3,9 @@
 
 
 //#define _WINSOCKAPI_
-#define WIN32_LEAN_AND_MEAN
-#include <WinSock2.h>
-#include <Ws2tcpip.h>
+//#define WIN32_LEAN_AND_MEAN
+//#include <WinSock2.h>
+//#include <Ws2tcpip.h>
 #include <windows.h>
 
 #include <iostream>
