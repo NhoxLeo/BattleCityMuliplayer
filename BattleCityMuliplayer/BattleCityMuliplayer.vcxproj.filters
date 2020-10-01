@@ -144,6 +144,9 @@
     <ClInclude Include="ModuleNetworkingClient.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="NetworkScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Action.cpp">
@@ -256,6 +259,9 @@
     </ClCompile>
     <ClCompile Include="ModuleNetworkingClient.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkScene.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
