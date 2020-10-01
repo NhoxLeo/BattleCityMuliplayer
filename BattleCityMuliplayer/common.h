@@ -1,29 +1,30 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
-/**************************************************************************
-*  @file	 : common.h
-*  @version  : ver  1.0
-*  @author   : Alex
-*  @date     : 
-*  @brief    : 各个头文件的包含以及相关宏的定义
-**************************************************************************/
+
+//#define _WINSOCKAPI_
+//#define WIN32_LEAN_AND_MEAN
+//#include <WinSock2.h>
+//#include <Ws2tcpip.h>
+#include <windows.h>
+
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include <cassert>
-#include <windows.h>
+
 #include <windowsx.h>
 #include <tchar.h>
-#include <dsound.h>
-#include <Mmreg.h>
+//#include <Mmreg.h>
 
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <dinput.h>
-//#include "bass.h"
 
-//#pragma  comment(lib,"bass.lib")
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_dx9.h"
+#include "ImGui/imgui_impl_win32.h"
+
+//#pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib,"Dinput8.lib")
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
@@ -53,7 +54,7 @@ using namespace std;
 #define InitLife 6//玩家初始生命值
 #define InitGrade 0//玩家初始积分
 #define YESFIRE true//敌方坦克是否可以fire
-#define FRAME 60
+#define FRAME 120
 #define AwardNumber 1//每AwardNumber个坦克出现一个奖励
 #define StopTime 3
 
@@ -118,11 +119,3 @@ static __TYPE__* create() \
 			    } \
 }
 
-/********************************************************
-	*  @brief    :	转码函数
-	*  @input	 :
-	*  @output	 :
-	*  @return   :  
-	*  @author   :	Alex
-	********************************************************/
-#endif // !COMMON_H

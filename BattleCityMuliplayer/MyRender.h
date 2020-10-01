@@ -38,6 +38,8 @@ public:
 		*  @author   :	Alex
 		********************************************************/
 	static MyRender* getInstance();
+	void updateGUI();
+	LRESULT HandleWindowsEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	~MyRender();
 protected:
 	LPDIRECT3D9 m_Direct3D9;
