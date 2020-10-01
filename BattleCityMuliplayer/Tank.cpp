@@ -139,19 +139,19 @@ void Tank::Update()
 		Timer = 601;
 	}
 	Timer++;
+	if (Timer == FRAME/4)
+	{
+		setRenderRet(28, 28, 28, 0);
+	}
 	if (Timer == FRAME/2)
+	{
+		setRenderRet(28, 28, 56,0);
+	}
+	if (Timer == 3*FRAME/4)
 	{
 		setRenderRet(28, 28, 28, 0);
 	}
 	if (Timer == FRAME)
-	{
-		setRenderRet(28, 28, 56,0);
-	}
-	if (Timer == 3*FRAME/2)
-	{
-		setRenderRet(28, 28, 28, 0);
-	}
-	if (Timer == 2*FRAME)
 	{
 		TouchAble = true;
 		Moveable = true;
@@ -164,7 +164,7 @@ void Tank::Update()
 			setTankTexture();
 		}
 	}
-	if (Timer > 2*FRAME)
+	if (Timer > FRAME)
 	{
 		dirctionRenderRet();
 	}

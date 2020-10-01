@@ -1,8 +1,10 @@
 #pragma once
 
-//#include <WinSock2.h>
-//#include <Ws2tcpip.h>
-//#pragma comment(lib, "Ws2_32.lib")
+#define _WINSOCKAPI_
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
 
 //#pragma comment (lib, "D3D9.lib")
 
