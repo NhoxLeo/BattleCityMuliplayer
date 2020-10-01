@@ -177,6 +177,7 @@
     <ClInclude Include="MyRender.h" />
     <ClInclude Include="MyWindow.h" />
     <ClInclude Include="Networks.h" />
+    <ClInclude Include="NetworkScene.h" />
     <ClInclude Include="OverScene.h" />
     <ClInclude Include="Ref.h" />
     <ClInclude Include="ReleaseManager.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="MyRender.cpp" />
     <ClCompile Include="MyWindow.cpp" />
     <ClCompile Include="Networks.cpp" />
+    <ClCompile Include="NetworkScene.cpp" />
     <ClCompile Include="OverScene.cpp" />
     <ClCompile Include="Ref.cpp" />
     <ClCompile Include="ReleaseManager.cpp" />

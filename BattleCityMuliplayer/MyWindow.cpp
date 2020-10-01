@@ -8,6 +8,7 @@
 #include "CFont.h"
 #include "OverScene.h"
 #include "GameScene.h"
+#include "NetworkScene.h"
 //#include "Sound.h"
 
 static DWORD dwTime = timeGetTime();
@@ -108,7 +109,8 @@ int MyWindow::MessageProc()
 	//OverScene* scene = OverScene::create();
 	//StartScene* scene = StartScene::create();
 	GameManager::getInstance()->setLevel(1);
-	GameScene* scene = GameScene::create();
+	//GameScene* scene = GameScene::create();
+	NetworkScene* scene = NetworkScene::create();
 	GameManager::getInstance()->setScene(scene);
 	Controller::getInstance1()->InitControl(m_hwnd, m_hInstance);
 	Controller::getInstance2()->InitControl(m_hwnd, m_hInstance);
