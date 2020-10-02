@@ -38,7 +38,9 @@ public:
 		*  @author   :	Alex
 		********************************************************/
 	static MyRender* getInstance();
+	void preUpdateGUI();
 	void updateGUI();
+	void lateUpdateGUI();
 	LRESULT HandleWindowsEvents(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	~MyRender();
 protected:

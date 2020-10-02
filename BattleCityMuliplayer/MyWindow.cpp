@@ -182,6 +182,7 @@ void MyWindow::Update(DWORD ElapsedTime)
 	GameManager::getInstance()->checkclick4();
 	MyRender::getInstance()->getDevice()->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_XRGB(255, 251, 240), 1.0f, 0);
 	MyRender::getInstance()->getDevice()->BeginScene();
+	MyRender::getInstance()->preUpdateGUI();
 	GameManager::getInstance()->getScene()->Update();
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();
@@ -189,6 +190,7 @@ void MyWindow::Update(DWORD ElapsedTime)
 	GameManager::getInstance()->getScene()->DrawAllStatic();
 	frame->GetFont()->DrawText(NULL, Text, -1, &rect, DT_TOP | DT_RIGHT, D3DXCOLOR(0.0f, 0.0f, 0.0f, 255.0f));
 	MyRender::getInstance()->updateGUI();
+	MyRender::getInstance()->lateUpdateGUI();
 	MyRender::getInstance()->getDevice()->EndScene();
 	MyRender::getInstance()->getDevice()->Present(NULL, NULL, NULL, NULL);
 	if (ElapsedTime < 1000 / FRAME)

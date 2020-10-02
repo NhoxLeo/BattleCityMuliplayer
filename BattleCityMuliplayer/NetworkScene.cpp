@@ -32,6 +32,31 @@ bool NetworkScene::init()
 
 void NetworkScene::Update()
 {
+
+	ImGui::Begin("Main Menu");
+	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+	ImGui::Spacing();
+	ImGui::Text("Server");
+	static int localServerPort = 8888;
+	ImGui::InputInt("Server port", &localServerPort);
+	if (ImGui::Button("Start server"))
+		int a = 1;
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+	ImGui::Text("Client");
+	static char serverAddressStr[64] = "127.0.0.1";
+	ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
+	static int remoteServerPort = 8888;
+	ImGui::InputInt("Server port", &remoteServerPort);
+	static char playerNameStr[64] = "Player";
+	ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
+	static bool showInvalidUserName = false;
+	if (ImGui::Button("Connect to server"));
+	ImGui::PopItemWidth();
+	ImGui::End();
+
+
 	Scene::Update();
 	MyTank1->Update();
 

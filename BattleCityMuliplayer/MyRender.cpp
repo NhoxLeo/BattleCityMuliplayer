@@ -34,37 +34,20 @@ MyRender* MyRender::getInstance()
 	return render;
 }
 
-void MyRender::updateGUI()
+void MyRender::preUpdateGUI()
 {
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+}
 
+void MyRender::updateGUI()
+{
 
+}
 
-	ImGui::Begin("Main Menu");
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
-	ImGui::Spacing();
-	ImGui::Text("Server");
-	static int localServerPort = 8888;
-	ImGui::InputInt("Server port", &localServerPort);
-	if (ImGui::Button("Start server"));
-	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
-	ImGui::Text("Client");
-	static char serverAddressStr[64] = "127.0.0.1";
-	ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
-	static int remoteServerPort = 8888;
-	ImGui::InputInt("Server port", &remoteServerPort);
-	static char playerNameStr[64] = "Player";
-	ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
-	static bool showInvalidUserName = false;
-	if (ImGui::Button("Connect to server"));
-	ImGui::PopItemWidth();
-	ImGui::End();
-	
-	
+void MyRender::lateUpdateGUI()
+{
 	ImGui::EndFrame();
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
