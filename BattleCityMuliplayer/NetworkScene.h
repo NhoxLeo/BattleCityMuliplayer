@@ -12,6 +12,7 @@ public:
 	void Update();
 	void clear();
 	void LoadMap();
+	const char* UINTtoChar(UINT uint);
 private:
 	ActiveSprite* background;
 	Tank* MyTank1;
