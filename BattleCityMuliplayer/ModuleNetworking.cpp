@@ -1,17 +1,84 @@
 #include "Networks.h"
 #include "ModuleNetworking.h"
-#include <list>
-
-static uint8 NumModulesUsingWinsock = 0;
 
 
 
+////////////////////////////////////////////////////////////////////////
+// ModuleNetworking public methods
+////////////////////////////////////////////////////////////////////////
+void ModuleNetworking::disconnect()
+{
+	//setEnabled(false);
+}
+
+////////////////////////////////////////////////////////////////////////
+// ModuleNetworking protected methods
+////////////////////////////////////////////////////////////////////////
+bool ModuleNetworking::createSocket()
+{
+	// Create
+	socket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (socket == INVALID_SOCKET)
+	{
+		reportError("ModuleNetworking::createSocket() - socket");
+		return false;
+	}
+
+	// Set non-blocking mode
+	bool enableBlockingMode = true;
+	u_long arg = enableBlockingMode ? 1 : 0;
+	int res = ioctlsocket(socket, FIONBIO, &arg);
+	if (res == SOCKET_ERROR) {
+		reportError("ModuleNetworking::createSocket() - ioctlsocket FIONBIO");
+		disconnect();
+		return false;
+	}
+
+	return true;
+}
+bool ModuleNetworking::bindSocketToPort(int port)
+{
+	sockaddr_in local_address;
+	local_address.sin_addr.S_un.S_addr = INADDR_ANY;
+	local_address.sin_family = AF_INET;
+	local_address.sin_port = htons(port);
+	int res = bind(socket, (sockaddr*)&local_address, sizeof(local_address));
+	if (res == SOCKET_ERROR) {
+		reportError("ModuleNetworkingServer::start() - bind");
+		disconnect();
+		return false;
+	}
+
+	return true;
+}
+void ModuleNetworking::sendPacket(const OutputMemoryStream& packet, const sockaddr_in& destAddress)
+{
+	sendPacket(packet.GetBufferPtr(), packet.GetSize(), destAddress);
+}
+void ModuleNetworking::sendPacket(const char* data, uint32 size, const sockaddr_in& destAddress)
+{
+	ASSERT(size <= PACKET_SIZE); // NOTE(jesus): Increase PACKET_SIZE if not enough
+
+	int byteSentCount = sendto(socket,
+		(const char*)data,
+		size,
+		0, (sockaddr*)&destAddress, sizeof(destAddress));
+
+	if (byteSentCount <= 0)
+	{
+		reportError("ModuleNetworking::sendPacket() - sendto");
+	}
+	else
+	{
+		sentPacketsCount++;
+	}
+}
 void ModuleNetworking::reportError(const char* inOperationDesc)
 {
-	LPVOID lpMsgBuf;
+	/*LPVOID lpMsgBuf;
 	DWORD errorNum = WSAGetLastError();
 
-	FormatMessage(
+	FormatMessageA(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -21,137 +88,310 @@ void ModuleNetworking::reportError(const char* inOperationDesc)
 		(LPTSTR)&lpMsgBuf,
 		0, NULL);
 
-	ELOG("Error %s: %d- %s", inOperationDesc, errorNum, lpMsgBuf);
+	ELOG("Error %s: %d- %s", inOperationDesc, errorNum, lpMsgBuf);*/
 }
-
-void ModuleNetworking::disconnect()
+float ModuleNetworking::GetSimulatedLatency()
 {
-	for (SOCKET socket : sockets)
-	{
-		shutdown(socket, 2);
-		closesocket(socket);
-	}
-
-	sockets.clear();
+	return simulatedLatency;
 }
 
+////////////////////////////////////////////////////////////////////////
+// Module virtual methods
+////////////////////////////////////////////////////////////////////////
 bool ModuleNetworking::init()
 {
-	if (NumModulesUsingWinsock == 0)
+	WORD version = MAKEWORD(2, 2);
+	WSADATA data;
+	if (WSAStartup(version, &data) == SOCKET_ERROR)
 	{
-		NumModulesUsingWinsock++;
-
-		WORD version = MAKEWORD(2, 2);
-		WSADATA data;
-		if (WSAStartup(version, &data) != 0)
-		{
-			reportError("ModuleNetworking::init() - WSAStartup");
-			return false;
-		}
+		reportError("ModuleNetworking::init() - WSAStartup");
+		return false;
 	}
 
 	return true;
 }
+bool ModuleNetworking::start()
+{
+	sentPacketsCount = 0;
+	receivedPacketsCount = 0;
 
+	onStart();
+
+	return true;
+}
 bool ModuleNetworking::preUpdate()
 {
-	if (sockets.empty()) return true;
+	if (socket == INVALID_SOCKET) return true;
 
-	// NOTE(jesus): You can use this temporary buffer to store data from recv()
-	const uint32 incomingDataBufferSize = Kilobytes(1);
-	byte incomingDataBuffer[incomingDataBufferSize];
-	
-	// New socket set
-	fd_set readfds;
-	FD_ZERO(&readfds);
-	// Fill the set
-	for (auto s : sockets) {
-		FD_SET(s, &readfds);
-	}
-	// Timeout (return immediately)
-	timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 0;
-
-	// TODO(jesus): select those sockets that have a read operation available
-	int error = select(0, &readfds, nullptr, nullptr, &timeout);
-	if (error == SOCKET_ERROR) 
-		reportError("Socket selection error");
-	std::vector<SOCKET> disconnected_sockets;
-
-
-	for (auto s : sockets)
-	{
-		if (FD_ISSET(s, &readfds)) {
-			if (isListenSocket(s)) { // Is the server socket
-
-				SOCKET Socket = INVALID_SOCKET;
-				sockaddr_in addr;
-				int len = sizeof(addr);
-				Socket = accept(s, (sockaddr*)&addr, &len);
-
-				if (Socket == INVALID_SOCKET)
-					reportError("Socket accept error");
-				else {
-					onSocketConnected(Socket, addr);
-					addSocket(Socket);
-				}
-
-			}
-			else { 
-					
-				error = recv(s, (char*)incomingDataBuffer, incomingDataBufferSize, 0);
-				if (error == SOCKET_ERROR) {
-					reportError("Socket receive info error");
-					disconnected_sockets.push_back(s);
-				}
-				else if(error == 0 || error == ECONNRESET){
-					
-						disconnected_sockets.push_back(s);
-					
-				}
-				else {
-					incomingDataBuffer[error] = '\0';
-					onSocketReceivedData(s, incomingDataBuffer);
-				}
-			}
-		}
-	}
-
-	for (std::vector<SOCKET>::iterator it = disconnected_sockets.begin();it!= disconnected_sockets.end();it++) {
-		for (int i = 0; i < sockets.size(); i++) {
-			if (*it == sockets[i]) {
-				onSocketDisconnected(sockets[i]);
-				sockets.erase(sockets.begin() + i);
-				
-			}
-		}
-		
-	
-	}
+	processIncomingPackets();
 
 	return true;
 }
+bool ModuleNetworking::update()
+{
+	if (socket == INVALID_SOCKET) return true;
 
+	onUpdate();
+
+	return true;
+}
+bool ModuleNetworking::gui()
+{
+	if (isConnected())
+	{
+		if (true)
+		{
+
+			ImGui::Begin("ModuleNetworking window");
+
+			ImGui::Text(" - Current time: %f", Time.time);
+			ImGui::Text(" - # Packet sent: %u", sentPacketsCount);
+			ImGui::Text(" - # Packet received: %u", receivedPacketsCount);
+
+			//ImGui::Text(" - # Networked objects: %u", App->modLinkingContext->getNetworkGameObjectsCount());
+
+			if (ImGui::Button("Disconnect")) {
+				disconnect();
+			}
+
+			ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+
+#if defined(SIMULATE_REAL_WORLD_CONDITIONS)
+
+			if (ImGui::CollapsingHeader("Simulate real world conditions", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Checkbox("Simulate latency / jitter", &simulateLatency);
+				if (simulateLatency)
+				{
+					ImGui::InputFloat("Max. latency (s)", &simulatedLatency, 0.001f, 0.01f, 4);
+					ImGui::InputFloat("Max. jitter (s)", &simulatedJitter, 0.001f, 0.01f, 4);
+					if (ImGui::Button("Reset##defaults_latency_jitter")) {
+						simulatedLatency = 0.07f;
+						simulatedJitter = 0.03f;
+					}
+				}
+				ImGui::Checkbox("Simulate packet drops", &simulateDrops);
+				if (simulateDrops)
+				{
+					ImGui::InputFloat("Drop ratio", &simulatedDropRatio, 0.01f, 0.1f, 4);
+					if (ImGui::Button("Reset##default_drop_ratio")) {
+						simulatedDropRatio = 0.01f;
+					}
+					ImGui::Text(" # Dropped packets: %d", simulatedPacketsDropped);
+					ImGui::Text(" #  - Replication Packets Dropped: %d", replicationPacketsDropped);
+					ImGui::Text(" #  - Ping Packets Dropped: %d", pingPacketsDropped);
+					ImGui::Text(" #  - Welcome Packets Dropped: %d", welcomePacketDropped);
+					ImGui::Text(" #  - Unwelcome Packets Dropped: %d", unwelcomePacketDropped);
+					ImGui::Text(" # Received packets: %d", simulatedPacketsReceived);
+				}
+			}
+#endif
+		}
+	}
+
+	onGui();
+
+	if (true)
+	{
+
+		ImGui::PopItemWidth();
+		ImGui::End();
+	}
+
+	floatingUI();
+
+	return true;
+}
+bool ModuleNetworking::stop()
+{
+	onDisconnect();
+
+	closesocket(socket);
+	socket = INVALID_SOCKET;
+
+	sentPacketsCount = 0;
+	receivedPacketsCount = 0;
+
+	simulatedPacketQueue.clear();
+	simulatedRandom = RandomNumberGenerator();
+
+	return true;
+}
 bool ModuleNetworking::cleanUp()
 {
-	disconnect();
-
-	NumModulesUsingWinsock--;
-	if (NumModulesUsingWinsock == 0)
+	if (WSACleanup() == SOCKET_ERROR)
 	{
-
-		if (WSACleanup() != 0)
-		{
-			reportError("ModuleNetworking::cleanUp() - WSACleanup");
-			return false;
-		}
+		reportError("ModuleNetworking::cleanUp() - WSACleanup");
+		return false;
 	}
 
 	return true;
 }
 
-void ModuleNetworking::addSocket(SOCKET socket)
+//////////////////////////////////////////////////////////////////////
+// Incoming / outgoing packet processing
+//////////////////////////////////////////////////////////////////////
+void ModuleNetworking::processIncomingPackets()
 {
-	sockets.push_back(socket);
+	// Handle incoming packets
+	while (true)
+	{
+		sockaddr_in fromAddress = {};
+		socklen_t fromLength = sizeof(fromAddress);
+
+		int readByteCount = recvfrom(socket,
+			inPacket.GetBufferPtr(),
+			inPacket.GetCapacity(),
+			0,
+			(sockaddr*)&fromAddress,
+			&fromLength);
+
+		inPacket.Clear();
+		inPacket.SetSize(readByteCount);
+
+		if (readByteCount > 0)
+		{
+#if defined(SIMULATE_REAL_WORLD_CONDITIONS)
+			if (simulateLatency || simulateDrops)
+			{
+				simulatedRealWorldConditions_EnqueuePacket(inPacket, fromAddress);
+			}
+			else
+			{
+				receivedPacketsCount++;
+				onPacketReceived(inPacket, fromAddress);
+			}
+#else
+			receivedPacketsCount++;
+			onPacketReceived(inPacket, fromAddress);
+#endif
+		}
+		else
+		{
+			int error = WSAGetLastError();
+
+			if (readByteCount == 0)
+			{
+				// Graceful disconnection from remote socket
+				onConnectionReset(fromAddress);
+			}
+			else if (error == WSAEWOULDBLOCK)
+			{
+				// NOTE(jesus): This is not an error for us, as the socket is configured in
+				// non-blocking mode. This means that there was no incoming data available
+				// when recvfrom was executed.
+			}
+			else if (error == WSAECONNRESET)
+			{
+				//this can happen if a remote socket closed and we haven't DC'd yet.
+				//this is the ICMP message being sent back saying the port on that computer is closed
+				char fromAddressStr[64];
+				inet_ntop(AF_INET, &fromAddress.sin_addr, fromAddressStr, sizeof(fromAddressStr));
+				WLOG("ModuleNetworking::processIncomingPackets() - Connection reset from %s:%d",
+					fromAddressStr,
+					ntohs(fromAddress.sin_port));
+
+				onConnectionReset(fromAddress);
+			}
+			else
+			{
+				reportError("ModuleNetworking::processIncomingPackets() - recvfrom");
+			}
+
+			break;
+		}
+	}
+
+#if defined(SIMULATE_REAL_WORLD_CONDITIONS)
+	if (simulateLatency || simulateDrops)
+	{
+		simulatedRealWorldConditions_ProcessQueuedPackets();
+	}
+#endif
 }
+
+//////////////////////////////////////////////////////////////////////
+// Real world conditions simulation
+//////////////////////////////////////////////////////////////////////
+#if defined(SIMULATE_REAL_WORLD_CONDITIONS)
+
+void ModuleNetworking::simulatedRealWorldConditions_EnqueuePacket(const InputMemoryStream& packet, const sockaddr_in& fromAddress)
+{
+	float packetChance = simulatedRandom.next();
+
+	if (simulateDrops == false)
+	{
+		packetChance = 1.0f;
+	}
+
+	if (packetChance > simulatedDropRatio)
+	{
+		float randomJitterFactor = 2.0f * simulatedRandom.next() - 1.0f; // from -1 to 1
+		double receptionTime = Time.time + simulatedLatency + simulatedJitter * randomJitterFactor;
+
+		if (simulateLatency == false)
+		{
+			receptionTime = Time.time;
+		}
+
+		auto it = simulatedPacketQueue.end();
+		while (it != simulatedPacketQueue.begin())
+		{
+			--it;
+			if (it->receptionTime < receptionTime)
+			{
+				++it;
+				break;
+			}
+		}
+
+		SimulatedPacket simulatedPacket{ packet, fromAddress, receptionTime };
+		simulatedPacketQueue.emplace(it, simulatedPacket);
+
+		simulatedPacketsReceived++;
+	}
+	else
+	{
+		ServerMessage msg;
+		packet >> msg;
+		if (msg == ServerMessage::Replication)
+		{
+			++replicationPacketsDropped;
+		}
+		else if (msg == ServerMessage::Ping)
+		{
+			++pingPacketsDropped;
+		}
+		else if (msg == ServerMessage::Welcome)
+		{
+			++welcomePacketDropped;
+
+		}
+		else if (msg == ServerMessage::Unwelcome)
+		{
+			++unwelcomePacketDropped;
+
+		}
+		simulatedPacketsDropped++;
+	}
+}
+
+void ModuleNetworking::simulatedRealWorldConditions_ProcessQueuedPackets()
+{
+	while (!simulatedPacketQueue.empty())
+	{
+		SimulatedPacket& simulatedPacket = simulatedPacketQueue.front();
+		if (simulatedPacket.receptionTime <= Time.time)
+		{
+			receivedPacketsCount++;
+			onPacketReceived(simulatedPacket.packet, simulatedPacket.fromAddress);
+			simulatedPacketQueue.pop_front();
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
+#endif

@@ -8,8 +8,8 @@
 bool OverScene::init()
 {
 	Scene::init();
-	oversound = Sound::create(_T("../sound/Lose.mp3"), false);
-	oversound->Play();
+	//oversound = Sound::create(_T("../sound/Lose.mp3"), false);
+	//oversound->Play();
 	counter = 0;
 	ActiveSprite* background = ActiveSprite::create();
 	background->LoadTexture(_T("../Sprite/background.jpg"), 640, 480, 1);

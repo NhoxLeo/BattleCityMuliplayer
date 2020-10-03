@@ -154,6 +154,7 @@
     <ClInclude Include="Award.h" />
     <ClInclude Include="bass.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="ByteSwap.h" />
     <ClInclude Include="CFont.h" />
     <ClInclude Include="ChoiceScene.h" />
     <ClInclude Include="common.h" />
@@ -170,7 +171,10 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapScene.h" />
+    <ClInclude Include="MemoryStream.h" />
+    <ClInclude Include="Messages.h" />
     <ClInclude Include="Module.h" />
+    <ClInclude Include="ModuleGameObject.h" />
     <ClInclude Include="ModuleNetworking.h" />
     <ClInclude Include="ModuleNetworkingClient.h" />
     <ClInclude Include="ModuleNetworkingServer.h" />
@@ -181,6 +185,8 @@
     <ClInclude Include="OverScene.h" />
     <ClInclude Include="Ref.h" />
     <ClInclude Include="ReleaseManager.h" />
+    <ClInclude Include="ReplicationManagerClient.h" />
+    <ClInclude Include="ReplicationManagerServer.h" />
     <ClInclude Include="Ret.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Sound.h" />
@@ -211,6 +217,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapScene.cpp" />
+    <ClCompile Include="MemoryStream.cpp" />
+    <ClCompile Include="ModuleGameObject.cpp" />
     <ClCompile Include="ModuleNetworking.cpp" />
     <ClCompile Include="ModuleNetworkingClient.cpp" />
     <ClCompile Include="ModuleNetworkingServer.cpp" />
@@ -221,6 +229,8 @@
     <ClCompile Include="OverScene.cpp" />
     <ClCompile Include="Ref.cpp" />
     <ClCompile Include="ReleaseManager.cpp" />
+    <ClCompile Include="ReplicationManagerClient.cpp" />
+    <ClCompile Include="ReplicationManagerServer.cpp" />
     <ClCompile Include="Ret.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Sound.cpp" />

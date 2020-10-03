@@ -138,14 +138,32 @@
     <ClInclude Include="Module.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="ModuleNetworkingServer.h">
+    <ClInclude Include="NetworkScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryStream.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Messages.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteSwap.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerClient.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerServer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleGameObject.h">
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="ModuleNetworkingClient.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkScene.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ModuleNetworkingServer.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,14 +272,26 @@
     <ClCompile Include="ModuleNetworking.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="NetworkScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryStream.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerServer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerClient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleGameObject.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
     <ClCompile Include="ModuleNetworkingServer.cpp">
       <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="ModuleNetworkingClient.cpp">
       <Filter>Network</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkScene.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

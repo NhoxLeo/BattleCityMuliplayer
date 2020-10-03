@@ -1,141 +1,693 @@
 #include "Networks.h"
 #include "ModuleNetworkingServer.h"
 
+
+
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingServer public methods
 //////////////////////////////////////////////////////////////////////
-
-bool ModuleNetworkingServer::start(int port)
+void ModuleNetworkingServer::setListenPort(int port)
 {
-	int error;
-	// TODO(jesus): TCP listen socket stuff
-	// - Create the listenSocket
-	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (listenSocket == INVALID_SOCKET)
-		reportError("Error creating listensocket");
-
-	// - Set address reuse
-	int enable = 1;
-	error = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&enable, sizeof(int));
-	if (error == SOCKET_ERROR)
-		reportError("Setting address error (server)");
-
-	// - Bind the socket to a local interface
-	sockaddr_in BindAddress;
-	BindAddress.sin_family = AF_INET;
-	BindAddress.sin_port = htons(port);
-	BindAddress.sin_addr.S_un.S_addr = INADDR_ANY;
-	error = bind(listenSocket, (const sockaddr*)&BindAddress, sizeof(BindAddress));
-	if (error == SOCKET_ERROR)
-		reportError("Bind socket error (server)");
-
-	// - Enter in listen mode
-	error = listen(listenSocket, 6);
-	if (error == SOCKET_ERROR)
-		reportError("Server listen error");
-
-	else {
-		
-		addSocket(listenSocket);
-		state = ServerState::Listening;
-
-	}
-	
-
-	return true;
+	listenPort = port;
 }
-
-bool ModuleNetworkingServer::isRunning() const
-{
-	return state != ServerState::Stopped;
-}
-
-
-
-//////////////////////////////////////////////////////////////////////
-// Module virtual methods
-//////////////////////////////////////////////////////////////////////
-
-bool ModuleNetworkingServer::update()
-{
-	return true;
-}
-
-bool ModuleNetworkingServer::gui()
-{
-	//if (state != ServerState::Stopped)
-	//{
-	//	// NOTE(jesus): You can put ImGui code here for debugging purposes
-	//	ImGui::Begin("Server Window");
-
-	//	Texture *tex = App->modResources->server;
-	//	ImVec2 texSize(400.0f, 400.0f * tex->height / tex->width);
-	//	ImGui::Image(tex->shaderResource, texSize);
-
-	//	ImGui::Text("List of connected sockets:");
-
-	//	for (auto &connectedSocket : connectedSockets)
-	//	{
-	//		ImGui::Separator();
-	//		ImGui::Text("Socket ID: %d", connectedSocket.socket);
-	//		ImGui::Text("Address: %d.%d.%d.%d:%d",
-	//			connectedSocket.address.sin_addr.S_un.S_un_b.s_b1,
-	//			connectedSocket.address.sin_addr.S_un.S_un_b.s_b2,
-	//			connectedSocket.address.sin_addr.S_un.S_un_b.s_b3,
-	//			connectedSocket.address.sin_addr.S_un.S_un_b.s_b4,
-	//			ntohs(connectedSocket.address.sin_port));
-	//		ImGui::Text("Player name: %s", connectedSocket.playerName.c_str());
-	//	}
-
-	//	ImGui::End();
-	//}
-
-	return true;
-}
-
 
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
 //////////////////////////////////////////////////////////////////////
-
-bool ModuleNetworkingServer::isListenSocket(SOCKET socket) const
+void ModuleNetworkingServer::onStart()
 {
-	return socket == listenSocket;
+	if (!createSocket()) return;
+
+	// Reuse address
+	int enable = 1;
+	int res = setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&enable, sizeof(int));
+	if (res == SOCKET_ERROR) {
+		reportError("ModuleNetworkingServer::start() - setsockopt");
+		disconnect();
+		return;
+	}
+
+	// Create and bind to local address
+	if (!bindSocketToPort(listenPort)) {
+		return;
+	}
+
+	state = ServerState::Listening;
+
+
+	//App->modGameObject->interpolateEntities = false;
+
+	secondsSinceLastPing = 0.0f;
 }
-
-void ModuleNetworkingServer::onSocketConnected(SOCKET socket, const sockaddr_in &socketAddress)
+void ModuleNetworkingServer::onGui()
 {
-	// Add a new connected socket to the list
-	ConnectedSocket connectedSocket;
-	connectedSocket.socket = socket;
-	connectedSocket.address = socketAddress;
-	connectedSockets.push_back(connectedSocket);
-}
-
-void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, byte * data)
-{
-	// Set the player name of the corresponding connected socket proxy
-	for (auto &connectedSocket : connectedSockets)
+	if (true)
 	{
-		if (connectedSocket.socket == socket)
+		if (ImGui::CollapsingHeader("ModuleNetworkingServer", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			//connectedSocket.playerName = (const char *)data;
+			ImGui::Text("Connection checking info:");
+			ImGui::Text(" - Ping interval (s): %f", PING_INTERVAL_SECONDS);
+			ImGui::Text(" - Disconnection timeout (s): %f", DISCONNECT_TIMEOUT_SECONDS);
+
+			ImGui::Separator();
+
+			ImGui::Text("Replication");
+			ImGui::InputFloat("Delivery interval (s)", &replicationDeliveryIntervalSeconds, 0.01f, 0.1f);
+
+			ImGui::Separator();
+
+			ImGui::Text("ZombieSpawnRatio");
+			ImGui::InputFloat("Initial Spawning Interval (s)", &initialZombieSpawnRatio, 0.1f, 10.0f);
+			ImGui::Text("Final Spawning Interval (s): %f", guiFinalZombieSpawnRatio);
+			ImGui::Checkbox("Enable Zombie Spawner", &isSpawnerEnabled);
+
+			ImGui::Separator();
+
+			if (state == ServerState::Listening)
+			{
+				int count = 0;
+
+				for (int i = 0; i < MAX_CLIENTS; ++i)
+				{
+					if (clientProxies[i].name != "")
+					{
+						ImGui::Text("CLIENT %d", count++);
+						ImGui::Text(" - address: %d.%d.%d.%d",
+							clientProxies[i].address.sin_addr.S_un.S_un_b.s_b1,
+							clientProxies[i].address.sin_addr.S_un.S_un_b.s_b2,
+							clientProxies[i].address.sin_addr.S_un.S_un_b.s_b3,
+							clientProxies[i].address.sin_addr.S_un.S_un_b.s_b4);
+						ImGui::Text(" - port: %d", ntohs(clientProxies[i].address.sin_port));
+						ImGui::Text(" - name: %s", clientProxies[i].name.c_str());
+						ImGui::Text(" - id: %d", clientProxies[i].clientId);
+						ImGui::Text(" - Last packet time: %.04f", clientProxies[i].lastPacketReceivedTime);
+						ImGui::Text(" - Seconds since repl.: %.04f", clientProxies[i].secondsSinceLastReplication);
+
+						ImGui::Separator();
+					}
+				}
+
+				//ImGui::Checkbox("Render colliders", &App->modRender->mustRenderColliders);
+			}
 		}
 	}
 }
-
-void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
+void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, const sockaddr_in& fromAddress)
 {
-	// Remove the connected socket from the list
-	for (auto it = connectedSockets.begin(); it != connectedSockets.end(); ++it)
+	if (state == ServerState::Listening)
 	{
-		auto &connectedSocket = *it;
-		if (connectedSocket.socket == socket)
+		// Register player
+		ClientProxy* proxy = getClientProxy(fromAddress);
+
+		// Read the packet type
+		ClientMessage message;
+		packet >> message;
+
+		// Process the packet depending on its type
+		if (message == ClientMessage::Hello)
 		{
-			connectedSockets.erase(it);
-			break;
+			bool newClient = false;
+
+			if (proxy == nullptr)
+			{
+				newClient = true;
+
+				std::string playerName;
+				packet >> playerName;
+
+				bool usedName = false;
+				for (int i = 0; i < MAX_CLIENTS; ++i)
+				{
+					if (clientProxies[i].name == playerName)
+					{
+						usedName = true;
+						break;
+					}
+				}
+
+				if (usedName)
+				{
+					OutputMemoryStream unwelcomePacket;
+					unwelcomePacket << ServerMessage::Unwelcome;
+					std::string errorMsg = "Player Name already in use";
+					unwelcomePacket << errorMsg;
+					sendPacket(unwelcomePacket, fromAddress);
+
+					WLOG("Message received: UNWELCOMED hello - from player %s", playerName.c_str());
+				}
+				else
+				{
+					proxy = createClientProxy();
+
+					connectedProxies++;
+
+					proxy->address.sin_family = fromAddress.sin_family;
+					proxy->address.sin_addr.S_un.S_addr = fromAddress.sin_addr.S_un.S_addr;
+					proxy->address.sin_port = fromAddress.sin_port;
+					proxy->connected = true;
+					proxy->name = playerName;
+					proxy->clientId = nextClientId++;
+
+					// Create new network object
+					spawnPlayer(*proxy);
+
+					// Send welcome to the new player
+					OutputMemoryStream welcomePacket;
+					welcomePacket << ServerMessage::Welcome;
+					welcomePacket << proxy->clientId;
+					welcomePacket << proxy->gameObject->networkId;
+					sendPacket(welcomePacket, fromAddress);
+
+					// Send all network objects to the new player
+					uint16 networkGameObjectsCount;
+					GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+					//App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					//for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+					//{
+					//	GameObject* gameObject = networkGameObjects[i];
+
+					//	// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
+					//	proxy->replicationManager.create(gameObject->networkId);
+					//}
+
+					LOG("Message received: hello - from player %s", playerName.c_str());
+				}
+			}
+
+			if (!newClient)
+			{
+				// Send welcome to the new player
+				OutputMemoryStream unwelcomePacket;
+				unwelcomePacket << ServerMessage::Unwelcome;
+				std::string errorMsg = "Client address already connected";
+				unwelcomePacket << errorMsg;
+				sendPacket(unwelcomePacket, fromAddress);
+
+				WLOG("Message received: UNWELCOMED hello - from player %s", proxy->name.c_str());
+			}
+		}
+		else if (message == ClientMessage::Input)
+		{
+			// Process the input packet and update the corresponding game object
+			if (proxy != nullptr)
+			{
+				//InputPacketData inputData;
+				//// Read input data
+				//while (packet.RemainingByteCount() > 0)
+				//{
+				//	packet >> inputData.sequenceNumber;
+				//	packet >> inputData.horizontalAxis;
+				//	packet >> inputData.verticalAxis;
+				//	packet >> inputData.buttonBits;
+				//	packet >> inputData.mouseX;
+				//	packet >> inputData.mouseY;
+				//	packet >> inputData.leftButton;
+				//	if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
+				//	{
+				//		//Process Keyboard
+				//		proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
+				//		proxy->gamepad.verticalAxis = inputData.verticalAxis;
+				//		//unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
+				//		//proxy->gameObject->behaviour->onInput(proxy->gamepad);
+				//		//Process Mouse
+				//		proxy->mouse.x = inputData.mouseX;
+				//		proxy->mouse.y = inputData.mouseY;
+				//		proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
+				//		proxy->gameObject->behaviour->onMouse(proxy->mouse);
+				//		proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
+				//	}
+				//}
+			}
+		}
+		else if (message == ClientMessage::Ping)
+		{
+			//App->delManager->processAckdSequenceNumbers(packet);
+		}
+
+		if (proxy != nullptr)
+		{
+			proxy->lastPacketReceivedTime = Time.time;
 		}
 	}
 }
+void ModuleNetworkingServer::onUpdate()
+{
+	if (state == ServerState::Listening)
+	{
+		secondsSinceLastPing += Time.deltaTime;
 
+		// Replication
+		for (ClientProxy& clientProxy : clientProxies)
+		{
+			if (clientProxy.connected)
+			{
+				clientProxy.secondsSinceLastReplication += Time.deltaTime;
+
+				// TODO(jesus): If the replication interval passed and the replication manager of this proxy
+				//              has pending data, write and send a replication packet to this client.
+				if (clientProxy.secondsSinceLastReplication > replicationDeliveryIntervalSeconds && clientProxy.replicationManager.commands.size() > 0)
+				{
+					OutputMemoryStream packet;
+					packet << ServerMessage::Replication;
+					packet << clientProxy.nextExpectedInputSequenceNumber; //ACK of last received input
+
+					//Delivery* delivery = App->delManager->writeSequenceNumber(packet);
+					//delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
+					//((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
+					//((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
+
+					clientProxy.secondsSinceLastReplication = 0.0f;
+					if (clientProxy.replicationManager.write(packet))
+					{
+						sendPacket(packet, clientProxy.address);
+					}
+				}
+
+				//Send ping to clients
+				if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+				{
+					OutputMemoryStream ping;
+					ping << ServerMessage::Ping;
+
+					sendPacket(ping, clientProxy.address);
+				}
+
+				//Disconnect client if waited too long
+				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
+				{
+					onConnectionReset(clientProxy.address);
+				}
+			}
+		}
+
+		//Reset ping timer
+		if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+		{
+			secondsSinceLastPing = 0.0f;
+		}
+
+		//Check for TimeOutPackets DeliveryManager
+
+		//App->delManager->processTimedOutPackets();
+
+		//Zombie Spawner WiP
+		ZombieSpawner();
+
+		//Server Reset Game Objects when there are no proxies connected
+		uint16 networkGameObjectsCount;
+		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+		//App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+		//if (connectedProxies == 0 && networkGameObjectsCount > 0)
+		//{
+		//	for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+		//	{
+		//		GameObject* gameObject = networkGameObjects[i];
+
+		//		// Unregister the network identity
+		//		//App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+
+		//		// Remove its associated game object
+		//		Destroy(gameObject);
+
+		//	}
+		//}
+	}
+}
+void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)
+{
+	// Find the client proxy
+	ClientProxy* proxy = getClientProxy(fromAddress);
+
+	if (proxy)
+	{
+		// Notify game object deletion to replication managers
+		for (int i = 0; i < MAX_CLIENTS; ++i)
+		{
+			if (clientProxies[i].connected && proxy->clientId != clientProxies[i].clientId)
+			{
+				// TODO(jesus): Notify this proxy's replication manager about the destruction of this player's game object
+				clientProxies[i].replicationManager.destroy(proxy->gameObject->networkId);
+			}
+		}
+
+		// Unregister the network identity
+		//App->modLinkingContext->unregisterNetworkGameObject(proxy->gameObject);
+
+		// Remove its associated game object
+		Destroy(proxy->gameObject);
+
+		// Clear the client proxy
+		destroyClientProxy(proxy);
+
+		connectedProxies--;
+	}
+}
+void ModuleNetworkingServer::onDisconnect()
+{
+	// Destroy network game objects
+	uint16 netGameObjectsCount;
+	GameObject* netGameObjects[MAX_NETWORK_OBJECTS];
+	//App->modLinkingContext->getNetworkGameObjects(netGameObjects, &netGameObjectsCount);
+	//for (uint32 i = 0; i < netGameObjectsCount; ++i)
+	//{
+	//	NetworkDestroy(netGameObjects[i]);
+	//}
+
+	// Clear all client proxies
+	for (ClientProxy& clientProxy : clientProxies)
+	{
+		destroyClientProxy(&clientProxy);
+	}
+
+	nextClientId = 0;
+
+	state = ServerState::Stopped;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// Client proxies
+//////////////////////////////////////////////////////////////////////
+ModuleNetworkingServer::ClientProxy* ModuleNetworkingServer::getClientProxy(const sockaddr_in& clientAddress)
+{
+	// Try to find the client
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].address.sin_addr.S_un.S_addr == clientAddress.sin_addr.S_un.S_addr &&
+			clientProxies[i].address.sin_port == clientAddress.sin_port)
+		{
+			return &clientProxies[i];
+		}
+	}
+
+	return nullptr;
+}
+ModuleNetworkingServer::ClientProxy* ModuleNetworkingServer::createClientProxy()
+{
+	// If it does not exist, pick an empty entry
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (!clientProxies[i].connected)
+		{
+			return &clientProxies[i];
+		}
+	}
+
+	return nullptr;
+}
+void ModuleNetworkingServer::destroyClientProxy(ClientProxy* proxy)
+{
+	*proxy = {};
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// Spawning
+//////////////////////////////////////////////////////////////////////
+GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
+{
+	// Create a new game object with the player properties
+	clientProxy.gameObject = Instantiate();
+	clientProxy.gameObject->size = D3DXVECTOR3(43, 49, 0);
+	clientProxy.gameObject->angle = 45.0f;
+	clientProxy.gameObject->order = 3;
+
+	//clientProxy.gameObject->texture = App->modResources->robot;
+	//clientProxy.gameObject->color.a = 0.75f;
+	//clientProxy.gameObject->name = clientProxy.name;
+
+	//// Create collider
+	//clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
+	//clientProxy.gameObject->collider->isTrigger = true;
+
+	//// Create behaviour
+	//clientProxy.gameObject->behaviour = new Player;
+	//clientProxy.gameObject->behaviour->gameObject = clientProxy.gameObject;
+
+	// Assign a new network identity to the object
+
+	//App->modLinkingContext->registerNetworkGameObject(clientProxy.gameObject);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
+		}
+	}
+
+	return clientProxy.gameObject;
+}
+GameObject* ModuleNetworkingServer::spawnBullet(GameObject* parent, D3DXVECTOR3 offset)
+{
+	//// Create a new game object with the player properties
+	//GameObject* gameObject = Instantiate();
+	//gameObject->size = { 8, 14 };
+	//gameObject->angle = parent->angle;
+	//gameObject->order = 4;
+	//D3DXVECTOR3 forward = vec2FromDegrees(parent->angle);
+	//D3DXVECTOR3 right = { -forward.y, forward.x };
+	//gameObject->position = parent->position + offset.x * right + offset.y * forward;
+	//gameObject->texture = App->modResources->bullet;
+	//gameObject->collider = App->modCollision->addCollider(ColliderType::Bullet, gameObject);
+
+	//// Create behaviour
+	//gameObject->behaviour = new Bullet;
+	//gameObject->behaviour->gameObject = gameObject;
+
+	//// Assign a new network identity to the object
+	//App->modLinkingContext->registerNetworkGameObject(gameObject);
+
+	//// Notify all client proxies' replication manager to create the object remotely
+	//for (int i = 0; i < MAX_CLIENTS; ++i)
+	//{
+	//	if (clientProxies[i].connected)
+	//	{
+	//		// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+	//		clientProxies[i].replicationManager.create(gameObject->networkId);
+	//	}
+	//}
+
+	//return gameObject;
+	return NULL;
+}
+void ModuleNetworkingServer::ZombieSpawner()
+{
+	static float finalSpawnRatio = initialZombieSpawnRatio;
+	if (connectedProxies > 0 && isSpawnerEnabled)
+	{
+		float safetyRadius = 175.0f; //Area from the center where zombies cannot spawn
+		float maxDistance = 850.0f; //Max distance where the zombies can spawn
+		float increasingSpawnRatio = 0.01f;
+		float fixedTimeincreaseSpawnRatio = 0.1f; //Time to increasing spawn ratio
+		float maxFinalSpawnRatio = 1.0 / (connectedProxies / 1.5f);
+
+		timeSinceLastZombieSpawned += Time.deltaTime;
+		timeSinceLastIncreaseSpawnRatio += Time.deltaTime;
+
+		//Increase spawn rate each...
+		if (timeSinceLastIncreaseSpawnRatio > fixedTimeincreaseSpawnRatio && finalSpawnRatio >= maxFinalSpawnRatio)
+		{
+			finalSpawnRatio = finalSpawnRatio - increasingSpawnRatio;
+			timeSinceLastIncreaseSpawnRatio = 0;
+		}
+
+
+
+		if (timeSinceLastZombieSpawned > finalSpawnRatio)
+		{
+
+			D3DXVECTOR3 randomDirection = D3DXVECTOR3(RandomFloat(-1.0f, 1.0f), RandomFloat(-1.0f, 1.0f), 0);
+			float distance = 1800.0f;
+
+			//spawnZombie(normalize(randomDirection) * distance);
+			timeSinceLastZombieSpawned = 0.0f;
+		}
+		guiFinalZombieSpawnRatio = finalSpawnRatio;
+	}
+	else
+	{
+		guiFinalZombieSpawnRatio = initialZombieSpawnRatio;
+		finalSpawnRatio = initialZombieSpawnRatio;
+	}
+
+
+
+}
+float ModuleNetworkingServer::RandomFloat(float min, float max)
+{
+	return ((float)rand() / RAND_MAX) * (max - min) + min;
+}
+GameObject* ModuleNetworkingServer::spawnZombie(D3DXVECTOR3 position)
+{
+	GameObject* zombie = Instantiate();
+	zombie->size = D3DXVECTOR3(43, 35, 0);
+	zombie->position = position;
+	zombie->order = 2;
+	//zombie->texture = App->modResources->zombie;
+	//zombie->collider = App->modCollision->addCollider(ColliderType::Zombie, zombie);
+	//zombie->collider->isTrigger = true;
+
+	//zombie->behaviour = new Zombie();
+	//zombie->behaviour->gameObject = zombie;
+
+	//App->modLinkingContext->registerNetworkGameObject(zombie);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(zombie->networkId);
+		}
+	}
+
+	return zombie;
+}
+GameObject* ModuleNetworkingServer::spawnExplosion(GameObject* zombie)
+{
+	GameObject* object = Instantiate();
+	object->size = D3DXVECTOR3(60, 60, 0);
+	object->position = zombie->position;
+	object->order = 6;
+	//object->animation = App->modAnimations->useAnimation("explosion");
+
+	/*Explosion* script = new Explosion();
+	script->gameObject = object;
+	script->zombie = zombie;
+	object->behaviour = script;*/
+
+
+	//App->modLinkingContext->registerNetworkGameObject(object);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(object->networkId);
+		}
+	}
+
+	return object;
+}
+GameObject* ModuleNetworkingServer::spawnBlood(D3DXVECTOR3 position, float angle)
+{
+	GameObject* object = Instantiate();
+	object->size = D3DXVECTOR3(50, 50, 0);
+	object->position = position;
+	object->angle = angle;
+	/*object->texture = App->modResources->blood;
+	object->order = 0;
+
+	object->behaviour = new Blood();
+	object->behaviour->gameObject = object;*/
+
+	//App->modLinkingContext->registerNetworkGameObject(object);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(object->networkId);
+		}
+	}
+
+	return object;
+}
+GameObject* ModuleNetworkingServer::spawnRezUI(D3DXVECTOR3 position)
+{
+	GameObject* object = Instantiate();
+	object->size = D3DXVECTOR3(66, 85, 0);
+	object->position = position;
+	//object->animation = App->modAnimations->useAnimation("rez");
+	object->order = 5;
+
+	//App->modLinkingContext->registerNetworkGameObject(object);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(object->networkId);
+		}
+	}
+
+	return object;
+}
+std::vector<GameObject*> ModuleNetworkingServer::getAllClientPlayers()
+{
+	std::vector<GameObject*> players;
+
+	for (auto& client : clientProxies)
+	{
+		if (client.connected)
+			players.push_back(client.gameObject);
+	}
+
+	return players;
+}
+
+
+//////////////////////////////////////////////////////////////////////
+// Update / destruction
+//////////////////////////////////////////////////////////////////////
+void ModuleNetworkingServer::destroyNetworkObject(GameObject* gameObject)
+{
+	// Notify all client proxies' replication manager to destroy the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the destruction of this game object
+			clientProxies[i].replicationManager.destroy(gameObject->networkId);
+		}
+	}
+
+	// Assuming the message was received, unregister the network identity
+
+	//App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+
+	// Finally, destroy the object from the server
+	Destroy(gameObject);
+}
+void ModuleNetworkingServer::updateNetworkObject(GameObject* gameObject, ReplicationAction updateType)
+{
+	// Notify all client proxies' replication manager to destroy the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the update of this game object
+			clientProxies[i].replicationManager.update(gameObject->networkId, updateType);
+		}
+	}
+}
+//////////////////////////////////////////////////////////////////////
+// Global update / destruction of game objects
+//////////////////////////////////////////////////////////////////////
+void NetworkUpdate(GameObject* gameObject, ReplicationAction updateType)
+{
+	/*ASSERT(App->modNetServer->isConnected());
+
+	App->modNetServer->updateNetworkObject(gameObject, updateType);*/
+}
+void NetworkDestroy(GameObject* gameObject)
+{
+	/*ASSERT(App->modNetServer->isConnected());
+
+	App->modNetServer->destroyNetworkObject(gameObject);*/
+}
+//std::vector<GameObject*> getPlayers()
+//{
+//	//return App->modNetServer->getAllClientPlayers();
+//}

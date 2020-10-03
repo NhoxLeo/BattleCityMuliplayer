@@ -11,9 +11,10 @@
 #include <vector>
 #include <math.h>
 #include <cassert>
-
+#include <deque>
 #include <windowsx.h>
 #include <tchar.h>
+#include <list>
 //#include <Mmreg.h>
 
 #include <d3d9.h>

@@ -38,10 +38,10 @@ void log(const char file[], int line, int type, const char* format, ...)
 	char *message = new char[strlen(tmp_string2)+1];
 	lstrcpyA(message, tmp_string2);
 
-	LogEntry entry;
+	/*LogEntry entry;
 	entry.type = type;
 	entry.message = message;
-	logLines.push_back(entry);
+	logLines.push_back(entry);*/
 }
 
 uint32 getLogEntryCount()
