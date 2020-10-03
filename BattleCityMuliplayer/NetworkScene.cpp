@@ -30,13 +30,19 @@ bool NetworkScene::init()
 	return true;
 }
 
+
+
 void NetworkScene::Update()
 {
 
 	ImGui::Begin("Main Menu");
+	
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
 	ImGui::Spacing();
 	ImGui::Text("Server");
+	
+
+	
 	static int localServerPort = 8888;
 	ImGui::InputInt("Server port", &localServerPort);
 	if (ImGui::Button("Start server"))
@@ -54,6 +60,14 @@ void NetworkScene::Update()
 	static bool showInvalidUserName = false;
 	if (ImGui::Button("Connect to server"));
 	ImGui::PopItemWidth();
+
+	//Debug
+	UINT newint = MyTank1->getSpeed().x;
+	char newchar[10] = "";
+	sprintf(newchar, "%d", newint);
+	ImGui::Text("Debug: ");
+	ImGui::Text((const char*)newchar);
+
 	ImGui::End();
 
 
