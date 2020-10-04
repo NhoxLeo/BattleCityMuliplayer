@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "StaticSprite.h"
 #include "ActiveSprite.h"
+#include "Networks.h"
 
 bool NetworkScene::init()
 {
@@ -29,6 +30,7 @@ bool NetworkScene::init()
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
+
 	return true;
 }
 
@@ -56,32 +58,42 @@ void NetworkScene::DebugBool(bool b)
 
 void NetworkScene::Update()
 {
-	
-	ImGui::Begin("Main Menu");
-	
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
-	ImGui::Spacing();
-	ImGui::Text("Server");
-	
-
-	
 	static int localServerPort = 8888;
-	ImGui::InputInt("Server port", &localServerPort);
-	if (ImGui::Button("Start server"))
-		int a = 1;
-	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
-	ImGui::Text("Client");
-	static char serverAddressStr[64] = "127.0.0.1";
-	ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
-	static int remoteServerPort = 8888;
-	ImGui::InputInt("Server port", &remoteServerPort);
-	static char playerNameStr[64] = "Player";
-	ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
-	static bool showInvalidUserName = false;
-	if (ImGui::Button("Connect to server"));
-	ImGui::PopItemWidth();
+	if (!isServer && !isClient)
+	{
+		ImGui::Begin("Main Menu");
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+		ImGui::Spacing();
+		ImGui::Text("Server");
+		ImGui::InputInt("Server port", &localServerPort);
+		if (ImGui::Button("Start server"))
+		{
+			isServer = true;
+			GameManager::getInstance()->CreateServer();
+			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
+			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+			modNetServerptr->start();
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::Text("Client");
+		static char serverAddressStr[64] = "127.0.0.1";
+		ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
+		static int remoteServerPort = 8888;
+		ImGui::InputInt("Server port", &remoteServerPort);
+		static char playerNameStr[64] = "Player";
+		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
+		static bool showInvalidUserName = false;
+		if (ImGui::Button("Connect to server"));
+		ImGui::PopItemWidth();
+		ImGui::End();
+	}
+	if (isServer)
+	{
+		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+		modNetServerptr->gui();
+	}
 
 	//Debug
 	/*UINT newint = MyTank1->getPosition().y;
@@ -90,14 +102,11 @@ void NetworkScene::Update()
 	ImGui::Text("Debug: ");
 	ImGui::Text((const char*)newchar);*/
 
-	NetworkScene::DebugBool(MyTank1->getAwardAble());
-
-	ImGui::End();
+	//NetworkScene::DebugBool(MyTank1->getAwardAble());
 
 
 	Scene::Update();
 	MyTank1->Update();
-
 	MyTank1->setSpeed(Speed(0, 0));
 	if (GameManager::getInstance()->getClick1() == ABUTTON_ON)
 	{

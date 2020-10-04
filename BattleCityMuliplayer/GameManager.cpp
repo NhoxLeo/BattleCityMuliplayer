@@ -11,6 +11,7 @@
 #include "Map.h"
 //#include "Sound.h"
 #include "Texture.h"
+#include "Networks.h"
 
 UINT GameManager::nowclick1 = 0;
 UINT GameManager::nowclick2 = 0;
@@ -1414,4 +1415,24 @@ void GameManager::setMap()
 	};
 	map34->setMap(mapArray34);
 	MapManager::getInstance()->addMap(map34);
+}
+
+void GameManager::CreateServer()
+{
+	if (modNetServer == nullptr)
+	{
+		modNetServer = new ModuleNetworkingServer();
+		Module* a = modNetServer;
+		a->init();
+	}
+}
+
+void GameManager::CreateClient()
+{
+	if (modNetClient == nullptr)
+	{
+		modNetClient = new ModuleNetworkingClient();
+		Module* a = modNetClient;
+		a->init();
+	}
 }

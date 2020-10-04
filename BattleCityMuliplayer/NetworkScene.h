@@ -18,5 +18,7 @@ private:
 	ActiveSprite* background;
 	Tank* MyTank1;
 	Map* nowmap;
+	bool isServer = false;
+	bool isClient = false;
 };
 

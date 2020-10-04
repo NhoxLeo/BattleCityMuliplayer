@@ -13,14 +13,16 @@ class Sprite;
 class Award;
 class Map;
 class Sound;
+class ModuleNetworkingServer;
+class ModuleNetworkingClient;
 
 class GameManager
 {
 public:
 
-	void setLevel(int m_Level){ Level = m_Level; }
+	void setLevel(int m_Level) { Level = m_Level; }
 
-	int getLevel(){ return Level; }
+	int getLevel() { return Level; }
 	static GameManager* getInstance();
 	~GameManager();
 
@@ -49,39 +51,35 @@ public:
 	void setClick3();
 	void setClick4();
 
-	void UpdateColl(Tank* tank,Bullet* bullet);
+	void UpdateColl(Tank* tank, Bullet* bullet);
 	void UpdateColl(Bullet* bullet1, Bullet* bullet2);
 	void UpdateColl(StaticSprite* sp1, Bullet* bullet);
 	void UpdateColl(Award* aw, Tank* tank);
 
-	void setPlayer(int p){ Player = p; }
-
-	int getPlayer(){ return Player; }
-
+	void setPlayer(int p) { Player = p; }
+	int getPlayer() { return Player; }
 	int getGrade(int Player)
 	{
 		if (Player == 1)
 		{
 			return Grade1;
 		}
-		if (Player==2)
+		if (Player == 2)
 		{
 			return Grade2;
 		}
 	}
-
 	void addGrade(int Player)
-	{ 
+	{
 		if (Player == 1)
 		{
-			Grade1+=GradeAdd;
+			Grade1 += GradeAdd;
 		}
 		if (Player == 2)
 		{
-			Grade2+=GradeAdd;
+			Grade2 += GradeAdd;
 		}
 	}
-
 	void setGrade(int player, int grade)
 	{
 		if (player == 1)
@@ -93,7 +91,6 @@ public:
 			Grade2 = grade;
 		}
 	}
-
 	int getMyLife(int Player)
 	{
 		if (Player == 1)
@@ -105,7 +102,6 @@ public:
 			return MyLife2;
 		}
 	}
-
 	void setMyLife(int Life, int Player)
 	{
 		if (Player == 1)
@@ -117,7 +113,6 @@ public:
 			MyLife2 = Life;
 		}
 	}
-
 	void LostLife(int Player)
 	{
 		if (Player == 1)
@@ -129,16 +124,19 @@ public:
 			MyLife2--;
 		}
 	}
-
 	void setMap();
+	void changeMapMake() { MapMake = !MapMake; }
+	bool getMapMake() { return MapMake; }
 
-	void changeMapMake(){ MapMake = !MapMake; }
+	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
+	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }
+	void CreateServer();
+	void CreateClient();
 
-	bool getMapMake(){ return MapMake; }
 private:
 	bool MapMake;
 	int Player;
-	GameManager(){};
+	GameManager() {};
 	Scene* nowScene;
 	static UINT nowclick1;
 	static UINT nowclick2;
@@ -149,9 +147,12 @@ private:
 	int Level;
 	int Grade1;
 	int Grade2;
-	Sound* award;
+	/*Sound* award;
 	Sound* LifeAdd;
-	Sound* boom;
+	Sound* boom;*/
+
+	ModuleNetworkingServer* modNetServer = nullptr;
+	ModuleNetworkingClient* modNetClient = nullptr;
 };
 
 #endif // !GAMEMANAGE_H
