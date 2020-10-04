@@ -19,8 +19,10 @@ bool NetworkScene::init()
 
 	MyTank1 = Tank::create();
 	MyTank1->setPlayer(1);
+
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
+	
 	addActiveChild(MyTank1);
 
 
@@ -30,11 +32,31 @@ bool NetworkScene::init()
 	return true;
 }
 
-
+void NetworkScene::DebugUINT(UINT uint)
+{
+	UINT newint = uint;
+	char newchar[10] = "";
+	sprintf(newchar, "%d", newint);
+	ImGui::Text("Debug: ");
+	ImGui::Text((const char*)newchar);
+}
+void NetworkScene::DebugBool(bool b)
+{
+	if (b)
+	{
+		ImGui::Text("Debug: ");
+		ImGui::Text("True");
+	}
+	else
+	{
+		ImGui::Text("Debug: ");
+		ImGui::Text("False");
+	}
+}
 
 void NetworkScene::Update()
 {
-
+	
 	ImGui::Begin("Main Menu");
 	
 	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
@@ -62,11 +84,13 @@ void NetworkScene::Update()
 	ImGui::PopItemWidth();
 
 	//Debug
-	UINT newint = MyTank1->getSpeed().x;
+	/*UINT newint = MyTank1->getPosition().y;
 	char newchar[10] = "";
 	sprintf(newchar, "%d", newint);
 	ImGui::Text("Debug: ");
-	ImGui::Text((const char*)newchar);
+	ImGui::Text((const char*)newchar);*/
+
+	NetworkScene::DebugBool(MyTank1->getAwardAble());
 
 	ImGui::End();
 
@@ -99,7 +123,10 @@ void NetworkScene::Update()
 	{
 		MyTank1->fire();
 	}
-
+	if (GameManager::getInstance()->getClick3() == ESCBUTTON_UP)
+	{
+		PostQuitMessage(0);
+	}
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();
 }
