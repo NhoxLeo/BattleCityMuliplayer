@@ -12,7 +12,8 @@ public:
 	void Update();
 	void clear();
 	void LoadMap();
-	const char* UINTtoChar(UINT uint);
+	void DebugUINT(UINT uint);
+	void DebugBool(bool b);
 private:
 	ActiveSprite* background;
 	Tank* MyTank1;
