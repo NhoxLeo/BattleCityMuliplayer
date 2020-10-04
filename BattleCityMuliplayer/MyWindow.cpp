@@ -11,7 +11,7 @@
 #include "NetworkScene.h"
 //#include "Sound.h"
 
-static DWORD dwTime = timeGetTime();
+static DWORD dwTime = GetTickCount();
 
 Message::Message(UINT m, void(*f)(HWND, WPARAM, LPARAM))
 {
@@ -127,7 +127,7 @@ int MyWindow::MessageProc()
 		}
 		else
 		{
-			DWORD dwCurrentTime = timeGetTime();
+			DWORD dwCurrentTime = GetTickCount();
 			DWORD dwElapsedTime = dwCurrentTime - dwTime;
 			DWORD fElapsedTime = dwElapsedTime*0.001f;
 			Update(fElapsedTime);

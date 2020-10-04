@@ -1,10 +1,10 @@
 #pragma once
 
 
-//#define _WINSOCKAPI_
-//#define WIN32_LEAN_AND_MEAN
-//#include <WinSock2.h>
-//#include <Ws2tcpip.h>
+#define _WINSOCKAPI_
+#define WIN32_LEAN_AND_MEAN
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
 #include <windows.h>
 
 #include <iostream>
@@ -25,7 +25,7 @@
 #include "ImGui/imgui_impl_dx9.h"
 #include "ImGui/imgui_impl_win32.h"
 
-//#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib,"Dinput8.lib")
 #pragma comment(lib,"d3d9.lib")
 #pragma comment(lib,"d3dx9.lib")
