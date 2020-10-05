@@ -24,33 +24,33 @@ struct Behaviour
 		DESTROY
 	};
 
-	//void NetworkCommunication(networkMessageType type, GameObject* object);
+	void NetworkCommunication(networkMessageType type, GameObject* object)
+	{
+		if (isServer)
+		{
+			switch (type)
+			{
+			case Behaviour::UPDATE_POSITION:
+				NetworkUpdate(object, ReplicationAction::Update_Position);
+				break;
+			case Behaviour::UPDATE_TEXTURE:
+				NetworkUpdate(object, ReplicationAction::Update_Texture);
+				break;
+			case Behaviour::UPDATE_ALPHA:
+				NetworkUpdate(object, ReplicationAction::Update_Alpha);
+				break;
+			case Behaviour::UPDATE_ANIMATION:
+				NetworkUpdate(object, ReplicationAction::Update_Animation);
+				break;
+			case Behaviour::DESTROY:
+				NetworkDestroy(object);
+				break;
+			}
+		}
+	}
 };
 
-//void Behaviour::NetworkCommunication(networkMessageType type, GameObject* object)
-//{
-//	if (isServer)
-//	{
-//		switch (type)
-//		{
-//		case Behaviour::UPDATE_POSITION:
-//			NetworkUpdate(object, ReplicationAction::Update_Position);
-//			break;
-//		case Behaviour::UPDATE_TEXTURE:
-//			NetworkUpdate(object, ReplicationAction::Update_Texture);
-//			break;
-//		case Behaviour::UPDATE_ALPHA:
-//			NetworkUpdate(object, ReplicationAction::Update_Alpha);
-//			break;
-//		case Behaviour::UPDATE_ANIMATION:
-//			NetworkUpdate(object, ReplicationAction::Update_Animation);
-//			break;
-//		case Behaviour::DESTROY:
-//			NetworkDestroy(object);
-//			break;
-//		}
-//	}
-//}
+
 
 struct Player : public Behaviour
 {
@@ -110,7 +110,7 @@ struct Player : public Behaviour
 			rezDuration = 0.0f;
 			if (rez != nullptr)
 			{
-				//NetworkCommunication(DESTROY, rez);
+				NetworkCommunication(DESTROY, rez);
 				rez = nullptr;
 			}
 		}
@@ -127,7 +127,7 @@ struct Player : public Behaviour
 			gameObject->size = D3DXVECTOR3(43, 49, 0);
 			gameObject->order = 3;
 			//NetworkCommunication(UPDATE_TEXTURE, gameObject);
-			//NetworkCommunication(DESTROY, rez);
+			NetworkCommunication(DESTROY, rez);
 			rez = nullptr;
 		}
 		if (laser != nullptr)
@@ -171,7 +171,7 @@ struct Player : public Behaviour
 
 
 
-				//NetworkCommunication(UPDATE_POSITION, gameObject);
+				NetworkCommunication(UPDATE_POSITION, gameObject);
 			}
 		}
 	}
