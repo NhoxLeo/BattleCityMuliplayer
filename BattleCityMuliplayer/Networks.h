@@ -71,11 +71,11 @@ typedef double real64;
 // FRAMEWORK TYPES
 ////////////////////////////////////////////////////////////////////////
 
-//struct GameObject;
+struct GameObject;
 //struct Texture;
 //struct Animation;
 //struct Collider;
-//struct Behaviour;
+struct Behaviour;
 class Task;
 //class Screen;
 enum class ColliderType
@@ -272,3 +272,4 @@ extern RandomNumberGenerator Random;
 //#include "ScreenMainMenu.h"
 //#include "ScreenGame.h"
 //#include "Application.h"
+#include "Behaviours.h"

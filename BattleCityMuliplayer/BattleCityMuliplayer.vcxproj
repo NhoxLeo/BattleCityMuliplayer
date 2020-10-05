@@ -153,6 +153,7 @@
     <ClInclude Include="AutoRef.h" />
     <ClInclude Include="Award.h" />
     <ClInclude Include="bass.h" />
+    <ClInclude Include="Behaviours.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="ByteSwap.h" />
     <ClInclude Include="CFont.h" />

@@ -675,17 +675,17 @@ void ModuleNetworkingServer::updateNetworkObject(GameObject* gameObject, Replica
 //////////////////////////////////////////////////////////////////////
 void NetworkUpdate(GameObject* gameObject, ReplicationAction updateType)
 {
-	/*ASSERT(App->modNetServer->isConnected());
+	ASSERT(GameManager::getInstance()->GetModNetServer()->isConnected());
 
-	App->modNetServer->updateNetworkObject(gameObject, updateType);*/
+	GameManager::getInstance()->GetModNetServer()->updateNetworkObject(gameObject, updateType);
 }
 void NetworkDestroy(GameObject* gameObject)
 {
-	/*ASSERT(App->modNetServer->isConnected());
+	ASSERT(GameManager::getInstance()->GetModNetServer()->isConnected());
 
-	App->modNetServer->destroyNetworkObject(gameObject);*/
+	GameManager::getInstance()->GetModNetServer()->destroyNetworkObject(gameObject);
 }
-//std::vector<GameObject*> getPlayers()
-//{
-//	//return App->modNetServer->getAllClientPlayers();
-//}
+std::vector<GameObject*> getPlayers()
+{
+	return GameManager::getInstance()->GetModNetServer()->getAllClientPlayers();
+}
