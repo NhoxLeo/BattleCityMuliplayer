@@ -165,6 +165,12 @@
     <ClInclude Include="ModuleNetworkingServer.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="DeliveryManager.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleLinkingContext.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Action.cpp">
@@ -291,6 +297,12 @@
       <Filter>Network</Filter>
     </ClCompile>
     <ClCompile Include="ModuleNetworkingClient.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleLinkingContext.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="DeliveryManager.cpp">
       <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>

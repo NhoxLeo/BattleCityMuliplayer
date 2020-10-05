@@ -210,7 +210,7 @@ void ModuleNetworkingClient::onUpdate()
 		//	playerClientGameObject->behaviour->onInput(Input);
 		//	playerClientGameObject->behaviour->onMouse(mouse);
 		//}
-		// Send input packet
+		//// Send input packet
 		//if (inputDataBack - inputDataFront < ArrayCount(inputData))
 		//{
 		//	uint32 currentInputData = inputDataBack++;
@@ -248,7 +248,6 @@ void ModuleNetworkingClient::onUpdate()
 		//if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
 		//{
 		//	secondsSinceLastPing = 0.0f;
-
 		//	OutputMemoryStream ping;
 		//	ping << ClientMessage::Ping;
 		//	//App->delManager->writeSequenceNumberPendingAck(ping);

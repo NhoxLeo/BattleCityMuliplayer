@@ -21,6 +21,9 @@ UINT GameManager::nowclick4 = 0;
 bool GameManager::Create(HWND hwnd, HINSTANCE hInstance)
 {
 	MyRender::getInstance()->InitRender(hwnd);
+
+	delManager = new DeliveryManager();
+
 	return true;
 }
 

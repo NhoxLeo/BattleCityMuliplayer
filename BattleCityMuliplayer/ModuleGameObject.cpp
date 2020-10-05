@@ -115,7 +115,7 @@ GameObject * ModuleGameObject::Instantiate()
 	//	}
 	//}
 
-	ASSERT(0); // NOTE(jesus): You need to increase MAX_GAME_OBJECTS in case this assert crashes
+	ASSERT(MAX_GAME_OBJECTS); // NOTE(jesus): You need to increase MAX_GAME_OBJECTS in case this assert crashes
 	return nullptr;
 }
 

@@ -120,9 +120,7 @@ extern TimeStruct Time;
 ////////////////////////////////////////////////////////////////////////
 // INPUT
 ////////////////////////////////////////////////////////////////////////
-
 enum ButtonState { Idle, Press, Pressed, Release };
-
 struct InputController
 {
 	bool isConnected = false;
@@ -146,20 +144,33 @@ struct InputController
 		};
 	};
 };
-
 // NOTE(jesus): Global object to access the input controller
 extern InputController Input;
-
 struct MouseController
 {
 	int16 x = 0;
 	int16 y = 0;
 	ButtonState buttons[5] = {}; //Left, Mid, Right, X1, X2
 };
-
 // NOTE(jesus): Global object to access the mouse
 extern MouseController Mouse;
 
+
+struct InputPacketData
+{
+	uint32 sequenceNumber = 0;
+	real32 horizontalAxis = 0.0f;
+	real32 verticalAxis = 0.0f;
+	uint16 buttonBits = 0;
+
+	int16  mouseX = 0;
+	int16 mouseY = 0;
+	int leftButton = 0;
+};
+
+uint16 packInputControllerButtons(const InputController& input);
+
+void unpackInputControllerButtons(uint16 buttonBits, InputController& input);
 
 ////////////////////////////////////////////////////////////////////////
 // LOG
@@ -246,6 +257,7 @@ extern RandomNumberGenerator Random;
 #include "ModuleGameObject.h"
 #include "ModuleNetworkingClient.h"
 #include "ModuleNetworkingServer.h"
+#include "DeliveryManager.h"
 //#include "ModulePlatform.h"
 //#include "ModuleRender.h"
 //#include "ModuleResources.h"

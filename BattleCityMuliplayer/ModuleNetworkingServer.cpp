@@ -1,6 +1,6 @@
 #include "Networks.h"
 #include "ModuleNetworkingServer.h"
-
+#include "GameManager.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -60,7 +60,6 @@ void ModuleNetworkingServer::onGui()
 			ImGui::Text("ZombieSpawnRatio");
 			ImGui::InputFloat("Initial Spawning Interval (s)", &initialZombieSpawnRatio, 0.1f, 10.0f);
 			ImGui::Text("Final Spawning Interval (s): %f", guiFinalZombieSpawnRatio);
-			ImGui::Checkbox("Enable Zombie Spawner", &isSpawnerEnabled);
 
 			ImGui::Separator();
 
@@ -156,13 +155,14 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					OutputMemoryStream welcomePacket;
 					welcomePacket << ServerMessage::Welcome;
 					welcomePacket << proxy->clientId;
-					welcomePacket << proxy->gameObject->networkId;
+					//welcomePacket << proxy->gameObject->networkId;
+					welcomePacket << proxy->clientId;
 					sendPacket(welcomePacket, fromAddress);
 
-					// Send all network objects to the new player
-					uint16 networkGameObjectsCount;
-					GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
-					//App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					//// Send all network objects to the new player
+					//uint16 networkGameObjectsCount;
+					//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+					////App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 					//for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 					//{
 					//	GameObject* gameObject = networkGameObjects[i];
@@ -222,7 +222,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 		}
 		else if (message == ClientMessage::Ping)
 		{
-			//App->delManager->processAckdSequenceNumbers(packet);
+			GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
 		}
 
 		if (proxy != nullptr)
@@ -252,10 +252,10 @@ void ModuleNetworkingServer::onUpdate()
 					packet << ServerMessage::Replication;
 					packet << clientProxy.nextExpectedInputSequenceNumber; //ACK of last received input
 
-					//Delivery* delivery = App->delManager->writeSequenceNumber(packet);
-					//delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
-					//((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
-					//((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
+					Delivery* delivery = GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumber(packet);
+					delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
+					((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
+					((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
 
 					clientProxy.secondsSinceLastReplication = 0.0f;
 					if (clientProxy.replicationManager.write(packet))
@@ -289,27 +289,24 @@ void ModuleNetworkingServer::onUpdate()
 
 		//Check for TimeOutPackets DeliveryManager
 
-		//App->delManager->processTimedOutPackets();
+		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
 		//Zombie Spawner WiP
-		ZombieSpawner();
+		//ZombieSpawner();
 
-		//Server Reset Game Objects when there are no proxies connected
-		uint16 networkGameObjectsCount;
-		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+		////Server Reset Game Objects when there are no proxies connected
+		//uint16 networkGameObjectsCount;
+		//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
 		//App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 		//if (connectedProxies == 0 && networkGameObjectsCount > 0)
 		//{
 		//	for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 		//	{
 		//		GameObject* gameObject = networkGameObjects[i];
-
 		//		// Unregister the network identity
 		//		//App->modLinkingContext->unregisterNetworkGameObject(gameObject);
-
 		//		// Remove its associated game object
 		//		Destroy(gameObject);
-
 		//	}
 		//}
 	}
@@ -408,10 +405,10 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy* proxy)
 GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 {
 	// Create a new game object with the player properties
-	clientProxy.gameObject = Instantiate();
+	/*clientProxy.gameObject = Instantiate();
 	clientProxy.gameObject->size = D3DXVECTOR3(43, 49, 0);
 	clientProxy.gameObject->angle = 45.0f;
-	clientProxy.gameObject->order = 3;
+	clientProxy.gameObject->order = 3;*/
 
 	//clientProxy.gameObject->texture = App->modResources->robot;
 	//clientProxy.gameObject->color.a = 0.75f;
@@ -435,7 +432,8 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 		if (clientProxies[i].connected)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-			clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
+			//clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
+			clientProxies[i].replicationManager.create(clientProxy.clientId);
 		}
 	}
 

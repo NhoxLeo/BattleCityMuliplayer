@@ -159,6 +159,7 @@
     <ClInclude Include="ChoiceScene.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Messages.h" />
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleGameObject.h" />
+    <ClInclude Include="ModuleLinkingContext.h" />
     <ClInclude Include="ModuleNetworking.h" />
     <ClInclude Include="ModuleNetworkingClient.h" />
     <ClInclude Include="ModuleNetworkingServer.h" />
@@ -206,6 +208,7 @@
     <ClCompile Include="CFont.cpp" />
     <ClCompile Include="ChoiceScene.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -219,6 +222,7 @@
     <ClCompile Include="MapScene.cpp" />
     <ClCompile Include="MemoryStream.cpp" />
     <ClCompile Include="ModuleGameObject.cpp" />
+    <ClCompile Include="ModuleLinkingContext.cpp" />
     <ClCompile Include="ModuleNetworking.cpp" />
     <ClCompile Include="ModuleNetworkingClient.cpp" />
     <ClCompile Include="ModuleNetworkingServer.cpp" />

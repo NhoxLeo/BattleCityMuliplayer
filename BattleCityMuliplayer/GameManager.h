@@ -15,6 +15,7 @@ class Map;
 class Sound;
 class ModuleNetworkingServer;
 class ModuleNetworkingClient;
+class DeliveryManager;
 
 class GameManager
 {
@@ -132,6 +133,7 @@ public:
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }
 	void CreateServer();
 	void CreateClient();
+	DeliveryManager* GetDeliveryManager() { return delManager; }
 
 private:
 	bool MapMake;
@@ -153,6 +155,7 @@ private:
 
 	ModuleNetworkingServer* modNetServer = nullptr;
 	ModuleNetworkingClient* modNetClient = nullptr;
+	DeliveryManager* delManager = nullptr;
 };
 
 #endif // !GAMEMANAGE_H

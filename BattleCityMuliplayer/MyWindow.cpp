@@ -12,6 +12,11 @@
 //#include "Sound.h"
 
 static DWORD dwTime = GetTickCount();
+DWORD m_Fps;
+DWORD m_ElapsedTime;
+DWORD m_PrevTime = GetTickCount();
+DWORD m_NowTime;
+DWORD m_DeltaTime;
 
 Message::Message(UINT m, void(*f)(HWND, WPARAM, LPARAM))
 {
@@ -127,11 +132,20 @@ int MyWindow::MessageProc()
 		}
 		else
 		{
-			DWORD dwCurrentTime = GetTickCount();
+			/*DWORD dwCurrentTime = GetTickCount();
 			DWORD dwElapsedTime = dwCurrentTime - dwTime;
 			DWORD fElapsedTime = dwElapsedTime*0.001f;
 			Update(fElapsedTime);
-			dwTime = dwCurrentTime;
+			dwTime = dwCurrentTime;*/
+
+			m_NowTime = GetTickCount();
+			m_DeltaTime = m_NowTime - m_PrevTime;
+			m_ElapsedTime += m_DeltaTime;
+			if (m_ElapsedTime > 1000) m_ElapsedTime = 0;
+			float deltaTime = static_cast<float>(m_DeltaTime) / 1000.0f;
+			deltaTime = deltaTime > 1 ? 0 : deltaTime;
+			Update(deltaTime);
+			m_PrevTime = m_NowTime;
 		}
 	}
 	return msg.wParam;
@@ -184,6 +198,7 @@ void MyWindow::Update(DWORD ElapsedTime)
 	MyRender::getInstance()->getDevice()->BeginScene();
 	MyRender::getInstance()->preUpdateGUI();
 	GameManager::getInstance()->getScene()->Update();
+	//GameManager::getInstance()->getScene()->Update(ElapsedTime);
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();
 	GameManager::getInstance()->getScene()->DrawAllActive();
@@ -193,8 +208,8 @@ void MyWindow::Update(DWORD ElapsedTime)
 	MyRender::getInstance()->lateUpdateGUI();
 	MyRender::getInstance()->getDevice()->EndScene();
 	MyRender::getInstance()->getDevice()->Present(NULL, NULL, NULL, NULL);
-	if (ElapsedTime < 1000 / FRAME)
+	/*if (ElapsedTime < 1000 / FRAME)
 	{
 		Sleep(1000 / FRAME - ElapsedTime);
-	}
+	}*/
 }

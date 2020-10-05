@@ -82,7 +82,7 @@ private:
 	static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 64;
 
 	// Queue of input data
-	//InputPacketData inputData[MAX_INPUT_DATA_SIMULTANEOUS_PACKETS];
+	InputPacketData inputData[MAX_INPUT_DATA_SIMULTANEOUS_PACKETS];
 	uint32 inputDataFront = 0; // list.begin()
 	uint32 inputDataBack = 0; // list.end()
 

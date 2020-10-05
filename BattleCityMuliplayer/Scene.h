@@ -31,6 +31,7 @@ public:
 	~Scene();
 	
 	virtual void Update(){};
+	virtual void Update(float deltaTime){};
 	
 	void homeBoom();
 	

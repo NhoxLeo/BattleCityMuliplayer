@@ -7,10 +7,10 @@
 #include "ActiveSprite.h"
 #include "Networks.h"
 
+
 bool NetworkScene::init()
 {
 	Scene::init();
-	
 
 	background = ActiveSprite::create();
 	background->LoadTexture(_T("../Sprite/background2.jpg"), 416, 416, 1);
@@ -23,7 +23,7 @@ bool NetworkScene::init()
 
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	
+
 	addActiveChild(MyTank1);
 
 
@@ -70,6 +70,7 @@ void NetworkScene::Update()
 		{
 			isServer = true;
 			GameManager::getInstance()->CreateServer();
+			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
 			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
 			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
 			modNetServerptr->start();
@@ -85,14 +86,135 @@ void NetworkScene::Update()
 		static char playerNameStr[64] = "Player";
 		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
 		static bool showInvalidUserName = false;
-		if (ImGui::Button("Connect to server"));
+		if (ImGui::Button("Connect to server"))
+		{
+			isClient = true;
+			GameManager::getInstance()->CreateClient();
+			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
+			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
+			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
+			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+			modNetClientptr->start();
+		}
 		ImGui::PopItemWidth();
 		ImGui::End();
 	}
 	if (isServer)
 	{
 		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+		modNetServerptr->preUpdate();
+		modNetServerptr->update();
 		modNetServerptr->gui();
+	}
+	if (isClient)
+	{
+		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+		modNetClientptr->preUpdate();
+		modNetClientptr->update();
+		modNetClientptr->gui();
+	}
+
+	//Debug
+	/*UINT newint = MyTank1->getPosition().y;
+	char newchar[10] = "";
+	sprintf(newchar, "%d", newint);
+	ImGui::Text("Debug: ");
+	ImGui::Text((const char*)newchar);*/
+
+	//NetworkScene::DebugBool(MyTank1->getAwardAble());
+
+
+	Scene::Update();
+	MyTank1->Update();
+	MyTank1->setSpeed(Speed(0, 0));
+	if (GameManager::getInstance()->getClick1() == ABUTTON_ON)
+	{
+		MyTank1->setSpeed(Speed(-1, 0));
+		MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
+	}
+	if (GameManager::getInstance()->getClick1() == SBUTTON_ON)
+	{
+		MyTank1->setSpeed(Speed(0, 1));
+		MyTank1->setDirection(D3DXVECTOR3(0, 1, 0));
+	}
+	if (GameManager::getInstance()->getClick1() == WBUTTON_ON)
+	{
+		MyTank1->setSpeed(Speed(0, -1));
+		MyTank1->setDirection(D3DXVECTOR3(0, -1, 0));
+	}
+	if (GameManager::getInstance()->getClick1() == DBUTTON_ON)
+	{
+		MyTank1->setSpeed(Speed(1, 0));
+		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
+	}
+	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
+	{
+		MyTank1->fire();
+	}
+	if (GameManager::getInstance()->getClick3() == ESCBUTTON_UP)
+	{
+		PostQuitMessage(0);
+	}
+	TankArray::getInstance()->VisitAll();
+	BulletArray::getInstance()->VisitAll();
+}
+
+void NetworkScene::Update(float deltaTime)
+{
+	static int localServerPort = 8888;
+	if (!isServer && !isClient)
+	{
+		ImGui::Begin("Main Menu");
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+		ImGui::Spacing();
+		ImGui::Text("Server");
+		ImGui::InputInt("Server port", &localServerPort);
+		if (ImGui::Button("Start server"))
+		{
+			isServer = true;
+			GameManager::getInstance()->CreateServer();
+			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
+			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
+			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+			modNetServerptr->start();
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::Text("Client");
+		static char serverAddressStr[64] = "127.0.0.1";
+		ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
+		static int remoteServerPort = 8888;
+		ImGui::InputInt("Server port", &remoteServerPort);
+		static char playerNameStr[64] = "Player";
+		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
+		static bool showInvalidUserName = false;
+		if (ImGui::Button("Connect to server"))
+		{
+			isClient = true;
+			GameManager::getInstance()->CreateClient();
+			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
+			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
+			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
+			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+			modNetClientptr->start();
+		}
+		ImGui::PopItemWidth();
+		ImGui::End();
+	}
+	if (isServer)
+	{
+		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+		modNetServerptr->preUpdate();
+		modNetServerptr->update();
+		modNetServerptr->gui();
+	}
+	if (isClient)
+	{
+		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+		modNetClientptr->preUpdate();
+		modNetClientptr->update();
+		modNetClientptr->gui();
 	}
 
 	//Debug

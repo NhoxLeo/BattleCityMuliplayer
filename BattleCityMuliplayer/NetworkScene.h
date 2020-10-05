@@ -10,6 +10,7 @@ public:
 	CREATE_FUNC(NetworkScene);
 	virtual bool init();
 	void Update();
+	void Update(float deltaTime);
 	void clear();
 	void LoadMap();
 	void DebugUINT(UINT uint);
