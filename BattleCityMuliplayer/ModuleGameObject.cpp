@@ -1,5 +1,6 @@
 #include "Networks.h"
 #include "ModuleGameObject.h"
+#include "GameManager.h"
 
 inline float Slerp(float from, float to, float step);
 
@@ -32,12 +33,12 @@ void GameObject::Interpolate()
 
 void GameObject::releaseComponents()
 {
-	/*if (behaviour != nullptr)
+	if (behaviour != nullptr)
 	{
 		delete behaviour;
 		behaviour = nullptr;
 	}
-	if (collider != nullptr)
+	/*if (collider != nullptr)
 	{
 		App->modCollision->removeCollider(collider);
 		collider = nullptr;
@@ -63,7 +64,7 @@ bool ModuleGameObject::preUpdate()
 		}
 		else if (gameObject.state == GameObject::CREATING)
 		{
-			//if (gameObject.behaviour != nullptr) gameObject.behaviour->start();
+			if (gameObject.behaviour != nullptr) gameObject.behaviour->start();
 			gameObject.state = GameObject::UPDATING;
 		}
 	}
@@ -79,10 +80,8 @@ bool ModuleGameObject::update()
 		{
 			if (interpolateEntities && gameObject.doInterpolation)
 				gameObject.Interpolate();
-		/*	if (gameObject.behaviour != nullptr)
+			if (gameObject.behaviour != nullptr)
 				gameObject.behaviour->update();
-			if (gameObject.animation)
-				gameObject.animation->Update();*/
 		}
 	}
 
@@ -106,14 +105,14 @@ bool ModuleGameObject::cleanUp()
 
 GameObject * ModuleGameObject::Instantiate()
 {
-	//for (GameObject &gameObject : App->modGameObject->gameObjects)
-	//{
-	//	if (gameObject.state == GameObject::NON_EXISTING)
-	//	{
-	//		gameObject.state = GameObject::CREATING;
-	//		return &gameObject;
-	//	}
-	//}
+	for (GameObject &gameObject : GameManager::getInstance()->GetModGameObject()->gameObjects)
+	{
+		if (gameObject.state == GameObject::NON_EXISTING)
+		{
+			gameObject.state = GameObject::CREATING;
+			return &gameObject;
+		}
+	}
 
 	ASSERT(MAX_GAME_OBJECTS); // NOTE(jesus): You need to increase MAX_GAME_OBJECTS in case this assert crashes
 	return nullptr;

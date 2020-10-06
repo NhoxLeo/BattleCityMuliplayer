@@ -16,6 +16,8 @@ class Sound;
 class ModuleNetworkingServer;
 class ModuleNetworkingClient;
 class DeliveryManager;
+class ModuleLinkingContext;
+class ModuleGameObject;
 
 class GameManager
 {
@@ -134,6 +136,8 @@ public:
 	void CreateServer();
 	void CreateClient();
 	DeliveryManager* GetDeliveryManager() { return delManager; }
+	ModuleLinkingContext* GetModLinkingContext() { return modLinkingContext; }
+	ModuleGameObject* GetModGameObject() { return modGameObject; }
 
 private:
 	bool MapMake;
@@ -156,6 +160,8 @@ private:
 	ModuleNetworkingServer* modNetServer = nullptr;
 	ModuleNetworkingClient* modNetClient = nullptr;
 	DeliveryManager* delManager = nullptr;
+	ModuleLinkingContext* modLinkingContext = nullptr;
+	ModuleGameObject* modGameObject = nullptr;
 };
 
 #endif // !GAMEMANAGE_H

@@ -159,17 +159,17 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					welcomePacket << proxy->clientId;
 					sendPacket(welcomePacket, fromAddress);
 
-					//// Send all network objects to the new player
-					//uint16 networkGameObjectsCount;
-					//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
-					////App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-					//for (uint16 i = 0; i < networkGameObjectsCount; ++i)
-					//{
-					//	GameObject* gameObject = networkGameObjects[i];
+					// Send all network objects to the new player
+					uint16 networkGameObjectsCount;
+					GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+					GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+					{
+						GameObject* gameObject = networkGameObjects[i];
 
-					//	// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
-					//	proxy->replicationManager.create(gameObject->networkId);
-					//}
+						// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
+						proxy->replicationManager.create(gameObject->networkId);
+					}
 
 					LOG("Message received: hello - from player %s", playerName.c_str());
 				}
@@ -192,32 +192,32 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 			// Process the input packet and update the corresponding game object
 			if (proxy != nullptr)
 			{
-				//InputPacketData inputData;
-				//// Read input data
-				//while (packet.RemainingByteCount() > 0)
-				//{
-				//	packet >> inputData.sequenceNumber;
-				//	packet >> inputData.horizontalAxis;
-				//	packet >> inputData.verticalAxis;
-				//	packet >> inputData.buttonBits;
-				//	packet >> inputData.mouseX;
-				//	packet >> inputData.mouseY;
-				//	packet >> inputData.leftButton;
-				//	if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
-				//	{
-				//		//Process Keyboard
-				//		proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
-				//		proxy->gamepad.verticalAxis = inputData.verticalAxis;
-				//		//unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
-				//		//proxy->gameObject->behaviour->onInput(proxy->gamepad);
-				//		//Process Mouse
-				//		proxy->mouse.x = inputData.mouseX;
-				//		proxy->mouse.y = inputData.mouseY;
-				//		proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
-				//		proxy->gameObject->behaviour->onMouse(proxy->mouse);
-				//		proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
-				//	}
-				//}
+				InputPacketData inputData;
+				// Read input data
+				while (packet.RemainingByteCount() > 0)
+				{
+					packet >> inputData.sequenceNumber;
+					packet >> inputData.horizontalAxis;
+					packet >> inputData.verticalAxis;
+					//packet >> inputData.buttonBits;
+					packet >> inputData.mouseX;
+					packet >> inputData.mouseY;
+					packet >> inputData.leftButton;
+					if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
+					{
+						////Process Keyboard
+						//proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
+						//proxy->gamepad.verticalAxis = inputData.verticalAxis;
+						////unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
+						////proxy->gameObject->behaviour->onInput(proxy->gamepad);
+						////Process Mouse
+						//proxy->mouse.x = inputData.mouseX;
+						//proxy->mouse.y = inputData.mouseY;
+						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
+						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
+						//proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
+					}
+				}
 			}
 		}
 		else if (message == ClientMessage::Ping)
@@ -280,7 +280,6 @@ void ModuleNetworkingServer::onUpdate()
 				}
 			}
 		}
-
 		//Reset ping timer
 		if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
 		{
@@ -294,28 +293,27 @@ void ModuleNetworkingServer::onUpdate()
 		//Zombie Spawner WiP
 		//ZombieSpawner();
 
-		////Server Reset Game Objects when there are no proxies connected
-		//uint16 networkGameObjectsCount;
-		//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
-		//App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-		//if (connectedProxies == 0 && networkGameObjectsCount > 0)
-		//{
-		//	for (uint16 i = 0; i < networkGameObjectsCount; ++i)
-		//	{
-		//		GameObject* gameObject = networkGameObjects[i];
-		//		// Unregister the network identity
-		//		//App->modLinkingContext->unregisterNetworkGameObject(gameObject);
-		//		// Remove its associated game object
-		//		Destroy(gameObject);
-		//	}
-		//}
+		//Server Reset Game Objects when there are no proxies connected
+		uint16 networkGameObjectsCount;
+		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+		if (connectedProxies == 0 && networkGameObjectsCount > 0)
+		{
+			for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+			{
+				GameObject* gameObject = networkGameObjects[i];
+				// Unregister the network identity
+				GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(gameObject);
+				// Remove its associated game object
+				Destroy(gameObject);
+			}
+		}
 	}
 }
 void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)
 {
 	// Find the client proxy
 	ClientProxy* proxy = getClientProxy(fromAddress);
-
 	if (proxy)
 	{
 		// Notify game object deletion to replication managers
@@ -327,16 +325,12 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)
 				clientProxies[i].replicationManager.destroy(proxy->gameObject->networkId);
 			}
 		}
-
 		// Unregister the network identity
-		//App->modLinkingContext->unregisterNetworkGameObject(proxy->gameObject);
-
+		GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(proxy->gameObject);
 		// Remove its associated game object
 		Destroy(proxy->gameObject);
-
 		// Clear the client proxy
 		destroyClientProxy(proxy);
-
 		connectedProxies--;
 	}
 }
@@ -345,11 +339,11 @@ void ModuleNetworkingServer::onDisconnect()
 	// Destroy network game objects
 	uint16 netGameObjectsCount;
 	GameObject* netGameObjects[MAX_NETWORK_OBJECTS];
-	//App->modLinkingContext->getNetworkGameObjects(netGameObjects, &netGameObjectsCount);
-	//for (uint32 i = 0; i < netGameObjectsCount; ++i)
-	//{
-	//	NetworkDestroy(netGameObjects[i]);
-	//}
+	GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(netGameObjects, &netGameObjectsCount);
+	for (uint32 i = 0; i < netGameObjectsCount; ++i)
+	{
+		NetworkDestroy(netGameObjects[i]);
+	}
 
 	// Clear all client proxies
 	for (ClientProxy& clientProxy : clientProxies)
@@ -405,10 +399,10 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy* proxy)
 GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 {
 	// Create a new game object with the player properties
-	/*clientProxy.gameObject = Instantiate();
+	clientProxy.gameObject = Instantiate();
 	clientProxy.gameObject->size = D3DXVECTOR3(43, 49, 0);
 	clientProxy.gameObject->angle = 45.0f;
-	clientProxy.gameObject->order = 3;*/
+	clientProxy.gameObject->order = 3;
 
 	//clientProxy.gameObject->texture = App->modResources->robot;
 	//clientProxy.gameObject->color.a = 0.75f;
@@ -418,13 +412,13 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 	//clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
 	//clientProxy.gameObject->collider->isTrigger = true;
 
-	//// Create behaviour
-	//clientProxy.gameObject->behaviour = new Player;
-	//clientProxy.gameObject->behaviour->gameObject = clientProxy.gameObject;
+	// Create behaviour
+	clientProxy.gameObject->behaviour = new Player;
+	clientProxy.gameObject->behaviour->gameObject = clientProxy.gameObject;
 
 	// Assign a new network identity to the object
 
-	//App->modLinkingContext->registerNetworkGameObject(clientProxy.gameObject);
+	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(clientProxy.gameObject);
 
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)
@@ -432,8 +426,8 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 		if (clientProxies[i].connected)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-			//clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
-			clientProxies[i].replicationManager.create(clientProxy.clientId);
+			clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
+			//clientProxies[i].replicationManager.create(clientProxy.clientId);
 		}
 	}
 
@@ -653,7 +647,7 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject* gameObject)
 
 	// Assuming the message was received, unregister the network identity
 
-	//App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+	GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(gameObject);
 
 	// Finally, destroy the object from the server
 	Destroy(gameObject);

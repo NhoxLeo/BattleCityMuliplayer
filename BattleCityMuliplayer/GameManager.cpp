@@ -23,6 +23,10 @@ bool GameManager::Create(HWND hwnd, HINSTANCE hInstance)
 	MyRender::getInstance()->InitRender(hwnd);
 
 	delManager = new DeliveryManager();
+	modLinkingContext = new ModuleLinkingContext();
+	modGameObject = new ModuleGameObject();
+	Module* a = modGameObject;
+	a->init();
 
 	return true;
 }

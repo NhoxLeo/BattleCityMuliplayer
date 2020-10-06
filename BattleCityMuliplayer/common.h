@@ -15,6 +15,7 @@
 #include <windowsx.h>
 #include <tchar.h>
 #include <list>
+#include <string>
 //#include <Mmreg.h>
 
 #include <d3d9.h>

@@ -32,7 +32,7 @@ struct GameObject
 	//Collider *collider = nullptr;
 
 	// "Script" component
-	//Behaviour *behaviour = nullptr;
+	Behaviour *behaviour = nullptr;
 
 	// Network identity component
 	uint32 networkId = 0; // NOTE(jesus): Only for network game objects

@@ -77,7 +77,7 @@ struct Player : public Behaviour
 
 	void start() override
 	{
-		gameObject->tag = (uint32)(Random.next() * UINT_MAX);
+		//gameObject->tag = (uint32)(Random.next() * UINT_MAX);
 		spawnTime = Time.time;
 		spawning = true;
 	}

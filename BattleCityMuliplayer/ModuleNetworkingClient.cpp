@@ -1,6 +1,6 @@
 #include "Networks.h"
 #include "ModuleNetworkingClient.h"
-
+#include "GameManager.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -93,10 +93,8 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Text("Player info:");
 				ImGui::Text(" - Network id: %u", networkId);
 				D3DXVECTOR3 playerPosition = {};
-				/*GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-				if (playerGameObject != nullptr) {
-					playerPosition = playerGameObject->position;
-				}*/
+				GameObject* playerGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
+				if (playerGameObject != nullptr) playerPosition = playerGameObject->position;
 				ImGui::Text(" - Coordinates: (%f, %f)", playerPosition.x, playerPosition.y);
 				ImGui::Separator();
 				ImGui::Text("Connection checking info:");
@@ -199,66 +197,66 @@ void ModuleNetworkingClient::onUpdate()
 		secondsSinceLastMouseDelivery += Time.deltaTime;
 		secondsSinceLastPing += Time.deltaTime;
 
-		//// Client side prediction
-		//GameObject* playerClientGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-		//if (clientPrediction && playerClientGameObject)
-		//{
-		//	MouseController mouse;
-		//	mouse.x = Mouse.x - Window.width / 2;
-		//	mouse.y = Mouse.y - Window.height / 2;
-		//	mouse.buttons[0] = Mouse.buttons[0];
-		//	playerClientGameObject->behaviour->onInput(Input);
-		//	playerClientGameObject->behaviour->onMouse(mouse);
-		//}
-		//// Send input packet
-		//if (inputDataBack - inputDataFront < ArrayCount(inputData))
-		//{
-		//	uint32 currentInputData = inputDataBack++;
-		//	InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
-		//	inputPacketData.sequenceNumber = currentInputData;
-		//	inputPacketData.horizontalAxis = Input.horizontalAxis;
-		//	inputPacketData.verticalAxis = Input.verticalAxis;
-		//	inputPacketData.buttonBits = packInputControllerButtons(Input);
-		//	inputPacketData.mouseX = Mouse.x - Window.width / 2;
-		//	inputPacketData.mouseY = Mouse.y - Window.height / 2;
-		//	inputPacketData.leftButton = Mouse.buttons[0];
-		//	// Create packet (if there's input and the input delivery interval exceeded)
-		//	if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
-		//	{
-		//		secondsSinceLastInputDelivery = 0.0f;
-		//		OutputMemoryStream packet;
-		//		packet << ClientMessage::Input;
-		//		for (uint32 i = inputDataFront; i < inputDataBack; ++i)
-		//		{
-		//			InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
-		//			packet << inputPacketData.sequenceNumber;
-		//			packet << inputPacketData.horizontalAxis;
-		//			packet << inputPacketData.verticalAxis;
-		//			packet << inputPacketData.buttonBits;
-		//			packet << inputPacketData.mouseX;
-		//			packet << inputPacketData.mouseY;
-		//			packet << inputPacketData.leftButton;
-		//		}
-		//		// Clear the queue
-		//		inputDataFront = inputDataBack;
-		//		sendPacket(packet, serverAddress);
-		//	}
-		//}
-		////Send pings to server
-		//if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
-		//{
-		//	secondsSinceLastPing = 0.0f;
-		//	OutputMemoryStream ping;
-		//	ping << ClientMessage::Ping;
-		//	//App->delManager->writeSequenceNumberPendingAck(ping);
-		//	sendPacket(ping, serverAddress);
-		//	ping.Clear();
-		//}
-		////Disconnect if waited too long
-		//if (Time.time - lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
-		//{
-		//	disconnect();
-		//}
+		// Client side prediction
+		GameObject* playerClientGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
+		if (clientPrediction && playerClientGameObject)
+		{
+			MouseController mouse;
+			mouse.x = Mouse.x - Window.width / 2;
+			mouse.y = Mouse.y - Window.height / 2;
+			mouse.buttons[0] = Mouse.buttons[0];
+			playerClientGameObject->behaviour->onInput(Input);
+			playerClientGameObject->behaviour->onMouse(mouse);
+		}
+		// Send input packet
+		if (inputDataBack - inputDataFront < ArrayCount(inputData))
+		{
+			uint32 currentInputData = inputDataBack++;
+			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
+			inputPacketData.sequenceNumber = currentInputData;
+			inputPacketData.horizontalAxis = Input.horizontalAxis;
+			inputPacketData.verticalAxis = Input.verticalAxis;
+			//inputPacketData.buttonBits = packInputControllerButtons(Input);
+			inputPacketData.mouseX = Mouse.x - Window.width / 2;
+			inputPacketData.mouseY = Mouse.y - Window.height / 2;
+			inputPacketData.leftButton = Mouse.buttons[0];
+			// Create packet (if there's input and the input delivery interval exceeded)
+			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
+			{
+				secondsSinceLastInputDelivery = 0.0f;
+				OutputMemoryStream packet;
+				packet << ClientMessage::Input;
+				for (uint32 i = inputDataFront; i < inputDataBack; ++i)
+				{
+					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+					packet << inputPacketData.sequenceNumber;
+					packet << inputPacketData.horizontalAxis;
+					packet << inputPacketData.verticalAxis;
+					//packet << inputPacketData.buttonBits;
+					packet << inputPacketData.mouseX;
+					packet << inputPacketData.mouseY;
+					packet << inputPacketData.leftButton;
+				}
+				// Clear the queue
+				inputDataFront = inputDataBack;
+				sendPacket(packet, serverAddress);
+			}
+		}
+		//Send pings to server
+		if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+		{
+			secondsSinceLastPing = 0.0f;
+			OutputMemoryStream ping;
+			ping << ClientMessage::Ping;
+			GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumberPendingAck(ping);
+			sendPacket(ping, serverAddress);
+			ping.Clear();
+		}
+		//Disconnect if waited too long
+		if (Time.time - lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
+		{
+			disconnect();
+		}
 	}
 
 	// Make the camera focus the player game object
@@ -277,12 +275,12 @@ void ModuleNetworkingClient::onDisconnect()
 	uint16 networkGameObjectsCount;
 	GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
 
-	/*App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-	App->modLinkingContext->clear();
+	GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+	GameManager::getInstance()->GetModLinkingContext()->clear();
 
 	players.clear();
-	App->modUI->isPlaying = false;
-	App->modUI->debugUI = true;*/
+	//App->modUI->isPlaying = false;
+	//App->modUI->debugUI = true;
 
 	//Reset game statistics on logout
 	zombieDeathCount = 0;
@@ -290,17 +288,17 @@ void ModuleNetworkingClient::onDisconnect()
 	alliesRevived = 0;
 
 	// Destroy all network objects
-	//for (uint32 i = 0; i < networkGameObjectsCount; ++i)
-	//{
-	//	Destroy(networkGameObjects[i]);
-	//}
+	for (uint32 i = 0; i < networkGameObjectsCount; ++i)
+	{
+		Destroy(networkGameObjects[i]);
+	}
 
 	//App->modRender->cameraPosition = {};
 }
 void ModuleNetworkingClient::floatingUI()
 {
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, { 0,0,0,0.3f });
-	/*GameObject* clientPlayer = App->modLinkingContext->getNetworkGameObject(networkId);
+	GameObject* clientPlayer = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 	if (clientPlayer)
 	{
 		int count = 0;
@@ -314,32 +312,32 @@ void ModuleNetworkingClient::floatingUI()
 
 			count++;
 		}
-	}*/
+	}
 	ImGui::PopStyleColor(1);
 }
 void ModuleNetworkingClient::processAllInputs()
 {
-	//GameObject* playerClientGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-	//if (playerClientGameObject && inputDataBack - inputDataFront < ArrayCount(inputData))
-	//{
-	//	for (uint32 i = inputDataFront; i < inputDataBack; ++i) //For all current inputs (not processed by the server)
-	//	{
-	//		InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+	GameObject* playerClientGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
+	if (playerClientGameObject && inputDataBack - inputDataFront < ArrayCount(inputData))
+	{
+		for (uint32 i = inputDataFront; i < inputDataBack; ++i) //For all current inputs (not processed by the server)
+		{
+			InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 
-	//		InputController input;
-	//		MouseController mouse;
+			InputController input;
+			MouseController mouse;
 
-	//		//Process Keyboard
-	//		input.horizontalAxis = inputPacketData.horizontalAxis;
-	//		input.verticalAxis = inputPacketData.verticalAxis;
-	//		unpackInputControllerButtons(inputPacketData.buttonBits, input);
-	//		playerClientGameObject->behaviour->onInput(input);
+			//Process Keyboard
+			input.horizontalAxis = inputPacketData.horizontalAxis;
+			input.verticalAxis = inputPacketData.verticalAxis;
+			//unpackInputControllerButtons(inputPacketData.buttonBits, input);
+			playerClientGameObject->behaviour->onInput(input);
 
-	//		//Process Mouse
-	//		mouse.x = inputPacketData.mouseX;
-	//		mouse.y = inputPacketData.mouseY;
-	//		mouse.buttons[0] = (ButtonState)inputPacketData.leftButton;
-	//		playerClientGameObject->behaviour->onMouse(mouse);
-	//	}
-	//}
+			//Process Mouse
+			mouse.x = inputPacketData.mouseX;
+			mouse.y = inputPacketData.mouseY;
+			mouse.buttons[0] = (ButtonState)inputPacketData.leftButton;
+			playerClientGameObject->behaviour->onMouse(mouse);
+		}
+	}
 }
