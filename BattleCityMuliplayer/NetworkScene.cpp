@@ -161,6 +161,9 @@ void NetworkScene::Update()
 
 void NetworkScene::Update(float deltaTime)
 {
+	Time.deltaTime = deltaTime;
+	Time.time += (double)Time.deltaTime;
+
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
 	{

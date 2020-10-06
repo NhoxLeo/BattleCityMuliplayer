@@ -60,7 +60,7 @@ public:
 	int getWindowHeight();
 	int getWindowwidth();
 
-	void Update(DWORD dwElapsedTime);
+	void Update(float dwElapsedTime);
 };
 
 #endif

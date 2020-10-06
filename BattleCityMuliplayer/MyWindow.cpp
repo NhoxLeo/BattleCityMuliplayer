@@ -174,19 +174,19 @@ std::wstring ANSIToUnicode(const std::string& str)
 	return rt;
 };
 
-void MyWindow::Update(DWORD ElapsedTime)
+void MyWindow::Update(float ElapsedTime)
 {
 	ZeroMemory(&szBuf, sizeof(char) * 10);
 	wstring x;
 	LPCTSTR Text;
-	if (ElapsedTime < 1000 / FRAME)
+	/*if (ElapsedTime < 1000 / FRAME)
 	{
 		sprintf_s(szBuf, "%d", FRAME);
 	}
 	else
 	{
 		sprintf_s(szBuf, "%d", 1 / (ElapsedTime / 1000));
-	}
+	}*/
 	x = ANSIToUnicode(szBuf);
 	Text = (LPCWSTR)x.c_str();
 	RECT rect = { 0,40, 100, 90 };
@@ -197,8 +197,8 @@ void MyWindow::Update(DWORD ElapsedTime)
 	MyRender::getInstance()->getDevice()->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_XRGB(255, 251, 240), 1.0f, 0);
 	MyRender::getInstance()->getDevice()->BeginScene();
 	MyRender::getInstance()->preUpdateGUI();
-	GameManager::getInstance()->getScene()->Update();
-	//GameManager::getInstance()->getScene()->Update(ElapsedTime);
+	//GameManager::getInstance()->getScene()->Update();
+	GameManager::getInstance()->getScene()->Update(ElapsedTime);
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();
 	GameManager::getInstance()->getScene()->DrawAllActive();
