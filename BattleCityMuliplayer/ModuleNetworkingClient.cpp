@@ -163,7 +163,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			packet >> lastPackedProccessed;
 			inputDataFront = lastPackedProccessed;
 
-			//App->delManager->processSequenceNumber(packet);
+			GameManager::getInstance()->GetDeliveryManager()->processSequenceNumber(packet);
 			replicationManager.read(packet, networkId);
 
 			//Apply all new performed inputs

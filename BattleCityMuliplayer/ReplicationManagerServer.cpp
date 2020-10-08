@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "GameManager.h"
 #include "ReplicationManagerServer.h"
 
 void ReplicationManagerServer::create(uint32 networkId)
@@ -39,59 +40,20 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 		packet << (*it_c).second;
 		if ((*it_c).second == ReplicationAction::Create)
 		{
-			//GameObject* go = App->modLinkingContext->getNetworkGameObject((*it_c).first);
-			//packet << go->position.x;
-			//packet << go->position.y;
-			//packet << go->size.x;
-			//packet << go->size.y;
-			//packet << go->angle;
-			//packet << go->order;
-			//packet << go->color.r;
-			//packet << go->color.g;
-			//packet << go->color.b;
-			//packet << go->color.a;
-			//packet << go->name;
-			//packet << go->clientInstanceNID;
-			//packet << (go->animation != nullptr); //Boolean to know if there is animation
-			//if (go->animation)
-			//{
-			//	packet << go->animation->tag;
-			//}
-			//else
-			//{
-			//	packet << go->texture->UID;
-			//}
+			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
+			packet << go->position.x;
+			packet << go->position.y;
+			packet << go->size.x;
+			packet << go->size.y;
+			packet << go->name;
+			packet << go->clientInstanceNID;
 		}
 		else if ((*it_c).second == ReplicationAction::Update_Position)
 		{
-			/*GameObject* go = App->modLinkingContext->getNetworkGameObject((*it_c).first);
+			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
-			packet << go->angle;*/
-		}
-		else if ((*it_c).second == ReplicationAction::Update_Texture)
-		{
-			/*GameObject* go = App->modLinkingContext->getNetworkGameObject((*it_c).first);
-			if (go->texture != nullptr)
-			{
-				packet << go->texture->UID;
-				packet << go->size.x;
-				packet << go->size.y;
-				packet << go->order;
-			}*/
-		}
-		else if ((*it_c).second == ReplicationAction::Update_Alpha)
-		{
-			/*GameObject* go = App->modLinkingContext->getNetworkGameObject((*it_c).first);
-			packet << go->color.a;*/
-		}
-		else if ((*it_c).second == ReplicationAction::Update_Animation)
-		{
-			/*GameObject* go = App->modLinkingContext->getNetworkGameObject((*it_c).first);
-			if (go->animation != nullptr)
-			{
-				packet << go->animation->spriteDuration;
-			}*/
+			packet << go->angle;
 		}
 	}
 
