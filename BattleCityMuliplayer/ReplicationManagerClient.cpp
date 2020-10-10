@@ -48,19 +48,19 @@ void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 cli
 				//	go->position = clientPlayer->position + forward * bullet_offset.y + right * bullet_offset.x;
 				//}
 			}
-			//if (go->isPlayer)
-			//{
-			//	/*Player* script = new Player();
-			//	script->gameObject = go;
-			//	script->isServer = false;
-			//	script->laser = App->modNetClient->spawnLaser(go);
-			//	script->laser->doInterpolation = false;
-			//	go->behaviour = script;*/
-			//}
-			//go->final_position = go->position;
-			//go->initial_position = go->position;
-			//go->final_angle = go->angle;
-			//go->initial_angle = go->angle;
+			if (go->isPlayer)
+			{
+				Player* script = new Player();
+				script->gameObject = go;
+				script->isServer = false;
+				//script->laser = GameManager::getInstance()->GetModNetClient()->spawnLaser(go);
+				//script->laser->doInterpolation = false;
+				go->behaviour = script;
+			}
+			go->final_position = go->position;
+			go->initial_position = go->position;
+			go->final_angle = go->angle;
+			go->initial_angle = go->angle;
 		}
 		else if (action == ReplicationAction::Update_Position)
 		{
