@@ -155,8 +155,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					OutputMemoryStream welcomePacket;
 					welcomePacket << ServerMessage::Welcome;
 					welcomePacket << proxy->clientId;
-					//welcomePacket << proxy->gameObject->networkId;
-					welcomePacket << proxy->clientId;
+					welcomePacket << proxy->gameObject->networkId;
 					sendPacket(welcomePacket, fromAddress);
 
 					// Send all network objects to the new player
@@ -199,23 +198,23 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					packet >> inputData.sequenceNumber;
 					packet >> inputData.horizontalAxis;
 					packet >> inputData.verticalAxis;
-					//packet >> inputData.buttonBits;
+					packet >> inputData.buttonBits;
 					packet >> inputData.mouseX;
 					packet >> inputData.mouseY;
 					packet >> inputData.leftButton;
 					if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
 					{
-						////Process Keyboard
-						//proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
-						//proxy->gamepad.verticalAxis = inputData.verticalAxis;
-						////unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
-						////proxy->gameObject->behaviour->onInput(proxy->gamepad);
-						////Process Mouse
-						//proxy->mouse.x = inputData.mouseX;
-						//proxy->mouse.y = inputData.mouseY;
-						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
-						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
-						//proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
+						//Process Keyboard
+						proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
+						proxy->gamepad.verticalAxis = inputData.verticalAxis;
+						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
+						proxy->gameObject->behaviour->onInput(proxy->gamepad);
+						//Process Mouse
+						proxy->mouse.x = inputData.mouseX;
+						proxy->mouse.y = inputData.mouseY;
+						proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
+						proxy->gameObject->behaviour->onMouse(proxy->mouse);
+						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
 				}
 			}

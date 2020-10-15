@@ -67,7 +67,7 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastPing = 0.0f;
 	lastPacketReceivedTime = Time.time;
 
-	//App->modGameObject->interpolateEntities = true;
+	GameManager::getInstance()->GetModGameObject()->interpolateEntities = true;
 }
 void ModuleNetworkingClient::onGui()
 {
@@ -104,7 +104,7 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Text("Input:");
 				ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
 				ImGui::Separator();
-				//ImGui::Checkbox("Entity interpolation", &App->modGameObject->interpolateEntities);
+				ImGui::Checkbox("Entity interpolation", &GameManager::getInstance()->GetModGameObject()->interpolateEntities);
 				ImGui::Checkbox("Client prediction", &clientPrediction);
 				if (clientPrediction) ImGui::Checkbox("Server Reconciliation", &serverReconciliation);
 			}
@@ -216,7 +216,7 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.sequenceNumber = currentInputData;
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
-			//inputPacketData.buttonBits = packInputControllerButtons(Input);
+			inputPacketData.buttonBits = packInputControllerButtons(Input);
 			inputPacketData.mouseX = Mouse.x - Window.width / 2;
 			inputPacketData.mouseY = Mouse.y - Window.height / 2;
 			inputPacketData.leftButton = Mouse.buttons[0];
@@ -232,7 +232,7 @@ void ModuleNetworkingClient::onUpdate()
 					packet << inputPacketData.sequenceNumber;
 					packet << inputPacketData.horizontalAxis;
 					packet << inputPacketData.verticalAxis;
-					//packet << inputPacketData.buttonBits;
+					packet << inputPacketData.buttonBits;
 					packet << inputPacketData.mouseX;
 					packet << inputPacketData.mouseY;
 					packet << inputPacketData.leftButton;
@@ -330,7 +330,7 @@ void ModuleNetworkingClient::processAllInputs()
 			//Process Keyboard
 			input.horizontalAxis = inputPacketData.horizontalAxis;
 			input.verticalAxis = inputPacketData.verticalAxis;
-			//unpackInputControllerButtons(inputPacketData.buttonBits, input);
+			unpackInputControllerButtons(inputPacketData.buttonBits, input);
 			playerClientGameObject->behaviour->onInput(input);
 
 			//Process Mouse
