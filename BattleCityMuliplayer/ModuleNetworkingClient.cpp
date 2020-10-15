@@ -94,7 +94,8 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Text(" - Network id: %u", networkId);
 				D3DXVECTOR3 playerPosition = {};
 				GameObject* playerGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
-				if (playerGameObject != nullptr) playerPosition = playerGameObject->position;
+				if (playerGameObject != nullptr) 
+					playerPosition = playerGameObject->position;
 				ImGui::Text(" - Coordinates: (%f, %f)", playerPosition.x, playerPosition.y);
 				ImGui::Separator();
 				ImGui::Text("Connection checking info:");

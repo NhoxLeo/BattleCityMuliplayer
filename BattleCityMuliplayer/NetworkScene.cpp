@@ -218,6 +218,16 @@ void NetworkScene::Update(float deltaTime)
 		modNetClientptr->preUpdate();
 		modNetClientptr->update();
 		modNetClientptr->gui();
+
+		/*if (GameManager::getInstance()->getClick1() == ABUTTON_ON) Input.horizontalAxis = -1;
+		else if (GameManager::getInstance()->getClick1() == DBUTTON_ON)Input.horizontalAxis = 1;
+		else Input.horizontalAxis = 0;
+		if (GameManager::getInstance()->getClick1() == WBUTTON_ON) Input.verticalAxis = 1;
+		else if (GameManager::getInstance()->getClick1() == SBUTTON_ON)Input.verticalAxis = -1;
+		else Input.verticalAxis = 0;
+		GameObject* tankNetworkObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(GameManager::getInstance()->GetModNetClient()->GetNetworkID());
+		if (tankNetworkObject != NULL)
+			MyTank1->setPosition(tankNetworkObject->position);*/
 	}
 
 	//Debug
@@ -235,8 +245,8 @@ void NetworkScene::Update(float deltaTime)
 	MyTank1->setSpeed(Speed(0, 0));
 	if (GameManager::getInstance()->getClick1() == ABUTTON_ON)
 	{
-		MyTank1->setSpeed(Speed(-1, 0));
-		MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
+		//MyTank1->setSpeed(Speed(-1, 0));
+		//MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
 	}
 	if (GameManager::getInstance()->getClick1() == SBUTTON_ON)
 	{

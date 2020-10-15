@@ -16,6 +16,8 @@ public:
 
 	GameObject* spawnLaser(GameObject* player);
 
+	uint32 GetNetworkID() { return networkId; }
+
 	// Replication Delay
 	float replicationPing = 0.0f;
 

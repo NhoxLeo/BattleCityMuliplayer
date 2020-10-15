@@ -402,6 +402,7 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 	clientProxy.gameObject->size = D3DXVECTOR3(43, 49, 0);
 	clientProxy.gameObject->angle = 45.0f;
 	clientProxy.gameObject->order = 3;
+	clientProxy.gameObject->position = D3DXVECTOR3(272, 444, 0);
 
 	//clientProxy.gameObject->texture = App->modResources->robot;
 	//clientProxy.gameObject->color.a = 0.75f;
