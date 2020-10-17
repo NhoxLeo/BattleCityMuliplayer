@@ -10,6 +10,7 @@
 #include "GameScene.h"
 #include "NetworkScene.h"
 //#include "Sound.h"
+#include "Networks.h"
 
 static DWORD dwTime = GetTickCount();
 DWORD m_Fps;
@@ -17,6 +18,25 @@ DWORD m_ElapsedTime;
 DWORD m_PrevTime = GetTickCount();
 DWORD m_NowTime;
 DWORD m_DeltaTime;
+
+static LONGLONG GlobalPerfCountFrequency;
+static LARGE_INTEGER StartTime;
+static LARGE_INTEGER EndTime;
+static real32 GameUpdateHz;
+static real32 TargetSecondsPerFrame;
+inline LARGE_INTEGER Win32GetWallClock(void)
+{
+	LARGE_INTEGER Result;
+	QueryPerformanceCounter(&Result);
+	return(Result);
+}
+inline float Win32GetSecondsElapsed(LARGE_INTEGER Start, LARGE_INTEGER End)
+{
+	float Result = ((float)(End.QuadPart - Start.QuadPart) /
+		(float)GlobalPerfCountFrequency);
+	return(Result);
+}
+
 
 Message::Message(UINT m, void(*f)(HWND, WPARAM, LPARAM))
 {
@@ -54,8 +74,22 @@ bool MyWindow::Create()
 		NULL);
 	GameManager::getInstance()->Create(m_hwnd, m_hInstance);
 	frame->Create();
-	ShowWindow(m_hwnd,SW_SHOW);
+	ShowWindow(m_hwnd, SW_SHOW);
 	UpdateWindow(m_hwnd);
+
+	// Is this query reliable?
+	int MonitorRefreshHz = 60;
+	HDC RefreshDC = GetDC(m_hwnd);
+	int Win32RefreshRate = GetDeviceCaps(RefreshDC, VREFRESH);
+	ReleaseDC(m_hwnd, RefreshDC);
+	if (Win32RefreshRate > 1)
+	{
+		MonitorRefreshHz = Win32RefreshRate;
+	}
+	GameUpdateHz = (MonitorRefreshHz / 1.0f);
+	TargetSecondsPerFrame = 1.0f / (real32)GameUpdateHz;
+	StartTime = Win32GetWallClock();
+
 
 	return true;
 }
@@ -123,9 +157,9 @@ int MyWindow::MessageProc()
 	Controller::getInstance4()->InitControl(m_hwnd, m_hInstance);
 	//BASS_Init(-1, 44100, 0, 0, NULL);
 
-	while (msg.message!=WM_QUIT)
+	while (msg.message != WM_QUIT)
 	{
-		if (PeekMessage(&msg,NULL,NULL,NULL,PM_REMOVE))
+		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -137,6 +171,19 @@ int MyWindow::MessageProc()
 			DWORD fElapsedTime = dwElapsedTime*0.001f;
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
+
+			static bool firstIteration = true;
+			if (firstIteration)
+			{
+				StartTime = Win32GetWallClock();
+				firstIteration = false;
+			}
+			// Time management
+			EndTime = Win32GetWallClock();
+			Time.frameTime = Win32GetSecondsElapsed(StartTime, EndTime);
+			Time.deltaTime = TargetSecondsPerFrame;
+			Time.time += (double)Time.deltaTime;
+			StartTime = EndTime;
 
 			m_NowTime = GetTickCount();
 			m_DeltaTime = m_NowTime - m_PrevTime;
@@ -155,7 +202,7 @@ std::string UnicodeToANSI(const std::wstring& str)
 {
 	int iTextlen = WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, NULL, 0, NULL, NULL);
 	char* pEleMentText = new char[iTextlen + 1];
-	memset((void*)pEleMentText, 0, sizeof(char)*(iTextlen + 1));
+	memset((void*)pEleMentText, 0, sizeof(char) * (iTextlen + 1));
 	WideCharToMultiByte(CP_ACP, 0, str.c_str(), -1, pEleMentText, iTextlen, NULL, NULL);
 	std::string strText(pEleMentText);
 	delete[] pEleMentText;
@@ -167,7 +214,7 @@ std::wstring ANSIToUnicode(const std::string& str)
 	int unicodelen = MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, NULL, 0);
 	wchar_t* pUnicode;
 	pUnicode = new wchar_t[unicodelen + 1];
-	memset(pUnicode, 0, (unicodelen + 1)*sizeof(wchar_t));
+	memset(pUnicode, 0, (unicodelen + 1) * sizeof(wchar_t));
 	MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, (LPWSTR)pUnicode, unicodelen);
 	std::wstring rt(pUnicode);
 	delete pUnicode;

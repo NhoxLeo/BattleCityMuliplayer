@@ -161,8 +161,8 @@ void NetworkScene::Update()
 
 void NetworkScene::Update(float deltaTime)
 {
-	Time.deltaTime = deltaTime;
-	Time.time += (double)Time.deltaTime;
+	//Time.deltaTime = deltaTime;
+	//Time.time += (double)Time.deltaTime;
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -214,20 +214,21 @@ void NetworkScene::Update(float deltaTime)
 	}
 	if (isClient)
 	{
-		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-		modNetClientptr->preUpdate();
-		modNetClientptr->update();
-		modNetClientptr->gui();
-
-		/*if (GameManager::getInstance()->getClick1() == ABUTTON_ON) Input.horizontalAxis = -1;
+		if (GameManager::getInstance()->getClick1() == ABUTTON_ON) Input.horizontalAxis = -1;
 		else if (GameManager::getInstance()->getClick1() == DBUTTON_ON)Input.horizontalAxis = 1;
 		else Input.horizontalAxis = 0;
 		if (GameManager::getInstance()->getClick1() == WBUTTON_ON) Input.verticalAxis = 1;
 		else if (GameManager::getInstance()->getClick1() == SBUTTON_ON)Input.verticalAxis = -1;
 		else Input.verticalAxis = 0;
+
+		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+		modNetClientptr->preUpdate();
+		modNetClientptr->update();
+		modNetClientptr->gui();
+
 		GameObject* tankNetworkObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(GameManager::getInstance()->GetModNetClient()->GetNetworkID());
 		if (tankNetworkObject != NULL)
-			MyTank1->setPosition(tankNetworkObject->position);*/
+			MyTank1->setPosition(tankNetworkObject->position);
 	}
 
 	//Debug
@@ -250,18 +251,18 @@ void NetworkScene::Update(float deltaTime)
 	}
 	if (GameManager::getInstance()->getClick1() == SBUTTON_ON)
 	{
-		MyTank1->setSpeed(Speed(0, 1));
-		MyTank1->setDirection(D3DXVECTOR3(0, 1, 0));
+	/*	MyTank1->setSpeed(Speed(0, 1));
+		MyTank1->setDirection(D3DXVECTOR3(0, 1, 0));*/
 	}
 	if (GameManager::getInstance()->getClick1() == WBUTTON_ON)
 	{
-		MyTank1->setSpeed(Speed(0, -1));
-		MyTank1->setDirection(D3DXVECTOR3(0, -1, 0));
+		/*MyTank1->setSpeed(Speed(0, -1));
+		MyTank1->setDirection(D3DXVECTOR3(0, -1, 0));*/
 	}
 	if (GameManager::getInstance()->getClick1() == DBUTTON_ON)
 	{
-		MyTank1->setSpeed(Speed(1, 0));
-		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
+	/*	MyTank1->setSpeed(Speed(1, 0));
+		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));*/
 	}
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
 	{
