@@ -36,7 +36,17 @@ inline float Win32GetSecondsElapsed(LARGE_INTEGER Start, LARGE_INTEGER End)
 		(float)GlobalPerfCountFrequency);
 	return(Result);
 }
-
+static void Win32ProcessKeyboardButton(ButtonState* NewState, bool IsDown)
+{
+	if (IsDown)
+	{
+		*NewState = Press;
+	}
+	else
+	{
+		*NewState = Release;
+	}
+}
 
 Message::Message(UINT m, void(*f)(HWND, WPARAM, LPARAM))
 {
@@ -171,6 +181,52 @@ int MyWindow::MessageProc()
 			DWORD fElapsedTime = dwElapsedTime*0.001f;
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
+
+			switch (msg.message)
+			{
+			case WM_QUIT:
+				return false;
+			case WM_SYSKEYDOWN:
+			case WM_SYSKEYUP:
+			case WM_KEYDOWN:
+			case WM_KEYUP:
+				if (ImGui::GetIO().WantCaptureKeyboard == false)
+				{
+					unsigned int VKCode = (unsigned int)msg.wParam;
+					bool AltKeyWasDown = (msg.lParam & (1 << 29));
+					bool ShiftKeyWasDown = (GetKeyState(VK_SHIFT) & (1 << 15));
+					bool WasDown = ((msg.lParam & (1UL << 30)) != 0);
+					bool IsDown = ((msg.lParam & (1UL << 31)) == 0);
+
+					if (WasDown != IsDown)
+					{
+						if (VKCode == VK_UP)
+						{
+							Win32ProcessKeyboardButton(&Input.actionUp, IsDown);
+						}
+						else if (VKCode == VK_LEFT)
+						{
+							Win32ProcessKeyboardButton(&Input.actionLeft, IsDown);
+						}
+						else if (VKCode == VK_DOWN)
+						{
+							Win32ProcessKeyboardButton(&Input.actionDown, IsDown);
+						}
+						else if (VKCode == VK_RIGHT)
+						{
+							Win32ProcessKeyboardButton(&Input.actionRight, IsDown);
+						}
+						else if (VKCode == VK_ESCAPE)
+						{
+							Win32ProcessKeyboardButton(&Input.back, IsDown);
+						}
+					}
+				}
+				::TranslateMessage(&msg);
+				break;
+
+			default:;
+			}
 
 			static bool firstIteration = true;
 			if (firstIteration)
