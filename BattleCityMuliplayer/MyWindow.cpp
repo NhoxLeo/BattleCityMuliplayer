@@ -11,6 +11,7 @@
 #include "NetworkScene.h"
 //#include "Sound.h"
 #include "Networks.h"
+#include "KeyboardInput.h"
 
 static DWORD dwTime = GetTickCount();
 DWORD m_Fps;
@@ -181,7 +182,7 @@ int MyWindow::MessageProc()
 			DWORD fElapsedTime = dwElapsedTime*0.001f;
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
-
+			Input.horizontalAxis = Input.verticalAxis = 0;
 			switch (msg.message)
 			{
 			case WM_QUIT:
@@ -189,6 +190,17 @@ int MyWindow::MessageProc()
 			case WM_SYSKEYDOWN:
 			case WM_SYSKEYUP:
 			case WM_KEYDOWN:
+				if (ImGui::GetIO().WantCaptureKeyboard == false)
+				{
+					unsigned int VKCode = (unsigned int)msg.wParam;
+					bool AltKeyWasDown = (msg.lParam & (1 << 29));
+					bool ShiftKeyWasDown = (GetKeyState(VK_SHIFT) & (1 << 15));
+					bool WasDown = ((msg.lParam & (1UL << 30)) != 0);
+					bool IsDown = ((msg.lParam & (1UL << 31)) == 0);
+
+					Input.horizontalAxis = (VKCode == VK_LEFT) ? -1 : ((VKCode == VK_RIGHT) ? 1 : 0);
+					Input.verticalAxis = (VKCode == VK_DOWN) ? -1 : ((VKCode == VK_UP) ? 1 : 0);
+				}
 			case WM_KEYUP:
 				if (ImGui::GetIO().WantCaptureKeyboard == false)
 				{
@@ -293,6 +305,7 @@ void MyWindow::Update(float ElapsedTime)
 	x = ANSIToUnicode(szBuf);
 	Text = (LPCWSTR)x.c_str();
 	RECT rect = { 0,40, 100, 90 };
+	KeyboardInput::getInstance()->Update();
 	GameManager::getInstance()->checkclick1();
 	GameManager::getInstance()->checkclick2();
 	GameManager::getInstance()->checkclick3();

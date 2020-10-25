@@ -44,9 +44,9 @@ GameManager* GameManager::getInstance()
 		Instance->MapMake = false;
 		Instance->setMap();
 		Instance->setScene(NULL);
-	/*	Instance->award = Sound::create(_T("../sound/Award.mp3"));
-		Instance->LifeAdd = Sound::create(_T("../sound/LifeAdd.mp3"));
-		Instance->boom = Sound::create(_T("../sound/boom.mp3"));*/
+		/*	Instance->award = Sound::create(_T("../sound/Award.mp3"));
+			Instance->LifeAdd = Sound::create(_T("../sound/LifeAdd.mp3"));
+			Instance->boom = Sound::create(_T("../sound/boom.mp3"));*/
 	}
 	return Instance;
 }
@@ -118,7 +118,7 @@ UINT GameManager::getClick4()
 }
 
 
-void GameManager::UpdateColl(Tank* tank,Bullet* bullet)
+void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 {
 	if (tank->getTouchAbleState())
 	{
@@ -132,7 +132,7 @@ void GameManager::UpdateColl(Tank* tank,Bullet* bullet)
 				{
 					bullet->BigBoom();
 				}
-				else if(tank->getLevel() == 3)
+				else if (tank->getLevel() == 3)
 				{
 					tank->setRenderRet(28, 28, (3 - tank->getLife()) * 56, 0);
 				}
@@ -201,7 +201,7 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 				sp1->setRet(Ret(Size(sp1->getHeight() - 8, sp1->getwidth()), sp1->getPosition()));
 				sp1->setRenderRet(sp1->getRenderRet()->RenderSize->getHeight() - 8, sp1->getRenderRet()->RenderSize->getwidth(), 0, 0);
 			}
-			if (sp1->getHeight() <= 0||sp1->getwidth() <= 0)
+			if (sp1->getHeight() <= 0 || sp1->getwidth() <= 0)
 			{
 				sp1->release();
 			}
@@ -218,7 +218,7 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 		bullet->SmallBoom();
 		return;
 	}
-	if (sp1->getType() == 6||
+	if (sp1->getType() == 6 ||
 		sp1->getType() == 7 ||
 		sp1->getType() == 8 ||
 		sp1->getType() == 9)
@@ -241,7 +241,7 @@ void GameManager::UpdateColl(Award* aw, Tank* tank)
 		}
 		if (aw->getType() == 1)
 		{
-			for (int i = 0; i < TankArray::getInstance()->getNumber();i++)
+			for (int i = 0; i < TankArray::getInstance()->getNumber(); i++)
 			{
 				if (!TankArray::getInstance()->getTankArray()[i]->getCamp())
 				{
@@ -257,7 +257,7 @@ void GameManager::UpdateColl(Award* aw, Tank* tank)
 		if (aw->getType() == 3)
 		{
 			//boom->Play();
-			for (int i = 0; i < TankArray::getInstance()->getNumber();i++)
+			for (int i = 0; i < TankArray::getInstance()->getNumber(); i++)
 			{
 				if (!TankArray::getInstance()->getTankArray()[i]->getCamp())
 				{
@@ -1422,6 +1422,37 @@ void GameManager::setMap()
 	};
 	map34->setMap(mapArray34);
 	MapManager::getInstance()->addMap(map34);
+}
+
+void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
+{
+	Tank* playerTank = Tank::create();
+	playerTank->setPlayer((int)_networkID);
+	playerTank->setCamp(true);
+	playerTank->setPosition(position);
+	//playerTank->SetNetworkID(networkID);
+	nowScene->addActiveChild(playerTank);
+	TankArray::getInstance()->pushTank(playerTank);
+	//playerTanks->push_back(playerTank);
+}
+
+void GameManager::UpdatePlayerTankLocal()
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i) != NULL) TankArray::getInstance()->getTankArray().at(i)->Update();
+	}
+}
+void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			TankArray::getInstance()->getTankArray().at(i)->setPosition(position);
+			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
+		}
+	}
 }
 
 void GameManager::CreateServer()

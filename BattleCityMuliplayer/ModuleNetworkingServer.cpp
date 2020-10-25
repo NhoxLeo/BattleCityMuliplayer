@@ -212,11 +212,11 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
 
-						//Process Mouse
-						proxy->mouse.x = inputData.mouseX;
-						proxy->mouse.y = inputData.mouseY;
-						proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
-						proxy->gameObject->behaviour->onMouse(proxy->mouse);
+						////Process Mouse
+						//proxy->mouse.x = inputData.mouseX;
+						//proxy->mouse.y = inputData.mouseY;
+						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
+						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
 
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
@@ -429,6 +429,7 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 
 	// Assign a new network identity to the object
 	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(clientProxy.gameObject);
+	GameManager::getInstance()->CreatePlayerTank(clientProxy.gameObject->networkId,clientProxy.gameObject->position);
 
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)

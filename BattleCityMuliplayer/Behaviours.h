@@ -1,4 +1,5 @@
 #pragma once
+#include"GameManager.h"
 
 struct Behaviour
 {
@@ -146,33 +147,41 @@ struct Player : public Behaviour
 
 	void onInput(const InputController& input) override
 	{
-		if (!isDown)
+		//if (!isDown)
+		//{
+		//	if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
+		//	{
+		//		const float advanceSpeed = 200.0f;
+		//		if (gameObject->position.x < 905 && input.horizontalAxis > 0.0f) /*Limit on the east*/
+		//		{
+		//			gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
+		//		}
+		//		else if (gameObject->position.x > -900 && input.horizontalAxis < 0.0f)/*Limit on the west*/
+		//		{
+		//			gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
+		//		}
+		//		if (gameObject->position.y > -1015 && input.verticalAxis > 0.0f) /*Limit on the north*/
+		//		{
+		//			gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
+		//		}
+		//		else if (gameObject->position.y < 1005 && input.verticalAxis < 0.0f) /*Limit on the south*/
+		//		{
+		//			gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
+		//		}
+		//		NetworkCommunication(UPDATE_POSITION, gameObject);
+		//	}
+		//}
+		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
 		{
-			if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
-			{
-				const float advanceSpeed = 200.0f;
-				if (gameObject->position.x < 905 && input.horizontalAxis > 0.0f) /*Limit on the east*/
-				{
-					gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-				}
-				else if (gameObject->position.x > -900 && input.horizontalAxis < 0.0f)/*Limit on the west*/
-				{
-					gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-				}
+			const float advanceSpeed = 200.0f;
+			if (input.horizontalAxis > 0.0f)  gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
+			else if (input.horizontalAxis < 0.0f) gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
+			if (input.verticalAxis > 0.0f)gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
+			else if (input.verticalAxis < 0.0f) gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
 
-				if (gameObject->position.y > -1015 && input.verticalAxis > 0.0f) /*Limit on the north*/
-				{
-					gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
-				}
-				else if (gameObject->position.y < 1005 && input.verticalAxis < 0.0f) /*Limit on the south*/
-				{
-					gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
-				}
+			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, gameObject->position, gameObject->position);
 
-
-
-				NetworkCommunication(UPDATE_POSITION, gameObject);
-			}
+			NetworkCommunication(UPDATE_POSITION, gameObject);
 		}
 	}
 

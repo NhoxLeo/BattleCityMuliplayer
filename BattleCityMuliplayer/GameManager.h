@@ -131,6 +131,10 @@ public:
 	void changeMapMake() { MapMake = !MapMake; }
 	bool getMapMake() { return MapMake; }
 
+	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
+	void UpdatePlayerTankLocal();
+	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation);
+
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }
 	void CreateServer();

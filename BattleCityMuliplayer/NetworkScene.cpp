@@ -6,6 +6,7 @@
 #include "StaticSprite.h"
 #include "ActiveSprite.h"
 #include "Networks.h"
+#include "KeyboardInput.h"
 
 
 bool NetworkScene::init()
@@ -18,13 +19,13 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	MyTank1 = Tank::create();
+	/*MyTank1 = Tank::create();
 	MyTank1->setPlayer(1);
 
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
 
-	addActiveChild(MyTank1);
+	addActiveChild(MyTank1);*/
 
 
 	Scene* scene = this;
@@ -163,6 +164,10 @@ void NetworkScene::Update(float deltaTime)
 {
 	//Time.deltaTime = deltaTime;
 	//Time.time += (double)Time.deltaTime;
+	Scene::Update();
+	GameManager::getInstance()->UpdatePlayerTankLocal();
+	/*MyTank1->Update();
+	MyTank1->setSpeed(Speed(0, 0));*/
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -214,21 +219,26 @@ void NetworkScene::Update(float deltaTime)
 	}
 	if (isClient)
 	{
-		if (GameManager::getInstance()->getClick1() == ABUTTON_ON) Input.horizontalAxis = -1;
-		else if (GameManager::getInstance()->getClick1() == DBUTTON_ON)Input.horizontalAxis = 1;
-		else Input.horizontalAxis = 0;
-		if (GameManager::getInstance()->getClick1() == WBUTTON_ON) Input.verticalAxis = 1;
-		else if (GameManager::getInstance()->getClick1() == SBUTTON_ON)Input.verticalAxis = -1;
-		else Input.verticalAxis = 0;
-
 		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
 		modNetClientptr->preUpdate();
 		modNetClientptr->update();
 		modNetClientptr->gui();
 
-		GameObject* tankNetworkObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(GameManager::getInstance()->GetModNetClient()->GetNetworkID());
+		uint16 networkGameObjectsCount;
+		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
+		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+		
+		/*GameObject* tankNetworkObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(GameManager::getInstance()->GetModNetClient()->GetNetworkID());
 		if (tankNetworkObject != NULL)
-			MyTank1->setPosition(tankNetworkObject->position);
+			GameManager::getInstance()->UpdatePlayerTank(tankNetworkObject->networkId, tankNetworkObject->position, tankNetworkObject->position);*/
+
+		for (int i = 0; i < 32; i++)
+		{
+			if (networkGameObjects[i] != NULL)
+			{
+				GameManager::getInstance()->UpdatePlayerTank(networkGameObjects[i]->networkId, networkGameObjects[i]->position, networkGameObjects[i]->position);
+			}
+		}
 	}
 
 	//Debug
@@ -240,30 +250,17 @@ void NetworkScene::Update(float deltaTime)
 
 	//NetworkScene::DebugBool(MyTank1->getAwardAble());
 
+	/*if (KeyboardInput::getInstance()->GetKeyState('A') == KeyState::Pressed)
+	{
+		MyTank1->setSpeed(Speed(-1, 0));
+		MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
+	}
+	if (KeyboardInput::getInstance()->GetKeyState('D') == KeyState::Pressed)
+	{
+		MyTank1->setSpeed(Speed(1, 0));
+		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
+	}*/
 
-	Scene::Update();
-	MyTank1->Update();
-	MyTank1->setSpeed(Speed(0, 0));
-	if (GameManager::getInstance()->getClick1() == ABUTTON_ON)
-	{
-		//MyTank1->setSpeed(Speed(-1, 0));
-		//MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
-	}
-	if (GameManager::getInstance()->getClick1() == SBUTTON_ON)
-	{
-	/*	MyTank1->setSpeed(Speed(0, 1));
-		MyTank1->setDirection(D3DXVECTOR3(0, 1, 0));*/
-	}
-	if (GameManager::getInstance()->getClick1() == WBUTTON_ON)
-	{
-		/*MyTank1->setSpeed(Speed(0, -1));
-		MyTank1->setDirection(D3DXVECTOR3(0, -1, 0));*/
-	}
-	if (GameManager::getInstance()->getClick1() == DBUTTON_ON)
-	{
-	/*	MyTank1->setSpeed(Speed(1, 0));
-		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));*/
-	}
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
 	{
 		MyTank1->fire();
@@ -272,8 +269,8 @@ void NetworkScene::Update(float deltaTime)
 	{
 		PostQuitMessage(0);
 	}
-	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();
+	//TankArray::getInstance()->VisitAll();
+	//BulletArray::getInstance()->VisitAll();
 }
 
 void NetworkScene::clear()
