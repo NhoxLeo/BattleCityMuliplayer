@@ -1430,9 +1430,8 @@ void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
 	playerTank->setPlayer((int)_networkID);
 	playerTank->setCamp(true);
 	playerTank->setPosition(position);
-	//playerTank->SetNetworkID(networkID);
 	nowScene->addActiveChild(playerTank);
-	TankArray::getInstance()->pushTank(playerTank);
+	//TankArray::getInstance()->pushTank(playerTank);
 	//playerTanks->push_back(playerTank);
 }
 
@@ -1442,6 +1441,25 @@ void GameManager::UpdatePlayerTankLocal()
 	{
 		if (TankArray::getInstance()->getTankArray().at(i) != NULL) TankArray::getInstance()->getTankArray().at(i)->Update();
 	}
+}
+void GameManager::PreUpdateAllPlayerTank()
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
+	}
+}
+void GameManager::UpdateAllPlayerTank()
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		TankArray::getInstance()->getTankArray().at(i)->Update();
+	}
+	TankArray::getInstance()->VisitAll();
+}
+void GameManager::AllPlayerTankVisitAll()
+{
+	TankArray::getInstance()->VisitAll();
 }
 void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation)
 {
@@ -1453,6 +1471,57 @@ void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DX
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
 		}
 	}
+}
+
+void GameManager::UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(_input.x, -_input.y));
+			TankArray::getInstance()->getTankArray().at(i)->setDirection(D3DXVECTOR3(_input.x, -_input.y,0));
+		}
+	}
+}
+
+Tank* GameManager::GetPlayerTank(int _networkID)
+{
+	Tank* tank = NULL;
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			tank = TankArray::getInstance()->getTankArray().at(i);
+		}
+	}
+	return nullptr;
+}
+
+D3DXVECTOR3 GameManager::GetPlayerTankPosition(int _networkID)
+{
+	D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0);
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			position = TankArray::getInstance()->getTankArray().at(i)->getPosition();
+		}
+	}
+	return position;
+}
+
+D3DXVECTOR3 GameManager::GetPlayerTankRotation(int _networkID)
+{
+	D3DXVECTOR3 rotation = D3DXVECTOR3(0, 0, 0);
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			rotation = TankArray::getInstance()->getTankArray().at(i)->getDirection();
+		}
+	}
+	return rotation;
 }
 
 void GameManager::CreateServer()

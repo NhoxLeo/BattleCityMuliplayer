@@ -21,10 +21,8 @@ bool NetworkScene::init()
 
 	/*MyTank1 = Tank::create();
 	MyTank1->setPlayer(1);
-
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-
 	addActiveChild(MyTank1);*/
 
 
@@ -162,12 +160,15 @@ void NetworkScene::Update()
 
 void NetworkScene::Update(float deltaTime)
 {
-	//Time.deltaTime = deltaTime;
-	//Time.time += (double)Time.deltaTime;
 	Scene::Update();
-	GameManager::getInstance()->UpdatePlayerTankLocal();
-	/*MyTank1->Update();
-	MyTank1->setSpeed(Speed(0, 0));*/
+
+	GameManager::getInstance()->PreUpdateAllPlayerTank();
+	GameManager::getInstance()->UpdateAllPlayerTank();
+
+	//MyTank1->Update();
+	//MyTank1->setSpeed(Speed(0, 0));
+	//MyTank1->setSpeed(Speed(Input.horizontalAxis,Input.verticalAxis));
+	//MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis,Input.verticalAxis,0));
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -247,9 +248,7 @@ void NetworkScene::Update(float deltaTime)
 	sprintf(newchar, "%d", newint);
 	ImGui::Text("Debug: ");
 	ImGui::Text((const char*)newchar);*/
-
 	//NetworkScene::DebugBool(MyTank1->getAwardAble());
-
 	/*if (KeyboardInput::getInstance()->GetKeyState('A') == KeyState::Pressed)
 	{
 		MyTank1->setSpeed(Speed(-1, 0));
@@ -260,7 +259,8 @@ void NetworkScene::Update(float deltaTime)
 		MyTank1->setSpeed(Speed(1, 0));
 		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
 	}*/
-
+	if (Input.horizontalAxis != 0)
+		int a = 1;
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
 	{
 		MyTank1->fire();

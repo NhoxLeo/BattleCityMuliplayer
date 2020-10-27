@@ -174,12 +174,17 @@ struct Player : public Behaviour
 		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
 		{
 			const float advanceSpeed = 200.0f;
-			if (input.horizontalAxis > 0.0f)  gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-			else if (input.horizontalAxis < 0.0f) gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-			if (input.verticalAxis > 0.0f)gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
-			else if (input.verticalAxis < 0.0f) gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
+	/*		if (input.horizontalAxis > 0.0f)  gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis;
+			else if (input.horizontalAxis < 0.0f) gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis;
+			if (input.verticalAxis > 0.0f)gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis;
+			else if (input.verticalAxis < 0.0f) gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis;*/
 
-			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, gameObject->position, gameObject->position);
+			D3DXVECTOR3 inputVector = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
+
+			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, gameObject->position, gameObject->position);
+			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, inputVector);
+			GameManager::getInstance()->AllPlayerTankVisitAll();
+			gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
 
 			NetworkCommunication(UPDATE_POSITION, gameObject);
 		}

@@ -133,7 +133,14 @@ public:
 
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
 	void UpdatePlayerTankLocal();
+	void PreUpdateAllPlayerTank();
+	void UpdateAllPlayerTank();
+	void AllPlayerTankVisitAll();
 	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation);
+	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);
+	Tank* GetPlayerTank(int _networkID);
+	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);
+	D3DXVECTOR3 GetPlayerTankRotation(int _networkID);
 
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }

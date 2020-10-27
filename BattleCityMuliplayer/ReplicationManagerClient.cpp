@@ -74,7 +74,7 @@ void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 cli
 			packet >> angle;
 			if (go != nullptr)
 			{
-				/*if (go->clientInstanceNID != 0)go->doInterpolation = true;
+				/*if (go->clientInstanceNID != 0)	go->doInterpolation = true;
 				go->newReplicationState(position, angle);
 				if (!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation)
 				{

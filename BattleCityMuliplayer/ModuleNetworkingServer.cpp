@@ -239,7 +239,6 @@ void ModuleNetworkingServer::onUpdate()
 	if (state == ServerState::Listening)
 	{
 		secondsSinceLastPing += Time.deltaTime;
-
 		// Replication
 		for (ClientProxy& clientProxy : clientProxies)
 		{
@@ -295,6 +294,9 @@ void ModuleNetworkingServer::onUpdate()
 
 		//Zombie Spawner WiP
 		ZombieSpawner();
+
+		GameManager::getInstance()->UpdateAllPlayerTank();
+		
 
 		//Server Reset Game Objects when there are no proxies connected
 		uint16 networkGameObjectsCount;
@@ -411,6 +413,7 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 {
 	// Create a new game object with the player properties
 	clientProxy.gameObject = Instantiate();
+	clientProxy.gameObject->position = D3DXVECTOR3(272, 444, 0);
 	//clientProxy.gameObject->size = { 43, 49 };
 	clientProxy.gameObject->angle = 45.0f;
 	clientProxy.gameObject->order = 3;
@@ -429,7 +432,7 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 
 	// Assign a new network identity to the object
 	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(clientProxy.gameObject);
-	GameManager::getInstance()->CreatePlayerTank(clientProxy.gameObject->networkId,clientProxy.gameObject->position);
+	GameManager::getInstance()->CreatePlayerTank(clientProxy.gameObject->networkId, clientProxy.gameObject->position);
 
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)
