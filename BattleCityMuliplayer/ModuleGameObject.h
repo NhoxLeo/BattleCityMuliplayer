@@ -7,6 +7,7 @@ struct GameObject
 
 	//Transform component
 	D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0);
+	D3DXVECTOR3 rotation = D3DXVECTOR3(0, 0, 0);
 
 	// Render component
 	D3DXVECTOR3 pivot = D3DXVECTOR3(0, 0, 0);
@@ -18,9 +19,11 @@ struct GameObject
 
 	// For entity interpolation
 	D3DXVECTOR3 initial_position = D3DXVECTOR3(0, 0, 0);
+	D3DXVECTOR3 initial_rotation = D3DXVECTOR3(0, 0, 0);
 	float initial_angle = 0.0f;
 
 	D3DXVECTOR3 final_position = D3DXVECTOR3(0, 0, 0);
+	D3DXVECTOR3 final_rotation = D3DXVECTOR3(0, 0, 0);
 	float final_angle = 0.0f;
 
 	float interpolationSecondsElapsed = 0.0f;

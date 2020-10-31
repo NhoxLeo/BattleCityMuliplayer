@@ -42,6 +42,7 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 		{
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
 			go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
+			go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
 			packet << go->size.x;
@@ -53,9 +54,12 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 		{
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
 			go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
+			go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
-			packet << go->angle;
+			packet << go->rotation.x;
+			packet << go->rotation.y;
+			//packet << go->angle;
 		}
 	}
 

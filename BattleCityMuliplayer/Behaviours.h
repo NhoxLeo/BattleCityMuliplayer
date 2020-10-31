@@ -183,7 +183,7 @@ struct Player : public Behaviour
 
 			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, gameObject->position, gameObject->position);
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, inputVector);
-			GameManager::getInstance()->AllPlayerTankVisitAll();
+			GameManager::getInstance()->SinglePlayerTankVisitAll(gameObject->networkId);
 			gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
 
 			NetworkCommunication(UPDATE_POSITION, gameObject);

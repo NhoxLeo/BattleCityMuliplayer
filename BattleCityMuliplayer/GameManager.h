@@ -135,6 +135,7 @@ public:
 	void UpdatePlayerTankLocal();
 	void PreUpdateAllPlayerTank();
 	void UpdateAllPlayerTank();
+	void SinglePlayerTankVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
 	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation);
 	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);

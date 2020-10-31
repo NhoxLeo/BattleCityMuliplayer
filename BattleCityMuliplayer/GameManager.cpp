@@ -1455,7 +1455,10 @@ void GameManager::UpdateAllPlayerTank()
 	{
 		TankArray::getInstance()->getTankArray().at(i)->Update();
 	}
-	TankArray::getInstance()->VisitAll();
+}
+void GameManager::SinglePlayerTankVisitAll(UINT32 _networkID)
+{
+	TankArray::getInstance()->SingleTankVisitAll(_networkID);
 }
 void GameManager::AllPlayerTankVisitAll()
 {
@@ -1468,6 +1471,7 @@ void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DX
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
 			TankArray::getInstance()->getTankArray().at(i)->setPosition(position);
+			TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
 		}
 	}

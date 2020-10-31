@@ -228,18 +228,6 @@ void NetworkScene::Update(float deltaTime)
 		uint16 networkGameObjectsCount;
 		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
 		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-		
-		/*GameObject* tankNetworkObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(GameManager::getInstance()->GetModNetClient()->GetNetworkID());
-		if (tankNetworkObject != NULL)
-			GameManager::getInstance()->UpdatePlayerTank(tankNetworkObject->networkId, tankNetworkObject->position, tankNetworkObject->position);*/
-
-		for (int i = 0; i < 32; i++)
-		{
-			if (networkGameObjects[i] != NULL)
-			{
-				GameManager::getInstance()->UpdatePlayerTank(networkGameObjects[i]->networkId, networkGameObjects[i]->position, networkGameObjects[i]->position);
-			}
-		}
 	}
 
 	//Debug
