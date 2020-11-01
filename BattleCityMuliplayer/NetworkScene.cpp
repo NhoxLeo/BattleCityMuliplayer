@@ -124,7 +124,7 @@ void NetworkScene::Update()
 
 
 	Scene::Update();
-	MyTank1->Update();
+	/*MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
 	if (GameManager::getInstance()->getClick1() == ABUTTON_ON)
 	{
@@ -155,14 +155,13 @@ void NetworkScene::Update()
 		PostQuitMessage(0);
 	}
 	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();
+	BulletArray::getInstance()->VisitAll();*/
 }
 
 void NetworkScene::Update(float deltaTime)
 {
 	Scene::Update();
 
-	GameManager::getInstance()->PreUpdateAllPlayerTank();
 	GameManager::getInstance()->UpdateAllPlayerTank();
 
 	//MyTank1->Update();
@@ -230,33 +229,27 @@ void NetworkScene::Update(float deltaTime)
 		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 	}
 
-	//Debug
-	/*UINT newint = MyTank1->getPosition().y;
-	char newchar[10] = "";
-	sprintf(newchar, "%d", newint);
-	ImGui::Text("Debug: ");
-	ImGui::Text((const char*)newchar);*/
+
+	////Debug
+	//UINT newint = MyTank1->getPosition().y;
+	//char newchar[10] = "";
+	//sprintf(newchar, "%d", newint);
+	//ImGui::Text("Debug: ");
+	//ImGui::Text((const char*)newchar);
 	//NetworkScene::DebugBool(MyTank1->getAwardAble());
-	/*if (KeyboardInput::getInstance()->GetKeyState('A') == KeyState::Pressed)
-	{
-		MyTank1->setSpeed(Speed(-1, 0));
-		MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
-	}
-	if (KeyboardInput::getInstance()->GetKeyState('D') == KeyState::Pressed)
-	{
-		MyTank1->setSpeed(Speed(1, 0));
-		MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
-	}*/
-	if (Input.horizontalAxis != 0)
-		int a = 1;
-	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
-	{
-		MyTank1->fire();
-	}
-	if (GameManager::getInstance()->getClick3() == ESCBUTTON_UP)
-	{
-		PostQuitMessage(0);
-	}
+
+	//if (KeyboardInput::getInstance()->GetKeyState('A') == KeyState::Pressed)
+	//{
+	//	MyTank1->setSpeed(Speed(-1, 0));
+	//	MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
+	//}
+	//if (KeyboardInput::getInstance()->GetKeyState('D') == KeyState::Pressed)
+	//{
+	//	MyTank1->setSpeed(Speed(1, 0));
+	//	MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
+	//}
+	//if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
+	//if (GameManager::getInstance()->getClick3() == ESCBUTTON_UP)PostQuitMessage(0);
 	//TankArray::getInstance()->VisitAll();
 	//BulletArray::getInstance()->VisitAll();
 }

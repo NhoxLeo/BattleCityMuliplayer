@@ -4,13 +4,15 @@
 
 inline float Slerp(float from, float to, float step);
 
-void GameObject::newReplicationState(D3DXVECTOR3 position, float angle)
+void GameObject::newReplicationState(D3DXVECTOR3 position, D3DXVECTOR3 rotation)
 {
 	initial_position = this->position;
-	initial_angle = this->angle;
+	initial_rotation = this->rotation;
+	//initial_angle = this->angle;
 
 	final_position = position;
-	final_angle = angle;
+	final_rotation = rotation;
+	//final_angle = angle;
 
 	interpolationSecondsElapsed = 0.0f;
 }

@@ -147,46 +147,29 @@ struct Player : public Behaviour
 
 	void onInput(const InputController& input) override
 	{
-		//if (!isDown)
-		//{
-		//	if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
-		//	{
-		//		const float advanceSpeed = 200.0f;
-		//		if (gameObject->position.x < 905 && input.horizontalAxis > 0.0f) /*Limit on the east*/
-		//		{
-		//			gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-		//		}
-		//		else if (gameObject->position.x > -900 && input.horizontalAxis < 0.0f)/*Limit on the west*/
-		//		{
-		//			gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis * advanceSpeed * Time.deltaTime;
-		//		}
-		//		if (gameObject->position.y > -1015 && input.verticalAxis > 0.0f) /*Limit on the north*/
-		//		{
-		//			gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
-		//		}
-		//		else if (gameObject->position.y < 1005 && input.verticalAxis < 0.0f) /*Limit on the south*/
-		//		{
-		//			gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis * advanceSpeed * Time.deltaTime;
-		//		}
-		//		NetworkCommunication(UPDATE_POSITION, gameObject);
-		//	}
-		//}
 		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
 		{
-			const float advanceSpeed = 200.0f;
-	/*		if (input.horizontalAxis > 0.0f)  gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis;
-			else if (input.horizontalAxis < 0.0f) gameObject->position += D3DXVECTOR3(1, 0, 0) * input.horizontalAxis;
-			if (input.verticalAxis > 0.0f)gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis;
-			else if (input.verticalAxis < 0.0f) gameObject->position += D3DXVECTOR3(0, -1, 0) * input.verticalAxis;*/
-
 			D3DXVECTOR3 inputVector = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
 
-			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, gameObject->position, gameObject->position);
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, inputVector);
 			GameManager::getInstance()->SinglePlayerTankVisitAll(gameObject->networkId);
 			gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
+			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 
 			NetworkCommunication(UPDATE_POSITION, gameObject);
+		}
+		if (input.buttons[8] == ButtonState::Press)
+		{
+			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
+			NetworkCommunication(UPDATE_POSITION, gameObject);
+			if (isServer /*&& Time.time - lastShotTime > shotingDelay*/)
+			{
+				lastShotTime = Time.time;
+				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId,gameObject->position);
+				//GameObject* bullet = GameManager::getInstance()->GetModNetServer()->spawnBullet(gameObject, bullet_offset);
+				//bullet->clientInstanceNID = gameObject->networkId;
+				//bullet->tag = gameObject->tag;
+			}
 		}
 	}
 

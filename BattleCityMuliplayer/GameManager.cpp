@@ -1435,24 +1435,11 @@ void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
 	//playerTanks->push_back(playerTank);
 }
 
-void GameManager::UpdatePlayerTankLocal()
-{
-	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
-	{
-		if (TankArray::getInstance()->getTankArray().at(i) != NULL) TankArray::getInstance()->getTankArray().at(i)->Update();
-	}
-}
-void GameManager::PreUpdateAllPlayerTank()
-{
-	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
-	{
-		TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
-	}
-}
 void GameManager::UpdateAllPlayerTank()
 {
 	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
 	{
+		TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(0, 0));
 		TankArray::getInstance()->getTankArray().at(i)->Update();
 	}
 }
@@ -1526,6 +1513,25 @@ D3DXVECTOR3 GameManager::GetPlayerTankRotation(int _networkID)
 		}
 	}
 	return rotation;
+}
+
+Bullet *GameManager::CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			Bullet* bullet = Bullet::createWithParent(TankArray::getInstance()->getTankArray().at(i));
+			GameManager::getInstance()->getScene()->addActiveChild(bullet);
+			return bullet;
+		}
+	}
+	
+}
+
+void GameManager::BulletVisitAll()
+{
+	BulletArray::getInstance()->VisitAll();
 }
 
 void GameManager::CreateServer()

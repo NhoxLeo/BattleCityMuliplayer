@@ -130,7 +130,7 @@ struct InputController
 
 	union
 	{
-		ButtonState buttons[8] = {};
+		ButtonState buttons[9] = {};
 		struct
 		{
 			ButtonState actionUp;
@@ -141,6 +141,7 @@ struct InputController
 			ButtonState rightShoulder;
 			ButtonState back;
 			ButtonState start;
+			ButtonState shoot;
 		};
 	};
 };

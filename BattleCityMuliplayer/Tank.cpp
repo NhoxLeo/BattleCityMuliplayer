@@ -20,16 +20,19 @@ void Tank::BulletLevelAdd()
 
 void Tank::removeBullet(Bullet* b)
 {
-	if (TheBullet[0] == b)
+	if (TheBullet.size() > 0)
 	{
-		TheBullet.erase(TheBullet.begin());
-		BulletNumber--;
-		return;
-	}
-	if (TheBullet[1] == b)
-	{
-		TheBullet.erase(TheBullet.begin() + 1);
-		BulletNumber--;
+		if (TheBullet[0] == b)
+		{
+			TheBullet.erase(TheBullet.begin());
+			BulletNumber--;
+			return;
+		}
+		if (TheBullet[1] == b)
+		{
+			TheBullet.erase(TheBullet.begin() + 1);
+			BulletNumber--;
+		}
 	}
 }
 

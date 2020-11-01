@@ -132,8 +132,6 @@ public:
 	bool getMapMake() { return MapMake; }
 
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
-	void UpdatePlayerTankLocal();
-	void PreUpdateAllPlayerTank();
 	void UpdateAllPlayerTank();
 	void SinglePlayerTankVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
@@ -142,6 +140,9 @@ public:
 	Tank* GetPlayerTank(int _networkID);
 	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);
 	D3DXVECTOR3 GetPlayerTankRotation(int _networkID);
+
+	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
+	void BulletVisitAll();
 
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }

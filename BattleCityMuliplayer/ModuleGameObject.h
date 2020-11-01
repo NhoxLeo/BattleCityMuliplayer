@@ -2,7 +2,7 @@
 
 struct GameObject
 {
-	void newReplicationState(D3DXVECTOR3 position, float angle);
+	void newReplicationState(D3DXVECTOR3 position, D3DXVECTOR3 rotation);
 	void Interpolate();
 
 	//Transform component

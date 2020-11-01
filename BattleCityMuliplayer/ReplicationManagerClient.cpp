@@ -78,16 +78,14 @@ void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 cli
 			//packet >> angle;
 			if (go != nullptr)
 			{
-				/*if (go->clientInstanceNID != 0)	go->doInterpolation = true;
-				go->newReplicationState(position, angle);
-				if (!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation)
+				if (go->clientInstanceNID != 0)	go->doInterpolation = true;
+				go->newReplicationState(position, rotation);
+				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{
 					go->position = position;
-					go->angle = angle;
-				}*/
-				go->position = position;
-				go->rotation = rotation;
-				GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation);
+					go->rotation = rotation;
+					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation);
+				}
 			}
 		}
 		else if (action == ReplicationAction::Destroy)

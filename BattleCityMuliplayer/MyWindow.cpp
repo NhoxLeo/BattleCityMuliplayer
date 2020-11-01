@@ -200,6 +200,7 @@ int MyWindow::MessageProc()
 
 					Input.horizontalAxis = (VKCode == VK_LEFT) ? -1 : ((VKCode == VK_RIGHT) ? 1 : 0);
 					Input.verticalAxis = (VKCode == VK_DOWN) ? -1 : ((VKCode == VK_UP) ? 1 : 0);
+
 				}
 			case WM_KEYUP:
 				if (ImGui::GetIO().WantCaptureKeyboard == false)
@@ -261,6 +262,8 @@ int MyWindow::MessageProc()
 			deltaTime = deltaTime > 1 ? 0 : deltaTime;
 			Update(deltaTime);
 			m_PrevTime = m_NowTime;
+
+			Win32ProcessKeyboardButton(&Input.buttons[8], GetKeyState(VK_SPACE) & (1 << 15));
 		}
 	}
 	return msg.wParam;

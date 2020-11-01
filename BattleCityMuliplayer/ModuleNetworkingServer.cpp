@@ -296,7 +296,7 @@ void ModuleNetworkingServer::onUpdate()
 		ZombieSpawner();
 
 		GameManager::getInstance()->UpdateAllPlayerTank();
-		
+		GameManager::getInstance()->BulletVisitAll();
 
 		//Server Reset Game Objects when there are no proxies connected
 		uint16 networkGameObjectsCount;
@@ -417,11 +417,10 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 	//clientProxy.gameObject->size = { 43, 49 };
 	clientProxy.gameObject->angle = 45.0f;
 	clientProxy.gameObject->order = 3;
+	clientProxy.gameObject->name = clientProxy.name;
 
 	//clientProxy.gameObject->texture = App->modResources->robot;
 	//clientProxy.gameObject->color.a = 0.75f;
-	//clientProxy.gameObject->name = clientProxy.name;
-
 	//// Create collider
 	//clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
 	//clientProxy.gameObject->collider->isTrigger = true;
