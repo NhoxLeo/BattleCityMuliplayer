@@ -94,6 +94,7 @@ public:
 
 	void VisitAll();
 	void SingleTankVisitAll(int _networkID);
+	void AllButOneTankVisitAll(int _networkID);
 
 	void pushTank(Tank* m_Tank)
 	{

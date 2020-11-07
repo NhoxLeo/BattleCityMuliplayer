@@ -147,7 +147,7 @@ struct Player : public Behaviour
 
 	void onInput(const InputController& input) override
 	{
-		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
+		if (/*input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f*/true)
 		{
 			D3DXVECTOR3 inputVector = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
 
@@ -155,7 +155,8 @@ struct Player : public Behaviour
 			GameManager::getInstance()->SinglePlayerTankVisitAll(gameObject->networkId);
 			gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
-
+			gameObject->speed = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
+			//gameObject->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)gameObject->networkId);
 			NetworkCommunication(UPDATE_POSITION, gameObject);
 		}
 		if (input.buttons[8] == ButtonState::Press)
@@ -165,12 +166,15 @@ struct Player : public Behaviour
 			if (isServer /*&& Time.time - lastShotTime > shotingDelay*/)
 			{
 				lastShotTime = Time.time;
-				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId,gameObject->position);
+				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 				//GameObject* bullet = GameManager::getInstance()->GetModNetServer()->spawnBullet(gameObject, bullet_offset);
 				//bullet->clientInstanceNID = gameObject->networkId;
 				//bullet->tag = gameObject->tag;
 			}
 		}
+
+		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
+			int a = 1;
 	}
 
 	void onMouse(const MouseController& mouse) override

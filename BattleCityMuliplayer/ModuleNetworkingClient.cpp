@@ -258,11 +258,9 @@ void ModuleNetworkingClient::onUpdate()
 		{
 			disconnect();
 		}
-	}
 
-	// Make the camera focus the player game object
-	/*GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
-	if (playerGameObject != nullptr) App->modRender->cameraPosition = playerGameObject->position;*/
+		//GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
+	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)
 {

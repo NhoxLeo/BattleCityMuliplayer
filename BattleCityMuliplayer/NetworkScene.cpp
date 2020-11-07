@@ -223,10 +223,6 @@ void NetworkScene::Update(float deltaTime)
 		modNetClientptr->preUpdate();
 		modNetClientptr->update();
 		modNetClientptr->gui();
-
-		uint16 networkGameObjectsCount;
-		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
-		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
 	}
 
 

@@ -8,6 +8,7 @@ struct GameObject
 	//Transform component
 	D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0);
 	D3DXVECTOR3 rotation = D3DXVECTOR3(0, 0, 0);
+	D3DXVECTOR3 speed = D3DXVECTOR3(0, 0, 0);
 
 	// Render component
 	D3DXVECTOR3 pivot = D3DXVECTOR3(0, 0, 0);

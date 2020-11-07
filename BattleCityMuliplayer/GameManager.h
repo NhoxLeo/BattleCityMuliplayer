@@ -134,12 +134,14 @@ public:
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
 	void UpdateAllPlayerTank();
 	void SinglePlayerTankVisitAll(UINT32 _networkID);
+	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
-	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation);
+	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed);
 	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);
 	Tank* GetPlayerTank(int _networkID);
 	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);
 	D3DXVECTOR3 GetPlayerTankRotation(int _networkID);
+	D3DXVECTOR3 GetPlayerTankSpeed(int _networkID);
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	void BulletVisitAll();

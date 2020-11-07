@@ -2,7 +2,7 @@
 #include "GameManager.h"
 #include "ReplicationManagerClient.h"
 
-void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 clientNetworkId)
+void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clientNetworkId)
 {
 	while (packet.RemainingByteCount() > 0)
 	{
@@ -69,12 +69,14 @@ void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 cli
 		else if (action == ReplicationAction::Update_Position)
 		{
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
-			D3DXVECTOR3 position,rotation;
+			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
 			float angle;
 			packet >> position.x;
 			packet >> position.y;
 			packet >> rotation.x;
 			packet >> rotation.y;
+			packet >> speed.x;
+			packet >> speed.y;
 			//packet >> angle;
 			if (go != nullptr)
 			{
@@ -84,7 +86,9 @@ void ReplicationManagerClient::read(const InputMemoryStream & packet, uint32 cli
 				{
 					go->position = position;
 					go->rotation = rotation;
-					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation);
+					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+					//if (networkId != clientNetworkId && speed.x == 0)
+						//int a = 1;
 				}
 			}
 		}

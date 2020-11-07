@@ -337,6 +337,82 @@ void TankArray::SingleTankVisitAll(int _networkID)
 	}
 }
 
+void TankArray::AllButOneTankVisitAll(int _networkID)
+{
+	for (int t = 0; t < TankNumber; t++)
+	{
+		if (Tankarray[t] != NULL && Tankarray[t]->getPlayer() != _networkID)
+		{
+			Tankarray[t]->Update();
+			if (Tankarray[t]->getSpeed().x != 0 || Tankarray[t]->getSpeed().y != 0)
+			{
+				int m_x = Tankarray[t]->getRenderRet()->RenderPoint->x / 56;
+				int m_y = 28 - Tankarray[t]->getRenderRet()->RenderPoint->x;
+				if (m_y < 0)
+				{
+					m_y = -m_y;
+				}
+				Tankarray[t]->setRenderRet(28, 28, m_x * 56 + m_y, Tankarray[t]->getRenderRet()->RenderPoint->y);
+			}
+			if (Tankarray[t]->getMoveState())
+			{
+				D3DXVECTOR3 m_Position = Tankarray[t]->getPosition() + D3DXVECTOR3(TankSpeed * Tankarray[t]->getSpeed().x, TankSpeed * Tankarray[t]->getSpeed().y, 0);
+				Ret m_Ret = Ret(TankArray::getInstance()->Tankarray[t]->getSize(), m_Position);
+				bool x = true; //x true -> movable
+
+				//Tank vs tank collision
+				for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
+				{
+					if (k != t)
+					{
+						if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), getTankArray()[k]->getRet()))
+						{
+							x = false;
+							break;
+						}
+					}
+				}
+				//Tank vs wall, brick, items.
+				for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
+				{
+					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+					{
+						if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
+							&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+						{
+							x = false;
+							break;
+						}
+					}
+				}
+
+				//Tank vs bound
+				if (m_Position.x < 126 || m_Position.x>514 || m_Position.y < 58 || m_Position.y>446)
+				{
+					x = false;
+				}
+
+				//No collision -> x == true.
+				if (x)
+				{
+					getTankArray()[t]->setPosition(m_Position);
+				}
+				else
+				{
+					getTankArray()[t]->setSpeed(Speed(0, 0));
+				}
+			}
+			if (Tankarray[t]->getScene()->getAward() != NULL)
+			{
+				if (Tankarray[t]->getRet().Collision(Tankarray[t]->getScene()->getAward()->getRet()))
+				{
+					GameManager::getInstance()->UpdateColl(Tankarray[t]->getScene()->getAward(), Tankarray[t]);
+				}
+			}
+		}
+	}
+}
+
 void TankArray::removeTank(Tank* tank)
 {
 	for (int i = 0; i < TankNumber;i++)

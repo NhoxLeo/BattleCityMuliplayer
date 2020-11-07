@@ -211,13 +211,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
-
-						////Process Mouse
-						//proxy->mouse.x = inputData.mouseX;
-						//proxy->mouse.y = inputData.mouseY;
 						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
 						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
-
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
 				}
@@ -238,6 +233,7 @@ void ModuleNetworkingServer::onUpdate()
 {
 	if (state == ServerState::Listening)
 	{
+
 		secondsSinceLastPing += Time.deltaTime;
 		// Replication
 		for (ClientProxy& clientProxy : clientProxies)
@@ -292,9 +288,7 @@ void ModuleNetworkingServer::onUpdate()
 		//Check for TimeOutPackets DeliveryManager
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
-		//Zombie Spawner WiP
-		ZombieSpawner();
-
+		//Update Tank Players on Server
 		GameManager::getInstance()->UpdateAllPlayerTank();
 		GameManager::getInstance()->BulletVisitAll();
 
