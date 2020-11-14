@@ -259,7 +259,9 @@ void ModuleNetworkingClient::onUpdate()
 			disconnect();
 		}
 
-		//GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
+		Module* modGameObj = GameManager::getInstance()->GetModGameObject();
+		modGameObj->update();
+		GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)
@@ -308,7 +310,6 @@ void ModuleNetworkingClient::floatingUI()
 			ImGui::Begin(std::to_string(count).c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBringToFrontOnFocus);
 			ImGui::Text((*it)->name.c_str());
 			ImGui::End();
-
 			count++;
 		}
 	}

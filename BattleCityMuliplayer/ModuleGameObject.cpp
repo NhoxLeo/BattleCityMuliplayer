@@ -78,6 +78,8 @@ bool ModuleGameObject::update()
 {
 	for (GameObject &gameObject : gameObjects)
 	{
+		if (gameObject.syncWaitTime > 5)gameObject.syncWaitTime = 0;
+		gameObject.syncWaitTime += Time.deltaTime;
 		if (gameObject.state == GameObject::UPDATING)
 		{
 			if (interpolateEntities && gameObject.doInterpolation)

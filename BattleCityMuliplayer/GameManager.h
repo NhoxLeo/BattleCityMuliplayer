@@ -132,6 +132,7 @@ public:
 	bool getMapMake() { return MapMake; }
 
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
+	void DeletePlayerTank(UINT32 _networkID);
 	void UpdateAllPlayerTank();
 	void SinglePlayerTankVisitAll(UINT32 _networkID);
 	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);
@@ -149,7 +150,9 @@ public:
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }
 	void CreateServer();
+	void DeleteServer();
 	void CreateClient();
+	void DeleteClient();
 	DeliveryManager* GetDeliveryManager() { return delManager; }
 	ModuleLinkingContext* GetModLinkingContext() { return modLinkingContext; }
 	ModuleGameObject* GetModGameObject() { return modGameObject; }

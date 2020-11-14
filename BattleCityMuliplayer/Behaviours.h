@@ -85,9 +85,10 @@ struct Player : public Behaviour
 
 	void update() override
 	{
-		float reviveSpeed = 1.0f;
+		/*float reviveSpeed = 1.0f;
 		if (detectedPlayers > 0)
-			reviveSpeed = 0.5f + detectedPlayers * 0.5f;
+			reviveSpeed = 0.5f + detectedPlayers * 0.5f;*/
+
 		/*if (rez != nullptr)
 		{
 			rez->animation->spriteDuration = (rezTime / (rez->animation->sprites.size() - 1)) / reviveSpeed;
@@ -106,35 +107,36 @@ struct Player : public Behaviour
 		//		gameObject->color.a = abs(sin((Time.time - spawnTime) / blinkTime * PI));
 		//	}
 		//}
-		if (isDown && detectedPlayers == 0)
-		{
-			rezDuration = 0.0f;
-			if (rez != nullptr)
-			{
-				NetworkCommunication(DESTROY, rez);
-				rez = nullptr;
-			}
-		}
-		if (detectedPlayers > 0)
-		{
-			rezDuration += Time.deltaTime * reviveSpeed;
-		}
-		detectedPlayers = 0;
-		if (isDown && rezDuration > rezTime)
-		{
-			isDown = false;
-			rezDuration = 0.0f;
-			//gameObject->texture = App->modResources->robot;
-			gameObject->size = D3DXVECTOR3(43, 49, 0);
-			gameObject->order = 3;
-			//NetworkCommunication(UPDATE_TEXTURE, gameObject);
-			NetworkCommunication(DESTROY, rez);
-			rez = nullptr;
-		}
-		if (laser != nullptr)
-		{
-			updateLaser();
-		}
+
+		//if (isDown && detectedPlayers == 0)
+		//{
+		//	rezDuration = 0.0f;
+		//	if (rez != nullptr)
+		//	{
+		//		NetworkCommunication(DESTROY, rez);
+		//		rez = nullptr;
+		//	}
+		//}
+		//if (detectedPlayers > 0)
+		//{
+		//	rezDuration += Time.deltaTime * reviveSpeed;
+		//}
+		//detectedPlayers = 0;
+		//if (isDown && rezDuration > rezTime)
+		//{
+		//	isDown = false;
+		//	rezDuration = 0.0f;
+		//	//gameObject->texture = App->modResources->robot;
+		//	gameObject->size = D3DXVECTOR3(43, 49, 0);
+		//	gameObject->order = 3;
+		//	//NetworkCommunication(UPDATE_TEXTURE, gameObject);
+		//	NetworkCommunication(DESTROY, rez);
+		//	rez = nullptr;
+		//}
+		//if (laser != nullptr)
+		//{
+		//	updateLaser();
+		//}
 	}
 
 	void updateLaser()

@@ -87,8 +87,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					go->position = position;
 					go->rotation = rotation;
 					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-					//if (networkId != clientNetworkId && speed.x == 0)
-						//int a = 1;
+					if (speed.x != 0 || speed.y != 0) go->syncWaitTime = 0;
 				}
 			}
 		}

@@ -19,11 +19,11 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	/*MyTank1 = Tank::create();
-	MyTank1->setPlayer(1);
-	MyTank1->setCamp(true);
-	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	addActiveChild(MyTank1);*/
+	//MyTank1 = Tank::create();
+	//MyTank1->setPlayer(1);
+	//MyTank1->setCamp(true);
+	//MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
+	//addActiveChild(MyTank1);
 
 
 	Scene* scene = this;
@@ -166,8 +166,11 @@ void NetworkScene::Update(float deltaTime)
 
 	//MyTank1->Update();
 	//MyTank1->setSpeed(Speed(0, 0));
-	//MyTank1->setSpeed(Speed(Input.horizontalAxis,Input.verticalAxis));
-	//MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis,Input.verticalAxis,0));
+	//MyTank1->setSpeed(Speed(Input.horizontalAxis, Input.verticalAxis));
+	//if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, Input.verticalAxis, 0));
+	//if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
+	//TankArray::getInstance()->VisitAll();
+	//BulletArray::getInstance()->VisitAll();
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -205,7 +208,11 @@ void NetworkScene::Update(float deltaTime)
 			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
 			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
 			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-			modNetClientptr->start();
+			if (modNetClientptr->needsStart())
+			{
+				modNetClientptr->updateEnabledState();
+				if (modNetClientptr->start() == false);
+			}
 		}
 		ImGui::PopItemWidth();
 		ImGui::End();
@@ -223,6 +230,26 @@ void NetworkScene::Update(float deltaTime)
 		modNetClientptr->preUpdate();
 		modNetClientptr->update();
 		modNetClientptr->gui();
+		if (modNetClientptr->needsStop())
+		{
+			modNetClientptr->cleanUp();
+			modNetClientptr->stop();
+			delete[] modNetClientptr;
+			GameManager::getInstance()->DeleteClient();
+			isClient = false;
+		}
+		/*	uint16 networkGameObjectsCount;
+			GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
+			GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+			for (GameObject* a : networkGameObjects)
+			{
+				if (a != NULL && a->state == GameObject::State::CREATING)
+				{
+					ImGui::Spacing();
+					ImGui::Text(" ID : %f", a->networkId);
+					ImGui::Text(" Sync Wait Time : %f", a->syncWaitTime);
+				}
+			}*/
 	}
 
 
@@ -233,21 +260,6 @@ void NetworkScene::Update(float deltaTime)
 	//ImGui::Text("Debug: ");
 	//ImGui::Text((const char*)newchar);
 	//NetworkScene::DebugBool(MyTank1->getAwardAble());
-
-	//if (KeyboardInput::getInstance()->GetKeyState('A') == KeyState::Pressed)
-	//{
-	//	MyTank1->setSpeed(Speed(-1, 0));
-	//	MyTank1->setDirection(D3DXVECTOR3(-1, 0, 0));
-	//}
-	//if (KeyboardInput::getInstance()->GetKeyState('D') == KeyState::Pressed)
-	//{
-	//	MyTank1->setSpeed(Speed(1, 0));
-	//	MyTank1->setDirection(D3DXVECTOR3(1, 0, 0));
-	//}
-	//if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
-	//if (GameManager::getInstance()->getClick3() == ESCBUTTON_UP)PostQuitMessage(0);
-	//TankArray::getInstance()->VisitAll();
-	//BulletArray::getInstance()->VisitAll();
 }
 
 void NetworkScene::clear()

@@ -289,7 +289,6 @@ void ModuleNetworkingServer::onUpdate()
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
 		//Update Tank Players on Server
-		GameManager::getInstance()->UpdateAllPlayerTank();
 		GameManager::getInstance()->BulletVisitAll();
 
 		//Server Reset Game Objects when there are no proxies connected
@@ -330,6 +329,7 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in& fromAddress)
 		}
 
 		// Unregister the network identity
+		GameManager::getInstance()->DeletePlayerTank(proxy->gameObject->networkId);
 		GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(proxy->gameObject);
 
 		// Remove its associated game object

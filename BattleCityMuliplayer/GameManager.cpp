@@ -1435,6 +1435,23 @@ void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
 	//playerTanks->push_back(playerTank);
 }
 
+void GameManager::DeletePlayerTank(UINT32 _networkID)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			Tank* delTank = nullptr;
+			delTank = TankArray::getInstance()->getTankArray().at(i);
+			if (delTank != nullptr)
+			{
+				TankArray::getInstance()->removeTank(delTank);
+				delTank->release();
+			}
+		}
+	}
+}
+
 void GameManager::UpdateAllPlayerTank()
 {
 	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
@@ -1462,7 +1479,7 @@ void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DX
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
 			TankArray::getInstance()->getTankArray().at(i)->setPosition(position);
-			TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
+			if (rotation.x != 0 || rotation.y != 0) TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
 		}
 	}
@@ -1475,7 +1492,7 @@ void GameManager::UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _inpu
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(_input.x, -_input.y));
-			TankArray::getInstance()->getTankArray().at(i)->setDirection(D3DXVECTOR3(_input.x, -_input.y, 0));
+			if (_input.x != 0 || _input.y != 0)TankArray::getInstance()->getTankArray().at(i)->setDirection(D3DXVECTOR3(_input.x, -_input.y, 0));
 		}
 	}
 }
@@ -1560,6 +1577,16 @@ void GameManager::CreateServer()
 		Module* a = modNetServer;
 		a->init();
 	}
+}
+
+void GameManager::DeleteServer()
+{
+
+}
+
+void GameManager::DeleteClient()
+{
+	modNetClient = nullptr;
 }
 
 void GameManager::CreateClient()
