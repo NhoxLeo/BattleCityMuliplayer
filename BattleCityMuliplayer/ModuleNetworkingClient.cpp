@@ -108,6 +108,15 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Checkbox("Entity interpolation", &GameManager::getInstance()->GetModGameObject()->interpolateEntities);
 				ImGui::Checkbox("Client prediction", &clientPrediction);
 				if (clientPrediction) ImGui::Checkbox("Server Reconciliation", &serverReconciliation);
+
+				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
+				for (size_t i = 0; i < 4095; i++)
+				{
+					if(a[i].state == GameObject::CREATING)
+						//ImGui::Text(" - Waiting Sync Time: %f", a[i].syncWaitTime);
+						ImGui::Text(" - Tick : %i", a[i].tickCount);
+						//ImGui::Text(" - Tick : %f", (GetTickCount()- a[i].tickCount)/Time.deltaTime);
+				}
 			}
 		}
 	}
@@ -215,6 +224,7 @@ void ModuleNetworkingClient::onUpdate()
 			uint32 currentInputData = inputDataBack++;
 			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
 			inputPacketData.sequenceNumber = currentInputData;
+			inputPacketData.tickCount = GetTickCount();
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
@@ -231,6 +241,7 @@ void ModuleNetworkingClient::onUpdate()
 				{
 					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
 					packet << inputPacketData.sequenceNumber;
+					packet << inputPacketData.tickCount;
 					packet << inputPacketData.horizontalAxis;
 					packet << inputPacketData.verticalAxis;
 					packet << inputPacketData.buttonBits;

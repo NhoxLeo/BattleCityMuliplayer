@@ -56,6 +56,7 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 			go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
 			go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
 			go->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)(*it_c).first);
+			packet << go->tickCount;
 			packet << go->position.x;
 			packet << go->position.y;
 			packet << go->rotation.x;

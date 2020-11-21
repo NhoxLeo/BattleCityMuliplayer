@@ -43,6 +43,8 @@ struct GameObject
 	// Network identity component
 	uint32 networkId = 0; // NOTE(jesus): Only for network game objects
 
+	uint32 tickCount = 0;
+
 	// NOTE(jesus): Don't use in gameplay systems (use Instantiate, Destroy instead)
 	enum State { NON_EXISTING, CREATING, UPDATING, DESTROYING };
 	State state = NON_EXISTING;

@@ -6,7 +6,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 {
 	while (packet.RemainingByteCount() > 0)
 	{
-		uint32 networkId;
+		uint32 networkId,tickCount;
 		ReplicationAction action;
 		packet >> networkId;
 		packet >> action;
@@ -71,6 +71,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
 			float angle;
+			packet >> tickCount;
 			packet >> position.x;
 			packet >> position.y;
 			packet >> rotation.x;
@@ -81,13 +82,15 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			if (go != nullptr)
 			{
 				if (go->clientInstanceNID != 0)	go->doInterpolation = true;
-				go->newReplicationState(position, rotation);
+				//go->newReplicationState(position, rotation);
 				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{
+					go->tickCount = tickCount;
 					go->position = position;
 					go->rotation = rotation;
 					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-					if (speed.x != 0 || speed.y != 0) go->syncWaitTime = 0;
+					if ((speed.x != 0 || speed.y != 0) && (go->speed.x ==0 && go->speed.y == 0)) go->syncWaitTime = 0;
+					go->speed = speed;
 				}
 			}
 		}

@@ -174,9 +174,6 @@ struct Player : public Behaviour
 				//bullet->tag = gameObject->tag;
 			}
 		}
-
-		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
-			int a = 1;
 	}
 
 	void onMouse(const MouseController& mouse) override

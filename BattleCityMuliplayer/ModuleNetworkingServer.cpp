@@ -195,8 +195,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				// Read input data
 				while (packet.RemainingByteCount() > 0)
 				{
-
 					packet >> inputData.sequenceNumber;
+					packet >> inputData.tickCount;
 					packet >> inputData.horizontalAxis;
 					packet >> inputData.verticalAxis;
 					packet >> inputData.buttonBits;
@@ -211,6 +211,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
+						proxy->gameObject->tickCount = inputData.tickCount;
 						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
 						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
