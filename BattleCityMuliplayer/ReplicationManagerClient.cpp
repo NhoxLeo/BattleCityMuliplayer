@@ -81,14 +81,16 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//packet >> angle;
 			if (go != nullptr)
 			{
+				go->tickCount = tickCount;
+				go->lateFrames = (int)(GetTickCount() - tickCount) / 16.67f;
 				if (go->clientInstanceNID != 0)	go->doInterpolation = true;
 				//go->newReplicationState(position, rotation);
 				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{
-					go->tickCount = tickCount;
 					go->position = position;
 					go->rotation = rotation;
-					GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+					if(networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+					else  GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed,go->lateFrames);
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x ==0 && go->speed.y == 0)) go->syncWaitTime = 0;
 					go->speed = speed;
 				}

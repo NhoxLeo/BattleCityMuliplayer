@@ -30,6 +30,7 @@ struct GameObject
 	float interpolationSecondsElapsed = 0.0f;
 
 	float syncWaitTime = 0;
+	int lateFrames = 0;
 
 	// Animation component
 	//Animation* animation = nullptr;

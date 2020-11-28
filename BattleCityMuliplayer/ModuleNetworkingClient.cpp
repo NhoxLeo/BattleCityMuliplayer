@@ -94,7 +94,7 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Text(" - Network id: %u", networkId);
 				D3DXVECTOR3 playerPosition = {};
 				GameObject* playerGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
-				if (playerGameObject != nullptr) 
+				if (playerGameObject != nullptr)
 					playerPosition = playerGameObject->position;
 				ImGui::Text(" - Coordinates: (%f, %f)", playerPosition.x, playerPosition.y);
 				ImGui::Separator();
@@ -112,15 +112,12 @@ void ModuleNetworkingClient::onGui()
 				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
 				for (size_t i = 0; i < 4095; i++)
 				{
-					if(a[i].state == GameObject::CREATING)
-						//ImGui::Text(" - Waiting Sync Time: %f", a[i].syncWaitTime);
-						ImGui::Text(" - Tick : %i", a[i].tickCount);
-						//ImGui::Text(" - Tick : %f", (GetTickCount()- a[i].tickCount)/Time.deltaTime);
+					if (a[i].state == GameObject::CREATING) ImGui::Text(" - Late Frames : %i", a[i].lateFrames);
 				}
 			}
 		}
 	}
-	else 
+	else
 	{
 		ImGui::Begin("Game Statistics (since login):");
 		ImGui::Text("Zombies killed: %d", zombieDeathCount);

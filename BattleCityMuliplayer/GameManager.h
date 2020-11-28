@@ -138,6 +138,7 @@ public:
 	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
 	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed);
+	void UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed,int lateframes);
 	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);
 	Tank* GetPlayerTank(int _networkID);
 	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);

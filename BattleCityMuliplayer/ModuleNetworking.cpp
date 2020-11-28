@@ -59,19 +59,9 @@ void ModuleNetworking::sendPacket(const char* data, uint32 size, const sockaddr_
 {
 	ASSERT(size <= PACKET_SIZE); // NOTE(jesus): Increase PACKET_SIZE if not enough
 
-	int byteSentCount = sendto(socket,
-		(const char*)data,
-		size,
-		0, (sockaddr*)&destAddress, sizeof(destAddress));
-
-	if (byteSentCount <= 0)
-	{
-		reportError("ModuleNetworking::sendPacket() - sendto");
-	}
-	else
-	{
-		sentPacketsCount++;
-	}
+	int byteSentCount = sendto(socket, (const char*)data, size, 0, (sockaddr*)&destAddress, sizeof(destAddress));
+	if (byteSentCount <= 0) reportError("ModuleNetworking::sendPacket() - sendto");
+	else sentPacketsCount++;
 }
 void ModuleNetworking::reportError(const char* inOperationDesc)
 {
@@ -114,9 +104,7 @@ bool ModuleNetworking::start()
 {
 	sentPacketsCount = 0;
 	receivedPacketsCount = 0;
-
 	onStart();
-
 	return true;
 }
 bool ModuleNetworking::preUpdate()
@@ -239,13 +227,7 @@ void ModuleNetworking::processIncomingPackets()
 		sockaddr_in fromAddress = {};
 		socklen_t fromLength = sizeof(fromAddress);
 
-		int readByteCount = recvfrom(socket,
-			inPacket.GetBufferPtr(),
-			inPacket.GetCapacity(),
-			0,
-			(sockaddr*)&fromAddress,
-			&fromLength);
-
+		int readByteCount = recvfrom(socket, inPacket.GetBufferPtr(), inPacket.GetCapacity(), 0, (sockaddr*)&fromAddress, &fromLength);
 		inPacket.Clear();
 		inPacket.SetSize(readByteCount);
 
@@ -287,10 +269,7 @@ void ModuleNetworking::processIncomingPackets()
 				//this is the ICMP message being sent back saying the port on that computer is closed
 				char fromAddressStr[64];
 				inet_ntop(AF_INET, &fromAddress.sin_addr, fromAddressStr, sizeof(fromAddressStr));
-				WLOG("ModuleNetworking::processIncomingPackets() - Connection reset from %s:%d",
-					fromAddressStr,
-					ntohs(fromAddress.sin_port));
-
+				WLOG("ModuleNetworking::processIncomingPackets() - Connection reset from %s:%d", fromAddressStr, ntohs(fromAddress.sin_port));
 				onConnectionReset(fromAddress);
 			}
 			else
