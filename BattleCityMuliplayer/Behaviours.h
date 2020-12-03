@@ -165,7 +165,7 @@ struct Player : public Behaviour
 		{
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 			NetworkCommunication(UPDATE_POSITION, gameObject);
-			if (isServer /*&& Time.time - lastShotTime > shotingDelay*/)
+			if (/*isServer &&*/ Time.time - lastShotTime > shotingDelay)
 			{
 				lastShotTime = Time.time;
 				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);

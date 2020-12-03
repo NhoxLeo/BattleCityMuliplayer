@@ -183,6 +183,7 @@ int MyWindow::MessageProc()
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
 			Input.horizontalAxis = Input.verticalAxis = 0;
+			bool SpaceKeyWasDown = false;
 			switch (msg.message)
 			{
 			case WM_QUIT:
@@ -233,6 +234,11 @@ int MyWindow::MessageProc()
 						{
 							Win32ProcessKeyboardButton(&Input.back, IsDown);
 						}
+						else if (VKCode == VK_SPACE)
+						{
+							Win32ProcessKeyboardButton(&Input.buttons[8], IsDown);
+							SpaceKeyWasDown = true;
+						}
 					}
 				}
 				::TranslateMessage(&msg);
@@ -254,6 +260,13 @@ int MyWindow::MessageProc()
 			Time.time += (double)Time.deltaTime;
 			StartTime = EndTime;
 
+			//Win32ProcessKeyboardButton(&Input.buttons[8], GetKeyState(VK_SPACE) & (1 << 15));
+			if (SpaceKeyWasDown)
+				Input.buttons[8] = ButtonState::Press;
+			else
+				Input.buttons[8] = ButtonState::Idle;
+
+
 			m_NowTime = GetTickCount();
 			m_DeltaTime = m_NowTime - m_PrevTime;
 			m_ElapsedTime += m_DeltaTime;
@@ -263,7 +276,6 @@ int MyWindow::MessageProc()
 			Update(deltaTime);
 			m_PrevTime = m_NowTime;
 
-			Win32ProcessKeyboardButton(&Input.buttons[8], GetKeyState(VK_SPACE) & (1 << 15));
 		}
 	}
 	return msg.wParam;

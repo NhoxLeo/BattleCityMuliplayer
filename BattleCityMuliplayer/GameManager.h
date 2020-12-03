@@ -146,6 +146,7 @@ public:
 	D3DXVECTOR3 GetPlayerTankSpeed(int _networkID);
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
+	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);
 	void BulletVisitAll();
 
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
@@ -157,6 +158,9 @@ public:
 	DeliveryManager* GetDeliveryManager() { return delManager; }
 	ModuleLinkingContext* GetModLinkingContext() { return modLinkingContext; }
 	ModuleGameObject* GetModGameObject() { return modGameObject; }
+
+	deque<std::vector<Tank*>*>* GetLastFrameObjectsInfo() { return lastFrameObjectsInfo; }
+	void AddThisFrameObjects();
 
 private:
 	bool MapMake;
@@ -181,6 +185,8 @@ private:
 	DeliveryManager* delManager = nullptr;
 	ModuleLinkingContext* modLinkingContext = nullptr;
 	ModuleGameObject* modGameObject = nullptr;
+
+	deque<std::vector<Tank*>*>* lastFrameObjectsInfo;
 };
 
 #endif // !GAMEMANAGE_H

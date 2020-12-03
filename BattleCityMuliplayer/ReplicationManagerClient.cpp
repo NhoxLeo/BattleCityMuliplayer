@@ -98,6 +98,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		}
 		else if (action == ReplicationAction::Destroy)
 		{
+			GameManager::getInstance()->DeletePlayerTank(networkId);
 			//GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 			//if (go)
 			//{

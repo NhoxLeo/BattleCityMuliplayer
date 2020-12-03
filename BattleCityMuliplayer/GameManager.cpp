@@ -27,6 +27,7 @@ bool GameManager::Create(HWND hwnd, HINSTANCE hInstance)
 	modGameObject = new ModuleGameObject();
 	Module* a = modGameObject;
 	a->init();
+	lastFrameObjectsInfo = new deque<std::vector<Tank*>*>();
 
 	return true;
 }
@@ -1575,7 +1576,22 @@ Bullet* GameManager::CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position)
 			return bullet;
 		}
 	}
+	return nullptr;
+}
 
+Bullet* GameManager::CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position, int lateframes)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			Bullet* bullet = Bullet::createWithParent(TankArray::getInstance()->getTankArray().at(i));
+			bullet->setPosition(bullet->getPosition() + D3DXVECTOR3((int)bullet->getSpeed().x * lateframes, (int)bullet->getSpeed().y * lateframes, 0));
+			GameManager::getInstance()->getScene()->addActiveChild(bullet);
+			return bullet;
+		}
+	}
+	return nullptr;
 }
 
 void GameManager::BulletVisitAll()
@@ -1601,6 +1617,33 @@ void GameManager::DeleteServer()
 void GameManager::DeleteClient()
 {
 	modNetClient = nullptr;
+}
+
+void GameManager::AddThisFrameObjects()
+{
+	{
+		vector<Tank*> copyFrameData = TankArray::getInstance()->getTankArray();
+		vector<Tank*>* thisFrameUserData = new std::vector<Tank*>();
+		if (copyFrameData.size() > 0)
+		{
+			for (int i = 0; i < copyFrameData.size(); i++)
+			{
+				if (copyFrameData.at(i)->getSpeed().y != 0)
+					int a = 1;
+				Tank* TankClone = new Tank();
+				TankClone->setPosition(copyFrameData.at(i)->getPosition());
+				TankClone->setDirection(copyFrameData.at(i)->getDirection());
+				TankClone->setSpeed(copyFrameData.at(i)->getSpeed());
+				TankClone->setPlayer(copyFrameData.at(i)->getPlayer());
+				TankClone->setCamp(true);
+
+				thisFrameUserData->push_back(TankClone);
+			}
+		}
+
+		if (lastFrameObjectsInfo->size() > 20 - 1) lastFrameObjectsInfo->pop_front();
+		lastFrameObjectsInfo->push_back(thisFrameUserData);
+	}
 }
 
 void GameManager::CreateClient()

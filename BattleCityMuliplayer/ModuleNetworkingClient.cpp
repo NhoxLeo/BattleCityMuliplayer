@@ -270,6 +270,7 @@ void ModuleNetworkingClient::onUpdate()
 		Module* modGameObj = GameManager::getInstance()->GetModGameObject();
 		modGameObj->update();
 		GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
+		GameManager::getInstance()->BulletVisitAll();
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)

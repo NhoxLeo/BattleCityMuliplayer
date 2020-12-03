@@ -291,6 +291,8 @@ void ModuleNetworkingServer::onUpdate()
 
 		//Update Tank Players on Server
 		GameManager::getInstance()->BulletVisitAll();
+		//Update Queue of Objects of Previous Frames
+		GameManager::getInstance()->AddThisFrameObjects();
 
 		//Server Reset Game Objects when there are no proxies connected
 		uint16 networkGameObjectsCount;
