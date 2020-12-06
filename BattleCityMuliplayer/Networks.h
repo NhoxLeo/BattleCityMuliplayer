@@ -128,6 +128,8 @@ struct InputController
 	float verticalAxis = 0.0f;
 	float horizontalAxis = 0.0f;
 
+	uint32 tickcount = 0;
+
 	union
 	{
 		ButtonState buttons[9] = {};

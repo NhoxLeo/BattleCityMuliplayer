@@ -1492,7 +1492,7 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 	{
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
-			D3DXVECTOR3 threshhold = speed * lateframes;
+			D3DXVECTOR3 threshhold = TankSpeed * speed * lateframes;
 			TankArray::getInstance()->getTankArray().at(i)->setPosition(position + threshhold);
 			if (rotation.x != 0 || rotation.y != 0) TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));

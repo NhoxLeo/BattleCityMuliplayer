@@ -165,10 +165,18 @@ struct Player : public Behaviour
 		{
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 			NetworkCommunication(UPDATE_POSITION, gameObject);
-			if (/*isServer &&*/ Time.time - lastShotTime > shotingDelay)
+			if (Time.time - lastShotTime > shotingDelay)
 			{
 				lastShotTime = Time.time;
-				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
+				if (isServer)
+				{
+					int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
+					GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
+				}
+				else
+				{
+					GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
+				}
 				//GameObject* bullet = GameManager::getInstance()->GetModNetServer()->spawnBullet(gameObject, bullet_offset);
 				//bullet->clientInstanceNID = gameObject->networkId;
 				//bullet->tag = gameObject->tag;

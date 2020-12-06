@@ -328,8 +328,8 @@ void MyWindow::Update(float ElapsedTime)
 	MyRender::getInstance()->getDevice()->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_XRGB(255, 251, 240), 1.0f, 0);
 	MyRender::getInstance()->getDevice()->BeginScene();
 	MyRender::getInstance()->preUpdateGUI();
-	//GameManager::getInstance()->getScene()->Update();
-	GameManager::getInstance()->getScene()->Update(ElapsedTime);
+	GameManager::getInstance()->getScene()->Update();
+	//GameManager::getInstance()->getScene()->Update(ElapsedTime);
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();
 	GameManager::getInstance()->getScene()->DrawAllActive();

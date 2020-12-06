@@ -209,6 +209,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						//Process Keyboard
 						proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
+						proxy->gamepad.tickcount = inputData.tickCount;
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
 						proxy->gameObject->tickCount = inputData.tickCount;

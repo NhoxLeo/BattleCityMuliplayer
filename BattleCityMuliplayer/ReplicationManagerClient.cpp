@@ -6,7 +6,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 {
 	while (packet.RemainingByteCount() > 0)
 	{
-		uint32 networkId,tickCount;
+		uint32 networkId, tickCount;
 		ReplicationAction action;
 		packet >> networkId;
 		packet >> action;
@@ -82,16 +82,16 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			if (go != nullptr)
 			{
 				go->tickCount = tickCount;
-				go->lateFrames = (int)(GetTickCount() - tickCount) / 16.67f;
+				go->lateFrames = (int)((GetTickCount() - tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 				if (go->clientInstanceNID != 0)	go->doInterpolation = true;
 				//go->newReplicationState(position, rotation);
 				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{
 					go->position = position;
 					go->rotation = rotation;
-					if(networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-					else  GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed,go->lateFrames);
-					if ((speed.x != 0 || speed.y != 0) && (go->speed.x ==0 && go->speed.y == 0)) go->syncWaitTime = 0;
+					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+					else  GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
+					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 					go->speed = speed;
 				}
 			}
