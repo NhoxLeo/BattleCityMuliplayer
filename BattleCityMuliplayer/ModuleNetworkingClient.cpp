@@ -109,11 +109,11 @@ void ModuleNetworkingClient::onGui()
 				ImGui::Checkbox("Client prediction", &clientPrediction);
 				if (clientPrediction) ImGui::Checkbox("Server Reconciliation", &serverReconciliation);
 
-				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
+				/*GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
 				for (size_t i = 0; i < 4095; i++)
 				{
 					if (a[i].state == GameObject::CREATING) ImGui::Text(" - Late Frames : %i", a[i].lateFrames);
-				}
+				}*/
 			}
 		}
 	}

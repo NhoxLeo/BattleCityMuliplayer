@@ -50,6 +50,7 @@ public:
 
 	void VisitAll();
 	void SingleBulletVisitAll(int _networkID);
+	void SingleBulletVisitAllWithLatency(int _networkID,int lateframes);
 	void AllButOneBulletVisitAll(int _networkID);
 
 	void pushBullet(Bullet* m_Bullet)

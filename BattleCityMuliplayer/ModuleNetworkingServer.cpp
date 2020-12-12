@@ -59,7 +59,6 @@ void ModuleNetworkingServer::onGui()
 			ImGui::Text("ZombieSpawnRatio");
 			ImGui::InputFloat("Initial Spawning Interval (s)", &initialZombieSpawnRatio, 0.1f, 10.0f);
 			ImGui::Text("Final Spawning Interval (s): %f", guiFinalZombieSpawnRatio);
-			ImGui::Checkbox("Enable Zombie Spawner", &isSpawnerEnabled);
 
 			ImGui::Separator();
 
@@ -87,7 +86,11 @@ void ModuleNetworkingServer::onGui()
 					}
 				}
 
-				//ImGui::Checkbox("Render colliders", &App->modRender->mustRenderColliders);
+				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
+				for (size_t i = 0; i < 4095; i++)
+				{
+					if (a[i].state == GameObject::CREATING) ImGui::Text(" - Late Frames : %i", a[i].lateFrames);
+				}
 			}
 		}
 	}

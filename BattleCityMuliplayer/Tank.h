@@ -11,8 +11,8 @@ class Tank :public ActiveSprite
 {
 public:
 	~Tank();
-	Tank(){};
-	
+	Tank() {};
+
 	void setTankTexture();
 
 	void BulletLevelAdd();
@@ -33,33 +33,34 @@ public:
 
 	void Update();
 
-	vector<Bullet*> getBullet(){ return TheBullet; }
+	vector<Bullet*> getBullet() { return TheBullet; }
 
-	void BulletReduce(){ BulletNumber--; }
+	void BulletReduce() { BulletNumber--; }
 
-	void MaxBulletAdd(){ MaxBullet++; }
+	void MaxBulletAdd() { MaxBullet++; }
 
 	void removeBullet(Bullet* b);
-	
+
 	void directionRenderRet();
 
-	int getTimer(){ return Timer; }
+	int getTimer() { return Timer; }
 
 	void checkInvincible();
 
-	void setLife(int life){ Life = life; }
+	void setLife(int life) { Life = life; }
 
-	int getLife(){ return Life; }
+	int getLife() { return Life; }
 
-	bool getTouchAbleState(){ return TouchAble; }
+	bool getTouchAbleState() { return TouchAble; }
+	void setTouchAbleState(bool touchable) { TouchAble = touchable; }
 
 	void setLife();
 
 	void setLevel(int level);
 
-	void changeAwardAble(){ AwardAble = !AwardAble; }
+	void changeAwardAble() { AwardAble = !AwardAble; }
 
-	bool getAwardAble(){ return AwardAble; }
+	bool getAwardAble() { return AwardAble; }
 
 	void boom();
 private:
@@ -81,20 +82,21 @@ private:
 class TankArray
 {
 private:
-	TankArray(){};
+	TankArray() {};
 protected:
 	int TankNumber;
 	vector<Tank*> Tankarray;
 public:
 	static TankArray* getInstance();
 
-	int getNumber(){ return TankNumber; }
+	int getNumber() { return TankNumber; }
 
-	vector<Tank*> getTankArray(){ return Tankarray; }
+	vector<Tank*> getTankArray() { return Tankarray; }
 
 	void VisitAll();
 	void SingleTankVisitAll(int _networkID);
 	void AllButOneTankVisitAll(int _networkID);
+	Tank* GetTank(int _networkID);
 
 	void pushTank(Tank* m_Tank)
 	{

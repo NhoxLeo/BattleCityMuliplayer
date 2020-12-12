@@ -161,6 +161,51 @@ void BulletArray::SingleBulletVisitAll(int _networkID)
 	}
 }
 
+void BulletArray::SingleBulletVisitAllWithLatency(int _networkID, int lateframes)
+{
+	for (int t = 0; t < BulletNumber; t++)
+	{
+		if (Bulletarray[t]->getParent()->getPlayer() == _networkID)
+		{
+			std::deque<std::vector<Tank*>*>* lastFrameObjectsInfo = GameManager::getInstance()->GetLastFrameObjectsInfo();
+			for (int startingFrameIndex = 20 - lateframes; startingFrameIndex < 20; startingFrameIndex++)
+			{
+				if (!Bulletarray[t]->getBoom())
+				{
+					D3DXVECTOR3 m_Position = Bulletarray[t]->getPosition();
+					for (int k = 0; k < BulletNumber; k++)
+					{
+						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet()))
+						{
+							GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);
+						}
+					}
+					for (int k = 0; k < lastFrameObjectsInfo->at(startingFrameIndex)->size(); k++)
+					{
+						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), lastFrameObjectsInfo->at(startingFrameIndex)->at(k)->getRet()))
+						{
+							Tank* tank = TankArray::getInstance()->GetTank(lastFrameObjectsInfo->at(startingFrameIndex)->at(k)->getPlayer());
+							if (tank != NULL)GameManager::getInstance()->UpdateColl(tank, Bulletarray[t]);
+						}
+					}
+					for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
+					{
+						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+						{
+							GameManager::getInstance()->UpdateColl(StaticSpriteArray::getInstance()->getArray()[k], Bulletarray[t]);
+						}
+					}
+					if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460)
+					{
+						Bulletarray[t]->detain();
+					}
+				}
+				Bulletarray[t]->Update();
+			}
+		}
+	}
+}
+
 void BulletArray::AllButOneBulletVisitAll(int _networkID)
 {
 	for (int t = 0; t < BulletNumber; t++)

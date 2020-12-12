@@ -1628,6 +1628,10 @@ void GameManager::SinglePlayerBulletVisitAll(UINT32 _networkID)
 {
 	BulletArray::getInstance()->SingleBulletVisitAll((int)_networkID);
 }
+void GameManager::SinglePlayerBulletVisitAllWithLatency(UINT32 _networkID, int lateframes)
+{
+	BulletArray::getInstance()->SingleBulletVisitAllWithLatency((int)_networkID, lateframes);
+}
 void GameManager::AllBulletsExceptPlayerVisitAll(UINT32 _networkID)
 {
 	BulletArray::getInstance()->AllButOneBulletVisitAll((int)_networkID);
@@ -1655,29 +1659,27 @@ void GameManager::DeleteClient()
 
 void GameManager::AddThisFrameObjects()
 {
+	vector<Tank*> copyFrameData = TankArray::getInstance()->getTankArray();
+	vector<Tank*>* thisFrameUserData = new std::vector<Tank*>();
+	if (copyFrameData.size() > 0)
 	{
-		vector<Tank*> copyFrameData = TankArray::getInstance()->getTankArray();
-		vector<Tank*>* thisFrameUserData = new std::vector<Tank*>();
-		if (copyFrameData.size() > 0)
+		for (int i = 0; i < copyFrameData.size(); i++)
 		{
-			for (int i = 0; i < copyFrameData.size(); i++)
-			{
-				if (copyFrameData.at(i)->getSpeed().y != 0)
-					int a = 1;
-				Tank* TankClone = new Tank();
-				TankClone->setPosition(copyFrameData.at(i)->getPosition());
-				TankClone->setDirection(copyFrameData.at(i)->getDirection());
-				TankClone->setSpeed(copyFrameData.at(i)->getSpeed());
-				TankClone->setPlayer(copyFrameData.at(i)->getPlayer());
-				TankClone->setCamp(true);
-
-				thisFrameUserData->push_back(TankClone);
-			}
+			Tank* TankClone = new Tank();
+			TankClone->setRet(copyFrameData.at(i)->getRet());
+			TankClone->setPosition(copyFrameData.at(i)->getPosition());
+			TankClone->setDirection(copyFrameData.at(i)->getDirection());
+			TankClone->setSpeed(copyFrameData.at(i)->getSpeed());
+			TankClone->setPlayer(copyFrameData.at(i)->getPlayer());
+			TankClone->setCamp(true);
+			TankClone->setTouchAbleState(true);
+			TankClone->ChangeInvincibleTo(false);
+			thisFrameUserData->push_back(TankClone);
 		}
-
-		if (lastFrameObjectsInfo->size() > 20 - 1) lastFrameObjectsInfo->pop_front();
-		lastFrameObjectsInfo->push_back(thisFrameUserData);
 	}
+
+	if (lastFrameObjectsInfo->size() > MAX_LATE_FRAMES - 1) lastFrameObjectsInfo->pop_front();
+	lastFrameObjectsInfo->push_back(thisFrameUserData);
 }
 
 void GameManager::CreateClient()

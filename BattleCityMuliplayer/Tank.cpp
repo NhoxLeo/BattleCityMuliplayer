@@ -413,6 +413,20 @@ void TankArray::AllButOneTankVisitAll(int _networkID)
 	}
 }
 
+Tank* TankArray::GetTank(int _networkID)
+{
+	Tank* tank = nullptr;
+	for (int i = 0; i < TankNumber; i++)
+	{
+		if (Tankarray[i]->getPlayer() == _networkID)
+		{
+			tank = Tankarray[i];
+			return tank;
+		}
+	}
+	return nullptr;
+}
+
 void TankArray::removeTank(Tank* tank)
 {
 	for (int i = 0; i < TankNumber;i++)

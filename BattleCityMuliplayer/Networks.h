@@ -45,6 +45,7 @@
 #define PACKET_SIZE                             Kilobytes(16)
 #define PING_INTERVAL_SECONDS                           0.5f
 #define REPLICATION_INTERVAL_SECONDS					0.128f
+#define MAX_LATE_FRAMES		20
 
 ////////////////////////////////////////////////////////////////////////
 // BASIC TYPES
