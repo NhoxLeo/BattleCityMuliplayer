@@ -1488,7 +1488,7 @@ void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DX
 
 void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed, int lateframes)
 {
-	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	/*for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
 	{
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
@@ -1497,6 +1497,11 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 			if (rotation.x != 0 || rotation.y != 0) TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
 		}
+	}*/
+	GameManager::getInstance()->UpdatePlayerTank(_networkID, position, rotation, speed);
+	for (int i = 0; i < lateframes; i++)
+	{
+		GameManager::getInstance()->SinglePlayerTankVisitAll(_networkID);
 	}
 }
 
@@ -1597,6 +1602,14 @@ Bullet* GameManager::CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR
 void GameManager::BulletVisitAll()
 {
 	BulletArray::getInstance()->VisitAll();
+}
+void GameManager::SinglePlayerBulletVisitAll(UINT32 _networkID)
+{
+	BulletArray::getInstance()->SingleBulletVisitAll((int)_networkID);
+}
+void GameManager::AllBulletsExceptPlayerVisitAll(UINT32 _networkID)
+{
+	BulletArray::getInstance()->AllButOneBulletVisitAll((int)_networkID);
 }
 
 void GameManager::CreateServer()

@@ -89,10 +89,14 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 				{
 					go->position = position;
 					go->rotation = rotation;
-					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-					else  GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
-					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 					go->speed = speed;
+					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+					else
+					{
+						if (speed.x + speed.y == 0)  GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+						else GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
+					}
+					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 				}
 			}
 		}

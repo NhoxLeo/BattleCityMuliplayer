@@ -89,54 +89,54 @@ struct Player : public Behaviour
 		if (detectedPlayers > 0)
 			reviveSpeed = 0.5f + detectedPlayers * 0.5f;*/
 
-		/*if (rez != nullptr)
-		{
-			rez->animation->spriteDuration = (rezTime / (rez->animation->sprites.size() - 1)) / reviveSpeed;
-			NetworkCommunication(UPDATE_ANIMATION, rez);
-		}*/
-		//if (spawning)
-		//{
-		//	if (Time.time - spawnTime >= immunityDuration)
-		//	{
-		//		spawning = false;
-		//		gameObject->color.a = 1.0f;
-		//		NetworkCommunication(UPDATE_ALPHA, gameObject);
-		//	}
-		//	else
-		//	{
-		//		gameObject->color.a = abs(sin((Time.time - spawnTime) / blinkTime * PI));
-		//	}
-		//}
+			/*if (rez != nullptr)
+			{
+				rez->animation->spriteDuration = (rezTime / (rez->animation->sprites.size() - 1)) / reviveSpeed;
+				NetworkCommunication(UPDATE_ANIMATION, rez);
+			}*/
+			//if (spawning)
+			//{
+			//	if (Time.time - spawnTime >= immunityDuration)
+			//	{
+			//		spawning = false;
+			//		gameObject->color.a = 1.0f;
+			//		NetworkCommunication(UPDATE_ALPHA, gameObject);
+			//	}
+			//	else
+			//	{
+			//		gameObject->color.a = abs(sin((Time.time - spawnTime) / blinkTime * PI));
+			//	}
+			//}
 
-		//if (isDown && detectedPlayers == 0)
-		//{
-		//	rezDuration = 0.0f;
-		//	if (rez != nullptr)
-		//	{
-		//		NetworkCommunication(DESTROY, rez);
-		//		rez = nullptr;
-		//	}
-		//}
-		//if (detectedPlayers > 0)
-		//{
-		//	rezDuration += Time.deltaTime * reviveSpeed;
-		//}
-		//detectedPlayers = 0;
-		//if (isDown && rezDuration > rezTime)
-		//{
-		//	isDown = false;
-		//	rezDuration = 0.0f;
-		//	//gameObject->texture = App->modResources->robot;
-		//	gameObject->size = D3DXVECTOR3(43, 49, 0);
-		//	gameObject->order = 3;
-		//	//NetworkCommunication(UPDATE_TEXTURE, gameObject);
-		//	NetworkCommunication(DESTROY, rez);
-		//	rez = nullptr;
-		//}
-		//if (laser != nullptr)
-		//{
-		//	updateLaser();
-		//}
+			//if (isDown && detectedPlayers == 0)
+			//{
+			//	rezDuration = 0.0f;
+			//	if (rez != nullptr)
+			//	{
+			//		NetworkCommunication(DESTROY, rez);
+			//		rez = nullptr;
+			//	}
+			//}
+			//if (detectedPlayers > 0)
+			//{
+			//	rezDuration += Time.deltaTime * reviveSpeed;
+			//}
+			//detectedPlayers = 0;
+			//if (isDown && rezDuration > rezTime)
+			//{
+			//	isDown = false;
+			//	rezDuration = 0.0f;
+			//	//gameObject->texture = App->modResources->robot;
+			//	gameObject->size = D3DXVECTOR3(43, 49, 0);
+			//	gameObject->order = 3;
+			//	//NetworkCommunication(UPDATE_TEXTURE, gameObject);
+			//	NetworkCommunication(DESTROY, rez);
+			//	rez = nullptr;
+			//}
+			//if (laser != nullptr)
+			//{
+			//	updateLaser();
+			//}
 	}
 
 	void updateLaser()
@@ -149,39 +149,32 @@ struct Player : public Behaviour
 
 	void onInput(const InputController& input) override
 	{
-		if (/*input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f*/true)
+		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f /*true*/)
 		{
-			D3DXVECTOR3 inputVector = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
-
-			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, inputVector);
+			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId) + inputVector, D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 			GameManager::getInstance()->SinglePlayerTankVisitAll(gameObject->networkId);
-			gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
-			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
-			gameObject->speed = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
-			//gameObject->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)gameObject->networkId);
-			NetworkCommunication(UPDATE_POSITION, gameObject);
 		}
 		if (input.buttons[8] == ButtonState::Press)
 		{
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
-			NetworkCommunication(UPDATE_POSITION, gameObject);
 			if (Time.time - lastShotTime > shotingDelay)
 			{
 				lastShotTime = Time.time;
 				if (isServer)
 				{
 					int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
-					GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
-				}
-				else
-				{
+					//GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
 					GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
+					for (int i = 0; i < lateFrames; i++) GameManager::getInstance()->SinglePlayerBulletVisitAll(gameObject->networkId);
 				}
-				//GameObject* bullet = GameManager::getInstance()->GetModNetServer()->spawnBullet(gameObject, bullet_offset);
-				//bullet->clientInstanceNID = gameObject->networkId;
-				//bullet->tag = gameObject->tag;
+				else GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 			}
 		}
+		GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
+		gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
+		gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
+		gameObject->speed = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
+		NetworkCommunication(UPDATE_POSITION, gameObject);
 	}
 
 	void onMouse(const MouseController& mouse) override

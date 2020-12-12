@@ -148,6 +148,8 @@ public:
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);
 	void BulletVisitAll();
+	void SinglePlayerBulletVisitAll(UINT32 _networkID);
+	void AllBulletsExceptPlayerVisitAll(UINT32 _networkID);
 
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }

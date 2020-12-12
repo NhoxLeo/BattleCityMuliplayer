@@ -351,19 +351,10 @@ void ModuleNetworkingServer::onDisconnect()
 	uint16 netGameObjectsCount;
 	GameObject* netGameObjects[MAX_NETWORK_OBJECTS];
 	GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(netGameObjects, &netGameObjectsCount);
-	for (uint32 i = 0; i < netGameObjectsCount; ++i)
-	{
-		NetworkDestroy(netGameObjects[i]);
-	}
-
+	for (uint32 i = 0; i < netGameObjectsCount; ++i) NetworkDestroy(netGameObjects[i]);
 	// Clear all client proxies
-	for (ClientProxy& clientProxy : clientProxies)
-	{
-		destroyClientProxy(&clientProxy);
-	}
-
+	for (ClientProxy& clientProxy : clientProxies) destroyClientProxy(&clientProxy);
 	nextClientId = 0;
-
 	state = ServerState::Stopped;
 }
 

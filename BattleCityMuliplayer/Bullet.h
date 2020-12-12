@@ -49,6 +49,8 @@ public:
 	vector<Bullet*> getBulletArray(){ return Bulletarray; }
 
 	void VisitAll();
+	void SingleBulletVisitAll(int _networkID);
+	void AllButOneBulletVisitAll(int _networkID);
 
 	void pushBullet(Bullet* m_Bullet)
 	{
