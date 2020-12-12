@@ -133,6 +133,7 @@ public:
 
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
 	void DeletePlayerTank(UINT32 _networkID);
+	void DeleteAllPlayerTank();
 	void UpdateAllPlayerTank();
 	void SinglePlayerTankVisitAll(UINT32 _networkID);
 	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);

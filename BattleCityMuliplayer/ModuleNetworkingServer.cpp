@@ -645,6 +645,7 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject* gameObject)
 	}
 
 	// Assuming the message was received, unregister the network identity
+	GameManager::getInstance()->DeletePlayerTank(gameObject->networkId);
 	GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(gameObject);
 
 	// Finally, destroy the object from the server

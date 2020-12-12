@@ -159,6 +159,12 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 			{
 				if (tank->getCamp())
 				{
+					if (GameManager::getInstance()->GetModNetServer() != nullptr)
+					{
+						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)tank->getPlayer());
+						go->behaviour->NetworkCommunication(Behaviour::networkMessageType::DESTROY, go);
+					}
+
 					Stop* action = Stop::create(3);
 					tank->runAction(action);
 					bullet->detain();
@@ -1449,6 +1455,21 @@ void GameManager::DeletePlayerTank(UINT32 _networkID)
 				TankArray::getInstance()->removeTank(delTank);
 				delTank->release();
 			}
+		}
+	}
+}
+
+void GameManager::DeleteAllPlayerTank()
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		Tank* delTank = nullptr;
+		delTank = TankArray::getInstance()->getTankArray().at(i);
+		if (delTank != nullptr)
+		{
+			TankArray::getInstance()->removeTank(delTank);
+			delTank->release();
+			i--;
 		}
 	}
 }

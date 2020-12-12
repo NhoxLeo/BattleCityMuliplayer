@@ -53,17 +53,31 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 		else if ((*it_c).second == ReplicationAction::Update_Position)
 		{
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
-			go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
-			go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
-			go->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)(*it_c).first);
-			packet << go->tickCount;
-			packet << go->position.x;
-			packet << go->position.y;
-			packet << go->rotation.x;
-			packet << go->rotation.y;
-			packet << go->speed.x;
-			packet << go->speed.y;
-			//packet << go->angle;
+			if (go != NULL)
+			{
+				go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
+				go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
+				go->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)(*it_c).first);
+				packet << go->tickCount;
+				packet << go->position.x;
+				packet << go->position.y;
+				packet << go->rotation.x;
+				packet << go->rotation.y;
+				packet << go->speed.x;
+				packet << go->speed.y;
+				//packet << go->angle;
+			}
+			else
+			{
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				//packet << go->angle;
+			}
 		}
 	}
 
