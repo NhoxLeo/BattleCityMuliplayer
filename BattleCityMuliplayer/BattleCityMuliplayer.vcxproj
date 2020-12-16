@@ -160,6 +160,7 @@
     <ClInclude Include="ChoiceScene.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="Debug.h" />
     <ClInclude Include="DeliveryManager.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameScene.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="CFont.cpp" />
     <ClCompile Include="ChoiceScene.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Debug.cpp" />
     <ClCompile Include="DeliveryManager.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameScene.cpp" />

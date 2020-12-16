@@ -1,10 +1,4 @@
-/**************************************************************************
-*  @file	 : StaticSprite.h
-*  @version  : ver  1.0
-*  @author   : Alex
-*  @date     : 
-*  @brief    : 静态精灵类
-**************************************************************************/
+
 #ifndef STATICSPRITE_H
 #define STATICSPRITE_H
 
@@ -21,37 +15,13 @@ private:
 	int m_type;
 public:
 	~StaticSprite();
-	/********************************************************
-		*  @brief    :	创建静态精灵对象
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	static StaticSprite* Create(int Type);
-	/********************************************************
-	*  @brief    :	把静态精灵从父节点移除
-	*  @input	 :
-	*  @output	 :
-	*  @return   :
-	*  @author   :	Alex
-	********************************************************/
+
 	void removeFromParent();
-	/********************************************************
-		*  @brief    :	初始化静态精灵对象
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	bool init(int Type);
-	/********************************************************
-		*  @brief    :	得到静态精灵的种类
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	int getType(){ return m_type; }
 };
 
@@ -62,38 +32,14 @@ private:
 	vector<StaticSprite*> StaticArray;
 	StaticSpriteArray(){};
 public:
-	/********************************************************
-		*  @brief    :	得到静态精灵数量
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	int getStaticSpriteNumber(){ return StaticSpriteNumber; }
-	/********************************************************
-		*  @brief    :	加入静态精灵
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	void pushSprite(StaticSprite* sp);
-	/********************************************************
-		*  @brief    :	移除静态精灵
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	void removeStaticSprite(StaticSprite* sp);
 	static StaticSpriteArray* getInstance();
-	/********************************************************
-		*  @brief    :	得到所有静态精灵
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
+
 	vector<StaticSprite*> getArray(){ return StaticArray; }
 };
 

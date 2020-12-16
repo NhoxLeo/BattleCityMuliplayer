@@ -9,6 +9,7 @@
 #include "KeyboardInput.h"
 
 
+
 bool NetworkScene::init()
 {
 	Scene::init();
@@ -29,6 +30,8 @@ bool NetworkScene::init()
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
+
+
 
 	return true;
 }
@@ -58,7 +61,7 @@ void NetworkScene::DebugBool(bool b)
 void NetworkScene::Update()
 {
 	Scene::Update();
-
+	
 	GameManager::getInstance()->UpdateAllPlayerTank();
 
 	//MyTank1->Update();
@@ -110,6 +113,10 @@ void NetworkScene::Update()
 				modNetClientptr->updateEnabledState();
 				if (modNetClientptr->start() == false);
 			}
+		}
+		if (ImGui::Button("Debug log"))
+		{
+			debug.Log(MyTank1->getHeight());
 		}
 		ImGui::PopItemWidth();
 		ImGui::End();

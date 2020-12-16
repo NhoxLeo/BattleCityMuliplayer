@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 #include "Scene.h"
-
+#include "Debug.h"
 class Tank;
 
 class NetworkScene : public Scene
@@ -19,6 +19,7 @@ private:
 	ActiveSprite* background;
 	Tank* MyTank1;
 	Map* nowmap;
+	Debug debug;
 	bool isServer = false;
 	bool isClient = false;
 };
