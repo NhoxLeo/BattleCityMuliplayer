@@ -1,6 +1,7 @@
 #include <iostream> 
 #include <fstream> 
 #include <iostream> 
+#include "Tank.h"
 //#include <minwindef.h>
 
 using namespace std;
@@ -16,5 +17,6 @@ public:
 
 	void Log(int i);
 	//void Log(UINT i);
+	void LogTank(Tank* tank);
 
 };

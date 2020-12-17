@@ -20,13 +20,13 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	//MyTank1 = Tank::create();
-	//MyTank1->setPlayer(1);
-	//MyTank1->setCamp(true);
-	//MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	//addActiveChild(MyTank1);
+	MyTank1 = Tank::create();
+	MyTank1->setPlayer(1);
+	MyTank1->setCamp(true);
+	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
+	addActiveChild(MyTank1);
 
-
+	
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
@@ -64,13 +64,13 @@ void NetworkScene::Update()
 	
 	GameManager::getInstance()->UpdateAllPlayerTank();
 
-	//MyTank1->Update();
-	//MyTank1->setSpeed(Speed(0, 0));
-	//MyTank1->setSpeed(Speed(Input.horizontalAxis, Input.verticalAxis));
-	//if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, Input.verticalAxis, 0));
-	//if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
-	//TankArray::getInstance()->VisitAll();
-	//BulletArray::getInstance()->VisitAll();
+	MyTank1->Update();
+	MyTank1->setSpeed(Speed(0, 0));
+	MyTank1->setSpeed(Speed(Input.horizontalAxis, Input.verticalAxis));
+	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, Input.verticalAxis, 0));
+	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
+	TankArray::getInstance()->VisitAll();
+	BulletArray::getInstance()->VisitAll();
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -117,6 +117,8 @@ void NetworkScene::Update()
 		if (ImGui::Button("Debug log"))
 		{
 			debug.Log(MyTank1->getHeight());
+			debug.LogTank(MyTank1);
+
 		}
 		ImGui::PopItemWidth();
 		ImGui::End();
