@@ -8,15 +8,21 @@ using namespace std;
 
 class Debug 
 {
-
+private: 
+	bool isDebug;
 	
 public:
 
 	Debug();
 	~Debug();
 
+	void SetDebug(bool debug);
+	bool GetDebug();
+
 	void Log(int i);
 	//void Log(UINT i);
-	void LogTank(Tank* tank);
+	void LogTank(ofstream& debug,Tank* tank);
+	void LogTank20(Tank* tank);
+
 
 };

@@ -30,9 +30,9 @@ bool NetworkScene::init()
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
-
-
-
+	
+	ofs = ofstream("Log.txt");
+	debug.SetDebug(false);
 	return true;
 }
 
@@ -64,6 +64,7 @@ void NetworkScene::Update()
 	
 	GameManager::getInstance()->UpdateAllPlayerTank();
 
+
 	MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
 	MyTank1->setSpeed(Speed(Input.horizontalAxis, Input.verticalAxis));
@@ -71,6 +72,8 @@ void NetworkScene::Update()
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();
+	if (GameManager::getInstance()->getClick2() == LBUTTON_ON) debug.SetDebug(true);
+
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -116,8 +119,10 @@ void NetworkScene::Update()
 		}
 		if (ImGui::Button("Debug log"))
 		{
-			debug.Log(MyTank1->getHeight());
-			debug.LogTank(MyTank1);
+			//debug.Log(MyTank1->getHeight());
+			//debug.LogTank(MyTank1);
+			//debug.LogTank20(MyTank1);
+			debug.SetDebug(true);
 
 		}
 		ImGui::PopItemWidth();
@@ -165,6 +170,38 @@ void NetworkScene::Update()
 	//ImGui::Text("Debug: ");
 	//ImGui::Text((const char*)newchar);
 	//NetworkScene::DebugBool(MyTank1->getAwardAble());
+
+
+	if (debug.GetDebug() == true)
+	{
+		for (int i = 0; i < 20; i++)
+		{
+			ofstream log(to_string(i)+"Log.txt");
+			log << "Tank's x: ";
+			log << MyTank1->getPosition().x;
+			log << "\n";
+			log << "Tank's y: ";
+			log << MyTank1->getPosition().y;
+			log << "\n";
+			log << "Tank's speed.x: ";
+			log << MyTank1->getSpeed().x;
+			log << "\n";
+			log << "Tank's speed.y: ";
+			log << MyTank1->getSpeed().y;
+			log << "\n";
+			log << "Tank's direction.x: ";
+			log << MyTank1->getDirection().x;
+			log << "\n";
+			log << "Tank's direction.y: ";
+			log << MyTank1->getDirection().y;
+			log << "\n";
+			log.close();
+			if (i == 19)
+			{
+				debug.SetDebug(false);
+			}
+		}
+	}
 }
 
 void NetworkScene::Update(float deltaTime)
