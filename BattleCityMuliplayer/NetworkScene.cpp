@@ -163,15 +163,6 @@ void NetworkScene::Update()
 			}*/
 	}
 
-	////Debug
-	//UINT newint = MyTank1->getPosition().y;
-	//char newchar[10] = "";
-	//sprintf(newchar, "%d", newint);
-	//ImGui::Text("Debug: ");
-	//ImGui::Text((const char*)newchar);
-	//NetworkScene::DebugBool(MyTank1->getAwardAble());
-
-
 	if (debug.GetDebug() == true)
 	{
 		for (int i = 0; i < 20; i++)
@@ -202,109 +193,6 @@ void NetworkScene::Update()
 			}
 		}
 	}
-}
-
-void NetworkScene::Update(float deltaTime)
-{
-	Scene::Update();
-
-	GameManager::getInstance()->UpdateAllPlayerTank();
-
-	//MyTank1->Update();
-	//MyTank1->setSpeed(Speed(0, 0));
-	//MyTank1->setSpeed(Speed(Input.horizontalAxis, Input.verticalAxis));
-	//if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, Input.verticalAxis, 0));
-	//if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
-	//TankArray::getInstance()->VisitAll();
-	//BulletArray::getInstance()->VisitAll();
-
-	static int localServerPort = 8888;
-	if (!isServer && !isClient)
-	{
-		ImGui::Begin("Main Menu");
-		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
-		ImGui::Spacing();
-		ImGui::Text("Server");
-		ImGui::InputInt("Server port", &localServerPort);
-		if (ImGui::Button("Start server"))
-		{
-			isServer = true;
-			GameManager::getInstance()->CreateServer();
-			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
-			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
-			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
-			modNetServerptr->start();
-		}
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
-		ImGui::Text("Client");
-		static char serverAddressStr[64] = "127.0.0.1";
-		ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
-		static int remoteServerPort = 8888;
-		ImGui::InputInt("Server port", &remoteServerPort);
-		static char playerNameStr[64] = "Player";
-		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
-		static bool showInvalidUserName = false;
-		if (ImGui::Button("Connect to server"))
-		{
-			isClient = true;
-			GameManager::getInstance()->CreateClient();
-			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
-			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
-			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
-			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-			if (modNetClientptr->needsStart())
-			{
-				modNetClientptr->updateEnabledState();
-				if (modNetClientptr->start() == false);
-			}
-		}
-		ImGui::PopItemWidth();
-		ImGui::End();
-	}
-	if (isServer)
-	{
-		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
-		modNetServerptr->preUpdate();
-		modNetServerptr->update();
-		modNetServerptr->gui();
-	}
-	if (isClient)
-	{
-		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-		modNetClientptr->preUpdate();
-		modNetClientptr->update();
-		modNetClientptr->gui();
-		if (modNetClientptr->needsStop())
-		{
-			modNetClientptr->cleanUp();
-			modNetClientptr->stop();
-			delete[] modNetClientptr;
-			GameManager::getInstance()->DeleteClient();
-			isClient = false;
-		}
-		/*	uint16 networkGameObjectsCount;
-			GameObject* networkGameObjects[MAX_NETWORK_OBJECTS] = {};
-			GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-			for (GameObject* a : networkGameObjects)
-			{
-				if (a != NULL && a->state == GameObject::State::CREATING)
-				{
-					ImGui::Spacing();
-					ImGui::Text(" ID : %f", a->networkId);
-					ImGui::Text(" Sync Wait Time : %f", a->syncWaitTime);
-				}
-			}*/
-	}
-
-	////Debug
-	//UINT newint = MyTank1->getPosition().y;
-	//char newchar[10] = "";
-	//sprintf(newchar, "%d", newint);
-	//ImGui::Text("Debug: ");
-	//ImGui::Text((const char*)newchar);
-	//NetworkScene::DebugBool(MyTank1->getAwardAble());
 }
 
 void NetworkScene::clear()
