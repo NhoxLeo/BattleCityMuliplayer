@@ -20,6 +20,7 @@ private:
 	Tank* MyTank1;
 	Map* nowmap;
 	Debug debug;
+	ofstream ofs;
 	bool isServer = false;
 	bool isClient = false;
 };
