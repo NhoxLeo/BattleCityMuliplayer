@@ -31,8 +31,14 @@ bool NetworkScene::init()
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
 	
-	ofs = ofstream("Log.txt");
 	debug.SetDebug(false);
+	debugIndex = 0;
+
+	/*for (int i = 0; i < 20; i++)
+	{
+		ofstream tempFile(to_string(i) + "Log.txt");
+		files.push_back(tempFile);
+	}*/
 	return true;
 }
 
@@ -121,8 +127,11 @@ void NetworkScene::Update()
 		{
 			//debug.Log(MyTank1->getHeight());
 			//debug.LogTank(MyTank1);
+
 			//debug.LogTank20(MyTank1);
+
 			debug.SetDebug(true);
+			debugIndex = 0;
 
 		}
 		ImGui::PopItemWidth();
@@ -165,7 +174,7 @@ void NetworkScene::Update()
 
 	if (debug.GetDebug() == true)
 	{
-		for (int i = 0; i < 20; i++)
+		/*for (int i = 0; i < 20; i++)
 		{
 			ofstream log(to_string(i)+"Log.txt");
 			log << "Tank's x: ";
@@ -191,6 +200,36 @@ void NetworkScene::Update()
 			{
 				debug.SetDebug(false);
 			}
+		}*/
+
+		if (debugIndex < 20)
+		{
+			ofstream file (to_string(debugIndex)+ "Log.txt");
+			file << "Tank's x: ";
+			file << MyTank1->getPosition().x;
+			file << "\n";
+			file << "Tank's y: ";
+			file << MyTank1->getPosition().y;
+			file << "\n";
+			file << "Tank's speed.x: ";
+			file << MyTank1->getSpeed().x;
+			file << "\n";
+			file << "Tank's speed.y: ";
+			file << MyTank1->getSpeed().y;
+			file << "\n";
+			file << "Tank's direction.x: ";
+			file << MyTank1->getDirection().x;
+			file << "\n";
+			file << "Tank's direction.y: ";
+			file << MyTank1->getDirection().y;
+			file << "\n";
+			file.close();
+
+			debugIndex++;
+		}
+		else
+		{
+			debug.SetDebug(false);
 		}
 	}
 }

@@ -19,7 +19,10 @@ private:
 	Tank* MyTank1;
 	Map* nowmap;
 	Debug debug;
-	ofstream ofs;
+	//vector<Debug> debugs;
+	vector<ofstream> files;
+	int debugIndex;
+
 	bool isServer = false;
 	bool isClient = false;
 };

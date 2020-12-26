@@ -23,6 +23,13 @@ public:
 	//void Log(UINT i);
 	void LogTank(ofstream& debug,Tank* tank);
 	void LogTank20(Tank* tank);
+};
 
+class DebugArray
+{
+private:
+	int debugNumber;
+	vector<Debug*> debugArray;
+public:
 
 };

@@ -1,6 +1,0 @@
-Tank's x: 186
-Tank's y: 446
-Tank's speed.x: 0
-Tank's speed.y: 0
-Tank's direction.x: -1
-Tank's direction.y: 0
