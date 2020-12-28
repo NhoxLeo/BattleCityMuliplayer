@@ -8,7 +8,7 @@
 
 void Tank::BulletLevelAdd()
 {
-	if (BulletLevel<4)
+	if (BulletLevel < 4)
 	{
 		BulletLevel++;
 	}
@@ -39,7 +39,7 @@ void Tank::removeBullet(Bullet* b)
 Tank* Tank::create()
 {
 	Tank* tank = new Tank();
-	if (tank&&tank->init())
+	if (tank && tank->init())
 	{
 		tank->autorelease();
 		return tank;
@@ -95,7 +95,7 @@ void Tank::checkInvincible()
 {
 	if (Invincible)
 	{
-		if (InvincibleTimer == FRAME*InvincibleTime)
+		if (InvincibleTimer == FRAME * InvincibleTime)
 		{
 			ChangeInvincibleTo(false);
 		}
@@ -137,20 +137,20 @@ void Tank::Update()
 	{
 		detain();
 	}
-	if (Timer>10000000)
+	if (Timer > 10000000)
 	{
 		Timer = 601;
 	}
 	Timer++;
-	if (Timer == FRAME/4)
+	if (Timer == FRAME / 4)
 	{
 		setRenderRet(28, 28, 28, 0);
 	}
-	if (Timer == FRAME/2)
+	if (Timer == FRAME / 2)
 	{
-		setRenderRet(28, 28, 56,0);
+		setRenderRet(28, 28, 56, 0);
 	}
-	if (Timer == 3*FRAME/4)
+	if (Timer == 3 * FRAME / 4)
 	{
 		setRenderRet(28, 28, 28, 0);
 	}
@@ -171,15 +171,15 @@ void Tank::Update()
 	{
 		directionRenderRet();
 	}
-	if (InvincibleTimer%20 == 1)
-	{	
+	if (InvincibleTimer % 20 == 1)
+	{
 		setRenderRet(28, 28, 0, 0);
 	}
-	if (InvincibleTimer%20 == 11)
+	if (InvincibleTimer % 20 == 11)
 	{
 		setRenderRet(28, 28, 0, 28);
 	}
-	if (Life<=0)
+	if (Life <= 0)
 	{
 		detain();
 	}
@@ -202,62 +202,62 @@ void TankArray::VisitAll()
 			}
 			Tankarray[t]->setRenderRet(28, 28, m_x * 56 + m_y, Tankarray[t]->getRenderRet()->RenderPoint->y);
 		}
-			if (Tankarray[t]->getMoveState())
+		if (Tankarray[t]->getMoveState())
+		{
+			D3DXVECTOR3 m_Position = Tankarray[t]->getPosition() + D3DXVECTOR3(TankSpeed * Tankarray[t]->getSpeed().x, TankSpeed * Tankarray[t]->getSpeed().y, 0);
+			Ret m_Ret = Ret(TankArray::getInstance()->Tankarray[t]->getSize(), m_Position);
+			bool x = true; //x true -> movable
+
+			//Tank vs tank collision
+			for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
 			{
-				D3DXVECTOR3 m_Position = Tankarray[t]->getPosition() + D3DXVECTOR3(TankSpeed*Tankarray[t]->getSpeed().x, TankSpeed*Tankarray[t]->getSpeed().y, 0);
-				Ret m_Ret = Ret(TankArray::getInstance()->Tankarray[t]->getSize(), m_Position);
-				bool x = true; //x true -> movable
-
-				//Tank vs tank collision
-				for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
+				if (k != t)
 				{
-					if (k != t)
+					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), getTankArray()[k]->getRet()))
 					{
-						if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(),getTankArray()[k]->getRet()))
-						{
-							x = false;
-							break;
-						}
+						x = false;
+						break;
 					}
 				}
-				//Tank vs wall, brick, items.
-				for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
+			}
+			//Tank vs wall, brick, items.
+			for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
+			{
+				if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
 				{
-					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+					if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
+						&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
 					{
-						if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
-							&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
-						{
-							x = false;
-							break;
-						}
+						x = false;
+						break;
 					}
-				}
-				
-				//Tank vs bound
-				if (m_Position.x < 126 || m_Position.x>514 || m_Position.y < 58 || m_Position.y>446)
-				{
-					x = false;
-				}
-
-				//No collision -> x == true.
-				if (x)
-				{
-					getTankArray()[t]->setPosition(m_Position);
-				}
-				else
-				{
-					getTankArray()[t]->setSpeed(Speed(0, 0));
 				}
 			}
 
-			if (Tankarray[t]->getScene()->getAward()!=NULL)
+			//Tank vs bound
+			if (m_Position.x < 126 || m_Position.x>514 || m_Position.y < 58 || m_Position.y>446)
 			{
-				if (Tankarray[t]->getRet().Collision(Tankarray[t]->getScene()->getAward()->getRet()))
-				{
-					GameManager::getInstance()->UpdateColl(Tankarray[t]->getScene()->getAward(), Tankarray[t]);
-				}
+				x = false;
 			}
+
+			//No collision -> x == true.
+			if (x)
+			{
+				getTankArray()[t]->setPosition(m_Position);
+			}
+			else
+			{
+				getTankArray()[t]->setSpeed(Speed(0, 0));
+			}
+		}
+
+		if (Tankarray[t]->getScene()->getAward() != NULL)
+		{
+			if (Tankarray[t]->getRet().Collision(Tankarray[t]->getScene()->getAward()->getRet()))
+			{
+				GameManager::getInstance()->UpdateColl(Tankarray[t]->getScene()->getAward(), Tankarray[t]);
+			}
+		}
 	}
 }
 
@@ -413,6 +413,110 @@ void TankArray::AllButOneTankVisitAll(int _networkID)
 	}
 }
 
+void TankArray::AllAITankVisitAll()
+{
+	for (int t = 0; t < TankNumber; t++)
+	{
+		if (Tankarray[t] != NULL && !Tankarray[t]->getCamp())
+		{
+			Tankarray[t]->Update();
+			if (Tankarray[t]->getSpeed().x != 0 || Tankarray[t]->getSpeed().y != 0)
+			{
+				int m_x = Tankarray[t]->getRenderRet()->RenderPoint->x / 56;
+				int m_y = 28 - Tankarray[t]->getRenderRet()->RenderPoint->x;
+				if (m_y < 0)
+				{
+					m_y = -m_y;
+				}
+				Tankarray[t]->setRenderRet(28, 28, m_x * 56 + m_y, Tankarray[t]->getRenderRet()->RenderPoint->y);
+			}
+			if (Tankarray[t]->getMoveState())
+			{
+				D3DXVECTOR3 m_Position = Tankarray[t]->getPosition() + D3DXVECTOR3(TankSpeed * Tankarray[t]->getSpeed().x, TankSpeed * Tankarray[t]->getSpeed().y, 0);
+				Ret m_Ret = Ret(TankArray::getInstance()->Tankarray[t]->getSize(), m_Position);
+				bool x = true; //x true -> movable
+
+				//Tank vs tank collision
+				for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
+				{
+					if (k != t)
+					{
+						if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), getTankArray()[k]->getRet()))
+						{
+							x = false;
+							break;
+						}
+					}
+				}
+				//Tank vs wall, brick, items.
+				for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
+				{
+					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+					{
+						if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
+							&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+						{
+							x = false;
+							break;
+						}
+					}
+				}
+
+				//Tank vs bound
+				if (m_Position.x < 126 || m_Position.x>514 || m_Position.y < 58 || m_Position.y>446)
+				{
+					x = false;
+				}
+
+				//No collision -> x == true.
+				if (x)
+				{
+					getTankArray()[t]->setPosition(m_Position);
+				}
+				else
+				{
+					getTankArray()[t]->setSpeed(Speed(0, 0));
+				}
+			}
+			if (Tankarray[t]->getScene()->getAward() != NULL)
+			{
+				if (Tankarray[t]->getRet().Collision(Tankarray[t]->getScene()->getAward()->getRet()))
+				{
+					GameManager::getInstance()->UpdateColl(Tankarray[t]->getScene()->getAward(), Tankarray[t]);
+				}
+			}
+		}
+	}
+}
+
+void TankArray::UpdateAITanks()
+{
+	for (int i = 0; i < TankNumber; i++)
+	{
+		if (!(TankArray::getInstance()->getTankArray()[i]->getCamp()))
+		{
+			if (YESFIRE) TankArray::getInstance()->getTankArray()[i]->fire();
+			if ((Tankarray[i]->getTimer() % 180) == 0 || (Tankarray[i]->getSpeed().x == 0 && Tankarray[i]->getSpeed().y == 0))
+			{
+				int weight = rand() % 100 + 1;
+				//setDirection(Up)
+				if (weight >= 0 && weight <= 20) Tankarray[i]->setDirection(D3DXVECTOR3(0, -1, 0));
+				if (weight > 20 && weight <= 45) Tankarray[i]->setDirection(D3DXVECTOR3(-1, 0, 0));//setDirection(Left)
+				if (weight > 45 && weight <= 75) Tankarray[i]->setDirection(D3DXVECTOR3(1, 0, 0));//setDirection(Right)
+				if (weight > 75 && weight <= 100) Tankarray[i]->setDirection(D3DXVECTOR3(0, 1, 0));//setDirection(Down)
+				if (Tankarray[i]->getLevel() == 2)
+				{
+					Tankarray[i]->setSpeed(Speed(2 * Tankarray[i]->getDirection().x, 2 * Tankarray[i]->getDirection().y));
+				}
+				else
+				{
+					Tankarray[i]->setSpeed(Speed(Tankarray[i]->getDirection().x, Tankarray[i]->getDirection().y));
+				}
+			}
+		}
+	}
+}
+
 Tank* TankArray::GetTank(int _networkID)
 {
 	Tank* tank = nullptr;
@@ -429,7 +533,7 @@ Tank* TankArray::GetTank(int _networkID)
 
 void TankArray::removeTank(Tank* tank)
 {
-	for (int i = 0; i < TankNumber;i++)
+	for (int i = 0; i < TankNumber; i++)
 	{
 		if (Tankarray[i] == tank)
 		{
@@ -453,7 +557,7 @@ TankArray* TankArray::getInstance()
 
 Tank::~Tank()
 {
-	for (int i = 0; i<TheBullet.size();i++)
+	for (int i = 0; i < TheBullet.size(); i++)
 	{
 		TheBullet[i]->setParent(NULL);
 	}

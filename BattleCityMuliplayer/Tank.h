@@ -63,6 +63,9 @@ public:
 	bool getAwardAble() { return AwardAble; }
 
 	void boom();
+
+	void SetIsPlayer(bool _isplayer) { isPlayer = _isplayer; }
+	bool IsPlayer() { return isPlayer; }
 private:
 	int Life;
 	int Timer;
@@ -77,6 +80,7 @@ private:
 	bool AwardAble;
 	int counter;
 	bool m_boom;
+	bool isPlayer = true;
 };
 
 class TankArray
@@ -96,6 +100,8 @@ public:
 	void VisitAll();
 	void SingleTankVisitAll(int _networkID);
 	void AllButOneTankVisitAll(int _networkID);
+	void AllAITankVisitAll();
+	void UpdateAITanks();
 	Tank* GetTank(int _networkID);
 
 	void pushTank(Tank* m_Tank)

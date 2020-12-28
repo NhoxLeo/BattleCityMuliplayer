@@ -26,27 +26,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			packet >> go->size.x;
 			packet >> go->size.y;
 			packet >> go->name;
-			packet >> go->clientInstanceNID;
 			if (networkId == clientNetworkId)
 			{
 				go->isPlayer = true;
 				go->doInterpolation = false;
-			}
-			if (go->clientInstanceNID != 0) //It will be an instanced object on the client
-			{
-				////Currently only for bullets
-				//go->behaviour = new Bullet();
-				//go->behaviour->gameObject = go;
-				//go->behaviour->isServer = false;
-				//go->doInterpolation = false;
-				//GameObject* clientPlayer = App->modLinkingContext->getNetworkGameObject(go->clientInstanceNID);
-				//if (clientPlayer)
-				//{
-				//	vec2 bullet_offset = { 10.0f, 20.0f };
-				//	vec2 forward = vec2FromDegrees(clientPlayer->angle);
-				//	vec2 right = { -forward.y, forward.x };
-				//	go->position = clientPlayer->position + forward * bullet_offset.y + right * bullet_offset.x;
-				//}
 			}
 			if (go->isPlayer)
 			{
@@ -83,7 +66,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			{
 				go->tickCount = tickCount;
 				go->lateFrames = (int)((GetTickCount() - tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
-				if (go->clientInstanceNID != 0)	go->doInterpolation = true;
+				//if (go->clientInstanceNID != 0)	go->doInterpolation = true;
 				//go->newReplicationState(position, rotation);
 				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{

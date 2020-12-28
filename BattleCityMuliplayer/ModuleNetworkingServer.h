@@ -81,13 +81,8 @@ public:
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
-	void ZombieSpawner();
+	void AITankSpawner(D3DXVECTOR3 position);
 	float RandomFloat(float min, float max);
-
-	//Zombie related objects
-	GameObject* spawnZombie(D3DXVECTOR3 position);
-	GameObject* spawnExplosion(GameObject* zombie);
-	GameObject* spawnBlood(D3DXVECTOR3 position, float angle);
 
 	float initialZombieSpawnRatio = 5.0;
 	float guiFinalZombieSpawnRatio = 0;

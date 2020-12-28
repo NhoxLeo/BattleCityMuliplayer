@@ -87,9 +87,13 @@ void ModuleNetworkingServer::onGui()
 				}
 
 				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
-				for (size_t i = 0; i < 4095; i++)
+				/*for (size_t i = 0; i < 4095; i++)
 				{
 					if (a[i].state == GameObject::CREATING) ImGui::Text(" - Late Frames : %i", a[i].lateFrames);
+				}*/
+				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0)
+				{
+					AITankSpawner(D3DXVECTOR3(126,58,0));
 				}
 			}
 		}
@@ -216,8 +220,6 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
 						proxy->gameObject->tickCount = inputData.tickCount;
-						//proxy->mouse.buttons[0] = (ButtonState)inputData.leftButton;
-						//proxy->gameObject->behaviour->onMouse(proxy->mouse);
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
 				}
@@ -294,6 +296,8 @@ void ModuleNetworkingServer::onUpdate()
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
 		//Update Tank Players on Server
+		GameManager::getInstance()->AITankControl();
+		GameManager::getInstance()->AllAIPlayerTankVisitAll();
 		GameManager::getInstance()->BulletVisitAll();
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
@@ -410,13 +414,6 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 	clientProxy.gameObject->angle = 45.0f;
 	clientProxy.gameObject->order = 3;
 	clientProxy.gameObject->name = clientProxy.name;
-
-	//clientProxy.gameObject->texture = App->modResources->robot;
-	//clientProxy.gameObject->color.a = 0.75f;
-	//// Create collider
-	//clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
-	//clientProxy.gameObject->collider->isTrigger = true;
-
 	// Create behaviour
 	clientProxy.gameObject->behaviour = new Player;
 	clientProxy.gameObject->behaviour->gameObject = clientProxy.gameObject;
@@ -469,106 +466,32 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 //
 //	return gameObject;
 //}
-void ModuleNetworkingServer::ZombieSpawner()
+void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
 {
-	static float finalSpawnRatio = initialZombieSpawnRatio;
-	if (connectedProxies > 0 && isSpawnerEnabled)
+	GameObject* aiTank = Instantiate();
+	//aiTank->size = D3DXVECTOR3{ 400, 400 ,0 };
+	aiTank->position = position;
+	aiTank->order = 3;
+
+	aiTank->behaviour = new Player();
+	aiTank->behaviour->gameObject = aiTank;
+
+	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(aiTank);
+	GameManager::getInstance()->CreateAIPlayerTank(aiTank->networkId, aiTank->position);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{
-		float safetyRadius = 175.0f; //Area from the center where zombies cannot spawn
-		float maxDistance = 850.0f; //Max distance where the zombies can spawn
-		float increasingSpawnRatio = 0.01f;
-		float fixedTimeincreaseSpawnRatio = 0.1f; //Time to increasing spawn ratio
-		float maxFinalSpawnRatio = 1.0 / (connectedProxies / 1.5f);
-
-		timeSinceLastZombieSpawned += Time.deltaTime;
-		timeSinceLastIncreaseSpawnRatio += Time.deltaTime;
-
-		//Increase spawn rate each...
-		if (timeSinceLastIncreaseSpawnRatio > fixedTimeincreaseSpawnRatio && finalSpawnRatio >= maxFinalSpawnRatio)
+		if (clientProxies[i].connected)
 		{
-			finalSpawnRatio = finalSpawnRatio - increasingSpawnRatio;
-			timeSinceLastIncreaseSpawnRatio = 0;
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(aiTank->networkId);
 		}
-
-
-
-		/*if (timeSinceLastZombieSpawned > finalSpawnRatio)
-		{
-
-			vec2 randomDirection = vec2{ RandomFloat(-1.0f,1.0f),RandomFloat(-1.0f,1.0f) };
-			float distance = 1800.0f;
-
-			spawnZombie(normalize(randomDirection) * distance);
-			timeSinceLastZombieSpawned = 0.0f;
-		}
-		guiFinalZombieSpawnRatio = finalSpawnRatio;*/
 	}
-	else
-	{
-		guiFinalZombieSpawnRatio = initialZombieSpawnRatio;
-		finalSpawnRatio = initialZombieSpawnRatio;
-	}
-
-
-
 }
 float ModuleNetworkingServer::RandomFloat(float min, float max)
 {
 	return ((float)rand() / RAND_MAX) * (max - min) + min;
-}
-//GameObject* ModuleNetworkingServer::spawnZombie(vec2 position)
-//{
-//	GameObject* zombie = Instantiate();
-//	zombie->size = { 43, 35 };
-//	zombie->position = position;
-//	zombie->order = 2;
-//	zombie->texture = App->modResources->zombie;
-//	zombie->collider = App->modCollision->addCollider(ColliderType::Zombie, zombie);
-//	zombie->collider->isTrigger = true;
-//
-//	zombie->behaviour = new Zombie();
-//	zombie->behaviour->gameObject = zombie;
-//
-//	App->modLinkingContext->registerNetworkGameObject(zombie);
-//
-//	// Notify all client proxies' replication manager to create the object remotely
-//	for (int i = 0; i < MAX_CLIENTS; ++i)
-//	{
-//		if (clientProxies[i].connected)
-//		{
-//			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-//			clientProxies[i].replicationManager.create(zombie->networkId);
-//		}
-//	}
-//
-//	return zombie;
-//}
-GameObject* ModuleNetworkingServer::spawnExplosion(GameObject* zombie)
-{
-	GameObject* object = Instantiate();
-	//object->size = { 60, 60 };
-	object->position = zombie->position;
-	object->order = 6;
-	//object->animation = App->modAnimations->useAnimation("explosion");
-
-	//Explosion* script = new Explosion();
-	//script->gameObject = object;
-	//script->zombie = zombie;
-	//object->behaviour = script;
-
-	//App->modLinkingContext->registerNetworkGameObject(object);
-
-	//// Notify all client proxies' replication manager to create the object remotely
-	//for (int i = 0; i < MAX_CLIENTS; ++i)
-	//{
-	//	if (clientProxies[i].connected)
-	//	{
-	//		// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-	//		clientProxies[i].replicationManager.create(object->networkId);
-	//	}
-	//}
-
-	return object;
 }
 //GameObject* ModuleNetworkingServer::spawnBlood(vec2 position, float angle)
 //{
