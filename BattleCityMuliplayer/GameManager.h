@@ -132,12 +132,14 @@ public:
 	bool getMapMake() { return MapMake; }
 
 	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
+	void CreateAIPlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
 	void DeletePlayerTank(UINT32 _networkID);
 	void DeleteAllPlayerTank();
 	void UpdateAllPlayerTank();
 	void SinglePlayerTankVisitAll(UINT32 _networkID);
 	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
+	void AllAIPlayerTankVisitAll();
 	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed);
 	void UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed,int lateframes);
 	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);
@@ -145,6 +147,8 @@ public:
 	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);
 	D3DXVECTOR3 GetPlayerTankRotation(int _networkID);
 	D3DXVECTOR3 GetPlayerTankSpeed(int _networkID);
+	int GetTanksCount();
+	void AITankControl();
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);

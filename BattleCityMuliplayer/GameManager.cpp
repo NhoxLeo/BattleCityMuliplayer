@@ -1438,8 +1438,17 @@ void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
 	playerTank->setCamp(true);
 	playerTank->setPosition(position);
 	nowScene->addActiveChild(playerTank);
-	//TankArray::getInstance()->pushTank(playerTank);
-	//playerTanks->push_back(playerTank);
+	playerTank->SetIsPlayer(true);
+}
+
+void GameManager::CreateAIPlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
+{
+	Tank* playerTank = Tank::create();
+	playerTank->setPlayer((int)_networkID);
+	playerTank->setCamp(false);
+	playerTank->setPosition(position);
+	nowScene->addActiveChild(playerTank);
+	playerTank->SetIsPlayer(false);
 }
 
 void GameManager::DeletePlayerTank(UINT32 _networkID)
@@ -1493,6 +1502,10 @@ void GameManager::AllTanksExceptPlayerVisitAll(UINT32 _networkID)
 void GameManager::AllPlayerTankVisitAll()
 {
 	TankArray::getInstance()->VisitAll();
+}
+void GameManager::AllAIPlayerTankVisitAll()
+{
+	TankArray::getInstance()->AllAITankVisitAll();
 }
 void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed)
 {
@@ -1589,6 +1602,16 @@ D3DXVECTOR3 GameManager::GetPlayerTankSpeed(int _networkID)
 		}
 	}
 	return speed;
+}
+
+int GameManager::GetTanksCount()
+{
+	return TankArray::getInstance()->getNumber();
+}
+
+void GameManager::AITankControl()
+{
+	TankArray::getInstance()->UpdateAITanks();
 }
 
 Bullet* GameManager::CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position)
