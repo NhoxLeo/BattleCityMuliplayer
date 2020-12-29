@@ -20,6 +20,11 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 	commands[networkId] = ReplicationAction::Destroy;
 }
 
+void ReplicationManagerServer::server_snapshot(uint32 networkId)
+{
+	commands[networkId] = ReplicationAction::Server_Snapshot;
+}
+
 std::map<uint32, ReplicationAction> ReplicationManagerServer::GetCommands()
 {
 	return commands;
@@ -30,12 +35,12 @@ void ReplicationManagerServer::InsertCommands(std::pair<uint32, ReplicationActio
 	commands.insert(command);
 }
 
-bool ReplicationManagerServer::write(OutputMemoryStream & packet)
+bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 {
 	if (commands.size() == 0) return false;
 
 	for (std::map<uint32, ReplicationAction>::iterator it_c = commands.begin(); it_c != commands.end(); ++it_c)
-	{	
+	{
 		packet << (*it_c).first;
 		packet << (*it_c).second;
 		if ((*it_c).second == ReplicationAction::Create)
@@ -76,6 +81,19 @@ bool ReplicationManagerServer::write(OutputMemoryStream & packet)
 				packet << 0;
 				packet << 0;
 				//packet << go->angle;
+			}
+		}
+		else if ((*it_c).second == ReplicationAction::Server_Snapshot)
+		{
+			vector<int>* destroyedBrickIDs = GameManager::getInstance()->GetModNetServer()->getDestroyedBricksID();
+			if (destroyedBrickIDs->size() > 0)
+			{
+				packet << true;
+				packet << destroyedBrickIDs->size();
+				if (destroyedBrickIDs->size() > 0)
+				{
+					for (int i = 0; i < destroyedBrickIDs->size(); i++) packet << destroyedBrickIDs->at(i);
+				}
 			}
 		}
 	}

@@ -20,17 +20,17 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	MyTank1 = Tank::create();
-	MyTank1->setPlayer(1);
-	MyTank1->setCamp(true);
-	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	addActiveChild(MyTank1);
+	//MyTank1 = Tank::create();
+	//MyTank1->setPlayer(1);
+	//MyTank1->setCamp(true);
+	//MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
+	//addActiveChild(MyTank1);
 
-	
+
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
-	
+
 	debug.SetDebug(false);
 	debugIndex = 0;
 
@@ -67,19 +67,19 @@ void NetworkScene::DebugBool(bool b)
 void NetworkScene::Update()
 {
 	Scene::Update();
-	
+
 	GameManager::getInstance()->UpdateAllPlayerTank();
+	//vector<StaticSprite*> asd = StaticSpriteArray::getInstance()->getArray();
 
 
-	MyTank1->Update();
+	/*MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
 	MyTank1->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();
-	if (GameManager::getInstance()->getClick2() == LBUTTON_ON) debug.SetDebug(true);
-
+	if (GameManager::getInstance()->getClick2() == LBUTTON_ON) debug.SetDebug(true);*/
 
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
@@ -134,6 +134,10 @@ void NetworkScene::Update()
 			debugIndex = 0;
 
 		}
+
+		//if (ImGui::Button("del brick"))
+		//StaticSpriteArray::getInstance()->removeStaticSpriteWithID(54);
+
 		ImGui::PopItemWidth();
 		ImGui::End();
 	}
@@ -176,7 +180,7 @@ void NetworkScene::Update()
 	{
 		if (debugIndex < 20)
 		{
-			ofstream file (to_string(debugIndex)+ "Log.txt");
+			ofstream file(to_string(debugIndex) + "Log.txt");
 
 			for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
 			{
@@ -199,7 +203,7 @@ void NetworkScene::Update()
 				file << TankArray::getInstance()->getTankArray()[i]->getDirection().y;
 				file << "\n-----------------";
 			}
-		
+
 			file.close();
 			debugIndex++;
 		}
@@ -256,16 +260,11 @@ void NetworkScene::LoadMap()
 			if (nowmap->getMap()[i * 26 + k])
 			{
 				StaticSprite* sp = StaticSprite::Create(nowmap->getMap()[i * 26 + k]);
+				sp->setID(i * 26 + k);
 				addStaticChild(sp);
 				sp->setPosition(SpritePosition);
 				sp->setRet(Ret(Size(16, 16), sp->getPosition()));
-				if (nowmap->getMap()[i * 26 + k] == 6 ||
-					nowmap->getMap()[i * 26 + k] == 7 ||
-					nowmap->getMap()[i * 26 + k] == 8 ||
-					nowmap->getMap()[i * 26 + k] == 9)
-				{
-					home.push_back(sp);
-				}
+				if (nowmap->getMap()[i * 26 + k] == 6 || nowmap->getMap()[i * 26 + k] == 7 || nowmap->getMap()[i * 26 + k] == 8 || nowmap->getMap()[i * 26 + k] == 9) home.push_back(sp);
 			}
 			SpritePosition += D3DXVECTOR3(16, 0, 0);
 		}

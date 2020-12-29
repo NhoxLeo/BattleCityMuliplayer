@@ -38,6 +38,7 @@ void ModuleNetworkingServer::onStart()
 	GameManager::getInstance()->GetModGameObject()->interpolateEntities = false;
 
 	secondsSinceLastPing = 0.0f;
+	destroyedBricksID = new vector<int>();
 }
 void ModuleNetworkingServer::onGui()
 {
@@ -94,6 +95,17 @@ void ModuleNetworkingServer::onGui()
 				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0)
 				{
 					AITankSpawner(D3DXVECTOR3(126,58,0));
+				}
+				if (ImGui::Button("Server Snapshot"))
+				{
+					for (int i = 0; i < MAX_CLIENTS; ++i)
+					{
+						if (clientProxies[i].connected)
+						{
+							// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+							clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
+						}
+					}
 				}
 			}
 		}

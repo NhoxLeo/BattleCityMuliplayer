@@ -13,6 +13,8 @@ class StaticSprite :public Sprite
 {
 private:
 	int m_type;
+	int ID = 0;
+	bool isDestroyed = false;
 public:
 	~StaticSprite();
 
@@ -23,6 +25,11 @@ public:
 	bool init(int Type);
 
 	int getType(){ return m_type; }
+
+	int getID() { return ID; }
+	void setID(int id) { ID = id; }
+	bool IsDestroyed() { return isDestroyed; }
+	void SetDestroy(bool _destroy) { isDestroyed = _destroy; }
 };
 
 class StaticSpriteArray
@@ -38,6 +45,7 @@ public:
 	void pushSprite(StaticSprite* sp);
 
 	void removeStaticSprite(StaticSprite* sp);
+	void removeStaticSpriteWithID(int id);
 	static StaticSpriteArray* getInstance();
 
 	vector<StaticSprite*> getArray(){ return StaticArray; }

@@ -57,6 +57,7 @@ bool StaticSprite::init(int Type)
 	default:
 		break;
 	}
+	isDestroyed = false;
 	return true;
 }
 
@@ -85,6 +86,21 @@ void StaticSpriteArray::removeStaticSprite(StaticSprite* sp)
 		{
 			StaticArray.erase(StaticArray.begin() + i);
 			StaticSpriteNumber--;
+			return;
+		}
+	}
+}
+
+void StaticSpriteArray::removeStaticSpriteWithID(int id)
+{
+	for (int i = 0; i < StaticArray.size(); i++)
+	{
+		StaticSprite* cloneSprite = StaticArray[i];
+		if (cloneSprite->getID() == id)
+		{
+			StaticArray.erase(StaticArray.begin() + i);
+			StaticSpriteNumber--;
+			cloneSprite->release();
 			return;
 		}
 	}
