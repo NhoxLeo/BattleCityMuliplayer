@@ -20,11 +20,11 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	//MyTank1 = Tank::create();
-	//MyTank1->setPlayer(1);
-	//MyTank1->setCamp(true);
-	//MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	//addActiveChild(MyTank1);
+	MyTank1 = Tank::create();
+	MyTank1->setPlayer(1);
+	MyTank1->setCamp(true);
+	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
+	addActiveChild(MyTank1);
 
 	
 	Scene* scene = this;
@@ -71,14 +71,14 @@ void NetworkScene::Update()
 	GameManager::getInstance()->UpdateAllPlayerTank();
 
 
-	/*MyTank1->Update();
+	MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
 	MyTank1->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();
-	if (GameManager::getInstance()->getClick2() == LBUTTON_ON) debug.SetDebug(true);*/
+	if (GameManager::getInstance()->getClick2() == LBUTTON_ON) debug.SetDebug(true);
 
 
 	static int localServerPort = 8888;
@@ -174,57 +174,33 @@ void NetworkScene::Update()
 
 	if (debug.GetDebug() == true)
 	{
-		/*for (int i = 0; i < 20; i++)
-		{
-			ofstream log(to_string(i)+"Log.txt");
-			log << "Tank's x: ";
-			log << MyTank1->getPosition().x;
-			log << "\n";
-			log << "Tank's y: ";
-			log << MyTank1->getPosition().y;
-			log << "\n";
-			log << "Tank's speed.x: ";
-			log << MyTank1->getSpeed().x;
-			log << "\n";
-			log << "Tank's speed.y: ";
-			log << MyTank1->getSpeed().y;
-			log << "\n";
-			log << "Tank's direction.x: ";
-			log << MyTank1->getDirection().x;
-			log << "\n";
-			log << "Tank's direction.y: ";
-			log << MyTank1->getDirection().y;
-			log << "\n";
-			log.close();
-			if (i == 19)
-			{
-				debug.SetDebug(false);
-			}
-		}*/
-
 		if (debugIndex < 20)
 		{
 			ofstream file (to_string(debugIndex)+ "Log.txt");
-			file << "Tank's x: ";
-			file << MyTank1->getPosition().x;
-			file << "\n";
-			file << "Tank's y: ";
-			file << MyTank1->getPosition().y;
-			file << "\n";
-			file << "Tank's speed.x: ";
-			file << MyTank1->getSpeed().x;
-			file << "\n";
-			file << "Tank's speed.y: ";
-			file << MyTank1->getSpeed().y;
-			file << "\n";
-			file << "Tank's direction.x: ";
-			file << MyTank1->getDirection().x;
-			file << "\n";
-			file << "Tank's direction.y: ";
-			file << MyTank1->getDirection().y;
-			file << "\n";
-			file.close();
 
+			for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+			{
+				file << to_string(i) + ".Tank's x: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getPosition().x;
+				file << "\n";
+				file << to_string(i) + ".Tank's y: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getPosition().y;
+				file << "\n";
+				file << to_string(i) + ".Tank's speed.x: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().x;
+				file << "\n";
+				file << to_string(i) + ".Tank's speed.y: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().y;
+				file << "\n";
+				file << to_string(i) + ".Tank's direction.x: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getDirection().x;
+				file << "\n";
+				file << to_string(i) + ".Tank's direction.y: ";
+				file << TankArray::getInstance()->getTankArray()[i]->getDirection().y;
+				file << "\n-----------------";
+			}
+		
+			file.close();
 			debugIndex++;
 		}
 		else
