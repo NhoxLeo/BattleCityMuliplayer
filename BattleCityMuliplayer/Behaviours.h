@@ -176,7 +176,6 @@ struct Player : public Behaviour
 		gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 		gameObject->speed = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
 		NetworkCommunication(UPDATE_POSITION, gameObject);
-		gameObject->lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 	}
 
 	void onMouse(const MouseController& mouse) override

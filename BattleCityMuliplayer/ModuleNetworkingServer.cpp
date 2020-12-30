@@ -39,6 +39,7 @@ void ModuleNetworkingServer::onStart()
 
 	secondsSinceLastPing = 0.0f;
 	destroyedBricksID = new vector<int>();
+	AITanksObject = new vector<GameObject*>();
 }
 void ModuleNetworkingServer::onGui()
 {
@@ -94,7 +95,7 @@ void ModuleNetworkingServer::onGui()
 				}*/
 				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0)
 				{
-					AITankSpawner(D3DXVECTOR3(126,58,0));
+					AITankSpawner(D3DXVECTOR3(126, 58, 0));
 				}
 				if (ImGui::Button("Server Snapshot"))
 				{
@@ -311,6 +312,21 @@ void ModuleNetworkingServer::onUpdate()
 		GameManager::getInstance()->AITankControl();
 		GameManager::getInstance()->AllAIPlayerTankVisitAll();
 		GameManager::getInstance()->BulletVisitAll();
+		for (int k = 0; k < AITanksObject->size(); k++)
+		{
+			AITanksObject->at(k)->tickCount = GetTickCount();
+			AITanksObject->at(k)->position = GameManager::getInstance()->GetPlayerTankPosition((int)AITanksObject->at(k)->networkId);
+			AITanksObject->at(k)->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)AITanksObject->at(k)->networkId);
+			AITanksObject->at(k)->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)AITanksObject->at(k)->networkId);
+			for (int i = 0; i < MAX_CLIENTS; ++i)
+			{
+				if (clientProxies[i].connected)
+				{
+					// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+					clientProxies[i].replicationManager.update(AITanksObject->at(k)->networkId,ReplicationAction::Update_Position);
+				}
+			}
+		}
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
 
@@ -481,7 +497,6 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
 {
 	GameObject* aiTank = Instantiate();
-	//aiTank->size = D3DXVECTOR3{ 400, 400 ,0 };
 	aiTank->position = position;
 	aiTank->order = 3;
 
@@ -490,6 +505,8 @@ void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
 
 	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(aiTank);
 	GameManager::getInstance()->CreateAIPlayerTank(aiTank->networkId, aiTank->position);
+
+	AITanksObject->push_back(aiTank);
 
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)

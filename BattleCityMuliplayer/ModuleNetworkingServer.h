@@ -67,6 +67,8 @@ private:
 
 	vector<int>* destroyedBricksID;
 
+	vector<GameObject*>* AITanksObject;
+
 public:
 
 	//////////////////////////////////////////////////////////////////////
