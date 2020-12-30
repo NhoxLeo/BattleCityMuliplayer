@@ -10,11 +10,22 @@ class Debug
 {
 private: 
 	bool isDebug;
-	
+	D3DXVECTOR3 debugPosition;
+	Speed debugSpeed;
+	D3DXVECTOR3 debugDirection;
+
 public:
 
 	Debug();
 	~Debug();
+
+	void SetDebugPositionX(int x);
+	void SetDebugPositionY(int y);
+	D3DXVECTOR3 GetDebugPosition();
+	void SetDebugDirectionX(int x);
+	void SetDebugDirectionY(int y);
+
+
 
 	void SetDebug(bool debug);
 	bool GetDebug();
