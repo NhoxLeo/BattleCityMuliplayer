@@ -30,8 +30,8 @@ bool NetworkScene::init()
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
-
-	debug.SetDebug(false);
+	
+	isDebug = false;
 	debugIndex = 0;
 
 	/*for (int i = 0; i < 20; i++)
@@ -129,15 +129,53 @@ void NetworkScene::Update()
 			//debug.LogTank(MyTank1);
 
 			//debug.LogTank20(MyTank1);
-
-			debug.SetDebug(true);
+			
+			isDebug = true;
 			debugIndex = 0;
 
 		}
 
-		//if (ImGui::Button("del brick"))
-		//StaticSpriteArray::getInstance()->removeStaticSpriteWithID(54);
+		if (ImGui::Button("Read log:"))
+		{
+			string line;
+			ifstream fileRead("0Log.txt");
+			ofstream fileWrite("20Log.txt");
+			if (fileRead.is_open())
+			{
+				while (getline(fileRead, line))
+				{
+					//c = line.c_str();
+					//fileWrite << line;
+					size_t posv = line.find(": ");
+					string v = line.substr(posv + 2);
+					string f = line.substr(9,4);
 
+					if (f == "posX")
+					{
+						stringstream str(v);
+						int x=0;
+						str >> x;
+						debug.SetDebugPositionX(x);
+					}
+					else if (f == "posY")
+					{
+						stringstream str(v);
+						int y = 0;
+						str >> y;
+						debug.SetDebugPositionY(y);
+					}
+					
+					//fileWrite << debug.GetDebugPosition().y
+					fileWrite << "\n";
+
+					//if()
+				}
+				fileRead.close();
+				fileWrite.close();
+			}
+			MyTank1->setPosition(debug.GetDebugPosition());
+		}
+		
 		ImGui::PopItemWidth();
 		ImGui::End();
 	}
@@ -176,7 +214,7 @@ void NetworkScene::Update()
 			}*/
 	}
 
-	if (debug.GetDebug() == true)
+	if (isDebug == true)
 	{
 		if (debugIndex < 20)
 		{
@@ -184,22 +222,22 @@ void NetworkScene::Update()
 
 			for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
 			{
-				file << to_string(i) + ".Tank's x: ";
+				file << to_string(i) + ".Tank's posX: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getPosition().x;
 				file << "\n";
-				file << to_string(i) + ".Tank's y: ";
+				file << to_string(i) + ".Tank's posY: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getPosition().y;
 				file << "\n";
-				file << to_string(i) + ".Tank's speed.x: ";
+				file << to_string(i) + ".Tank's speX: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().x;
 				file << "\n";
-				file << to_string(i) + ".Tank's speed.y: ";
+				file << to_string(i) + ".Tank's speY: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().y;
 				file << "\n";
-				file << to_string(i) + ".Tank's direction.x: ";
+				file << to_string(i) + ".Tank's dirX: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getDirection().x;
 				file << "\n";
-				file << to_string(i) + ".Tank's direction.y: ";
+				file << to_string(i) + ".Tank's dirY: ";
 				file << TankArray::getInstance()->getTankArray()[i]->getDirection().y;
 				file << "\n-----------------";
 			}
@@ -209,7 +247,7 @@ void NetworkScene::Update()
 		}
 		else
 		{
-			debug.SetDebug(false);
+			isDebug = false;
 		}
 	}
 }

@@ -1,0 +1,7 @@
+0.Tank's posX: 262
+0.Tank's posY: 446
+0.Tank's speX: 0
+0.Tank's speY: -0
+0.Tank's dirX: -1
+0.Tank's dirY: -0
+-----------------

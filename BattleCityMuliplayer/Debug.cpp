@@ -10,6 +10,20 @@ Debug::~Debug()
 
 }
 
+void Debug::SetDebugPositionX(int x)
+{
+	debugPosition.x = x;
+}
+void Debug::SetDebugPositionY(int y)
+{
+	debugPosition.y = y;
+}
+D3DXVECTOR3 Debug::GetDebugPosition()
+{
+	return debugPosition;
+}
+
+
 void Debug::Log(int i)
 {
 	ofstream debug ("Log.txt");

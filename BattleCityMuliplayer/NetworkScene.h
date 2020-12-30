@@ -2,6 +2,8 @@
 #include "common.h"
 #include "Scene.h"
 #include "Debug.h"
+#include <iostream> 
+#include <sstream> 
 class Tank;
 
 class NetworkScene : public Scene
@@ -22,7 +24,7 @@ private:
 	//vector<Debug> debugs;
 	vector<ofstream> files;
 	int debugIndex;
-
+	bool isDebug;
 	bool isServer = false;
 	bool isClient = false;
 };
