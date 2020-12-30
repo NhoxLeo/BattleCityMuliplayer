@@ -197,7 +197,8 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 		}
 		else
 		{
-			sp1->setPosition(sp1->getPosition() + bullet->getDirection() * 4);
+			sp1->release();
+			/*sp1->setPosition(sp1->getPosition() + bullet->getDirection() * 4);
 			if (bullet->getDirection().x != 0)
 			{
 				sp1->setRet(Ret(Size(sp1->getHeight(), sp1->getwidth() - 8), sp1->getPosition()));
@@ -211,8 +212,12 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 			if (sp1->getHeight() <= 0 || sp1->getwidth() <= 0)
 			{
 				sp1->release();
-			}
+			}*/
 			bullet->SmallBoom();
+			if (modNetServer != nullptr)
+			{
+				modNetServer->AddDestroyedBrickID(sp1->getID());
+			}
 			return;
 		}
 	}

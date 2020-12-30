@@ -1,5 +1,6 @@
 #include "Networks.h"
 #include "GameManager.h"
+#include "StaticSprite.h"
 #include "ReplicationManagerClient.h"
 
 void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clientNetworkId)
@@ -108,6 +109,24 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//	GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(go);
 			//	Destroy(go);
 			//}
+		}
+		else if (action == ReplicationAction::Server_Snapshot)
+		{
+			bool destroyedBricks = false;
+			packet >> destroyedBricks;
+			if (destroyedBricks)
+			{
+				int destroyedBrickSize = 0;
+				packet >> destroyedBrickSize;
+				vector<int>* destroyedBrickArray = new vector<int>();
+				for (int i = 0; i < destroyedBrickSize; i++)
+				{
+					int cloneID = 0;
+					packet >> cloneID;
+					//destroyedBrickArray->push_back(cloneID);
+					StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
+				}
+			}
 		}
 	}
 }

@@ -9,6 +9,7 @@ enum class ReplicationAction
 	Update_Texture,
 	Update_Alpha,
 	Update_Animation,
+	Server_Snapshot,
 	Destroy
 };
 
@@ -19,6 +20,7 @@ public:
 	void create(uint32 networkId);
 	void update(uint32 networkId, ReplicationAction updateType);
 	void destroy(uint32 networkId);
+	void server_snapshot(uint32 networkId);
 
 	std::map<uint32, ReplicationAction> GetCommands();
 	void InsertCommands(std::pair<uint32, ReplicationAction> command);

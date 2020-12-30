@@ -65,7 +65,9 @@ private:
 
 	void destroyClientProxy(ClientProxy * proxy);
 
+	vector<int>* destroyedBricksID;
 
+	vector<GameObject*>* AITanksObject;
 
 public:
 
@@ -75,9 +77,8 @@ public:
 
 	GameObject * spawnPlayer(ClientProxy &clientProxy);
 
-	GameObject * spawnBullet(GameObject *parent, D3DXVECTOR3 offset);
-
-	GameObject* spawnRezUI(D3DXVECTOR3 position);
+	vector<int>* getDestroyedBricksID() { return destroyedBricksID; }
+	void AddDestroyedBrickID(int _id) { destroyedBricksID->push_back(_id); }
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
