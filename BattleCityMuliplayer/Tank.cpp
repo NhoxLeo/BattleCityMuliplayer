@@ -64,7 +64,7 @@ bool Tank::init()
 	AwardAble = false;
 	MaxBullet = 1;
 	Player = 0;
-	Timer = 0;
+	Timer = 119;
 	Life = 1;
 	InvincibleTimer = 0;
 	BulletNumber = 0;

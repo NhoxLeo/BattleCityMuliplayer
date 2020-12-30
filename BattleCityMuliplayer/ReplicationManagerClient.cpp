@@ -27,6 +27,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			packet >> go->size.x;
 			packet >> go->size.y;
 			packet >> go->name;
+			packet >> go->isAI;
 			if (networkId == clientNetworkId)
 			{
 				go->isPlayer = true;
@@ -48,7 +49,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//go->final_angle = go->angle;
 			//go->initial_angle = go->angle;
 
-			GameManager::getInstance()->CreatePlayerTank(networkId, go->position);
+			if(go->isAI) GameManager::getInstance()->CreateAIPlayerTank(networkId, go->position);
+			else GameManager::getInstance()->CreatePlayerTank(networkId, go->position);
 		}
 		else if (action == ReplicationAction::Update_Position)
 		{

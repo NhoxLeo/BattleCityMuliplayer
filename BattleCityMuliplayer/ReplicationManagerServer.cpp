@@ -53,6 +53,7 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << go->size.x;
 			packet << go->size.y;
 			packet << go->name;
+			packet << go->isAI;
 		}
 		else if ((*it_c).second == ReplicationAction::Update_Position)
 		{

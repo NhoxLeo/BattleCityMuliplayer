@@ -185,11 +185,18 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 					{
 						GameObject* gameObject = networkGameObjects[i];
-
 						// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
 						proxy->replicationManager.create(gameObject->networkId);
 					}
-
+					if (AITanksObject->size() > 0)
+					{
+						for (int i = 0; i < AITanksObject->size(); ++i)
+						{
+							GameObject* gameObject = AITanksObject->at(i);
+							// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
+							proxy->replicationManager.create(gameObject->networkId);
+						}
+					}
 					LOG("Message received: hello - from player %s", playerName.c_str());
 				}
 			}
@@ -441,6 +448,7 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 	//clientProxy.gameObject->size = { 43, 49 };
 	clientProxy.gameObject->angle = 45.0f;
 	clientProxy.gameObject->order = 3;
+	clientProxy.gameObject->isAI = false;
 	clientProxy.gameObject->name = clientProxy.name;
 	// Create behaviour
 	clientProxy.gameObject->behaviour = new Player;
@@ -499,7 +507,7 @@ void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
 	GameObject* aiTank = Instantiate();
 	aiTank->position = position;
 	aiTank->order = 3;
-
+	aiTank->isAI = true;
 	aiTank->behaviour = new Player();
 	aiTank->behaviour->gameObject = aiTank;
 

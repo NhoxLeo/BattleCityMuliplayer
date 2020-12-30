@@ -64,6 +64,8 @@ struct GameObject
 	// Interpolate object
 	bool doInterpolation = true;
 
+	bool isAI = false;
+
 private:
 
 	void* operator new(size_t size) = delete;
