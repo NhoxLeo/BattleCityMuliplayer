@@ -162,6 +162,7 @@ struct Player : public Behaviour
 				lastShotTime = Time.time;
 				if (isServer)
 				{
+					gameObject->isShooted = true;
 					int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 					//GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
 					GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);

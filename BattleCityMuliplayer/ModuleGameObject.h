@@ -65,6 +65,7 @@ struct GameObject
 	bool doInterpolation = true;
 
 	bool isAI = false;
+	bool isShooted = false;
 
 private:
 

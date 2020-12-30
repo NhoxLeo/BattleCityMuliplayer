@@ -57,6 +57,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
 			float angle;
+			bool isShooted;
 			packet >> tickCount;
 			packet >> position.x;
 			packet >> position.y;
@@ -64,6 +65,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			packet >> rotation.y;
 			packet >> speed.x;
 			packet >> speed.y;
+			packet >> isShooted;
 			//packet >> angle;
 			if (go != nullptr)
 			{
@@ -83,6 +85,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 						else GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
 					}
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
+
+					if (isShooted && networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID()) 
+						GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
 				}
 			}
 		}
