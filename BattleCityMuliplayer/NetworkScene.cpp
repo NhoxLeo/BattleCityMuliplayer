@@ -20,7 +20,7 @@ bool NetworkScene::init()
 	background->setRet(Ret(Size(416, 416), background->getPosition()));
 	addActiveChild(background);
 
-	MyTank1 = Tank::create();
+	/*MyTank1 = Tank::create();
 	MyTank1->setPlayer(1);
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
@@ -30,7 +30,7 @@ bool NetworkScene::init()
 	MyTank2->setPlayer(2);
 	MyTank2->setCamp(true);
 	MyTank2->setPosition(D3DXVECTOR3(126, 58, 0));
-	addActiveChild(MyTank2);
+	addActiveChild(MyTank2);*/
 
 
 	Scene* scene = this;
@@ -78,7 +78,7 @@ void NetworkScene::Update()
 	//vector<StaticSprite*> asd = StaticSpriteArray::getInstance()->getArray();
 
 
-	MyTank1->Update();
+	/*MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
 	MyTank1->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
@@ -92,7 +92,7 @@ void NetworkScene::Update()
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank2->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank2->fire();
 	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();
+	BulletArray::getInstance()->VisitAll();*/
 
 
 	static int localServerPort = 8888;
