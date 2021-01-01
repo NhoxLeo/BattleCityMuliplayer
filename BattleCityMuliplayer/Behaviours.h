@@ -164,10 +164,10 @@ struct Player : public Behaviour
 				{
 					gameObject->isShooted = true;
 					int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
-					//GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
 					GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 					if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->SinglePlayerBulletVisitAllWithLatency(gameObject->networkId, lateFrames);
-					else for (int i = 0; i < lateFrames; i++) GameManager::getInstance()->SinglePlayerBulletVisitAll(gameObject->networkId);
+					//else for (int i = 0; i < lateFrames; i++) GameManager::getInstance()->SinglePlayerBulletVisitAll(gameObject->networkId);
+					else GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
 				}
 				else GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 			}
