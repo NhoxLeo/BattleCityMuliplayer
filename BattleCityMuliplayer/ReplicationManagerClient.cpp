@@ -86,8 +86,16 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					}
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 
-					if (isShooted && networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID()) 
-						GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
+					if (isShooted)
+					{
+						if (networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID())
+						{
+							int lateFrames = (int)((GetTickCount() - go->tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
+							GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
+							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->SinglePlayerBulletVisitAllWithLatency(go->networkId, lateFrames);
+							else for (int i = 0; i < lateFrames; i++) GameManager::getInstance()->SinglePlayerBulletVisitAll(go->networkId);
+						}
+					}
 				}
 			}
 		}

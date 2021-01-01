@@ -271,6 +271,9 @@ void ModuleNetworkingClient::onUpdate()
 		modGameObj->update();
 		GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
 		GameManager::getInstance()->BulletVisitAll();
+
+		//Update Queue of Objects of Previous Frames
+		GameManager::getInstance()->AddThisFrameObjects();
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)
