@@ -71,7 +71,8 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << go->speed.x;
 				packet << go->speed.y;
 				packet << go->isShooted;
-				if (go->isShooted) go->isShooted = false;
+				if (go->isShooted)
+					go->isShooted = false;
 				//packet << go->angle;
 			}
 			else
