@@ -132,6 +132,13 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 				if (tank->getLife() == 0)
 				{
 					bullet->BigBoom();
+
+					if (GameManager::getInstance()->GetModNetServer() != nullptr)
+					{
+						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)tank->getPlayer());
+						//go->behaviour->NetworkCommunication(Behaviour::networkMessageType::DESTROY, go);
+						if (go != nullptr)GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
+					}
 				}
 				else if (tank->getLevel() == 3)
 				{
@@ -1617,6 +1624,14 @@ int GameManager::GetTanksCount()
 void GameManager::AITankControl()
 {
 	TankArray::getInstance()->UpdateAITanks();
+	vector<Tank*> AItanklist = TankArray::getInstance()->getTankArray();
+	for (int i = 0; i < AItanklist.size(); i++)
+	{
+		if (AItanklist.at(i)->GetShootTrigger())
+		{
+			if (GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer()) != nullptr) GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer())->isShooted = true;
+		}
+	}
 }
 
 Bullet* GameManager::CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position)

@@ -98,6 +98,9 @@ void NetworkScene::Update()
 	static int localServerPort = 8888;
 	if (!isServer && !isClient)
 	{
+		//GameManager::getInstance()->GetModLinkingContext()->clear();
+		//TankArray::getInstance()->removeAllTank();
+
 		ImGui::Begin("Main Menu");
 		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
 		ImGui::Spacing();

@@ -103,7 +103,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		{
 			if (networkId == clientNetworkId)
 			{
-				GameManager::getInstance()->DeleteAllPlayerTank();
 				GameManager::getInstance()->GetModNetClient()->disconnect();
 			}
 			else

@@ -84,6 +84,14 @@ public:
 
 	void AITankSpawner(D3DXVECTOR3 position);
 	float RandomFloat(float min, float max);
+	void DestroyAINetworkObject(GameObject* gameObject)
+	{ 
+		for (int i = 0; i < AITanksObject->size(); i++)
+		{
+			if (AITanksObject->at(i)->networkId == gameObject->networkId) AITanksObject->erase(AITanksObject->begin() + i);
+		}
+		destroyNetworkObject(gameObject);
+	}
 
 	float initialZombieSpawnRatio = 5.0;
 	float guiFinalZombieSpawnRatio = 0;

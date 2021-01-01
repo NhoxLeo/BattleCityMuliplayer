@@ -66,6 +66,8 @@ public:
 
 	void SetIsPlayer(bool _isplayer) { isPlayer = _isplayer; }
 	bool IsPlayer() { return isPlayer; }
+	void SetShootTrigger(bool _shootTrigger) { shootTrigger = _shootTrigger; }
+	bool GetShootTrigger() { return shootTrigger; }
 private:
 	int Life;
 	int Timer;
@@ -81,6 +83,7 @@ private:
 	int counter;
 	bool m_boom;
 	bool isPlayer = true;
+	bool shootTrigger = false;
 };
 
 class TankArray
@@ -111,5 +114,6 @@ public:
 	}
 
 	void removeTank(Tank* tank);
+	void removeAllTank();
 };
 #endif

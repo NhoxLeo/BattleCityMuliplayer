@@ -40,6 +40,7 @@ void ModuleNetworkingServer::onStart()
 	secondsSinceLastPing = 0.0f;
 	destroyedBricksID = new vector<int>();
 	AITanksObject = new vector<GameObject*>();
+	GameManager::getInstance()->GetModLinkingContext()->clear();
 }
 void ModuleNetworkingServer::onGui()
 {
@@ -187,6 +188,9 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						GameObject* gameObject = networkGameObjects[i];
 						// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
 						proxy->replicationManager.create(gameObject->networkId);
+
+						if (gameObject->isAI)
+							int aasd = 1;
 					}
 					if (AITanksObject->size() > 0)
 					{
@@ -194,7 +198,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						{
 							GameObject* gameObject = AITanksObject->at(i);
 							// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
-							proxy->replicationManager.create(gameObject->networkId);
+							if (gameObject->networkId != 0) proxy->replicationManager.create(gameObject->networkId);
 						}
 					}
 					LOG("Message received: hello - from player %s", playerName.c_str());
@@ -330,7 +334,7 @@ void ModuleNetworkingServer::onUpdate()
 				if (clientProxies[i].connected)
 				{
 					// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-					clientProxies[i].replicationManager.update(AITanksObject->at(k)->networkId,ReplicationAction::Update_Position);
+					clientProxies[i].replicationManager.update(AITanksObject->at(k)->networkId, ReplicationAction::Update_Position);
 				}
 			}
 		}
@@ -341,7 +345,7 @@ void ModuleNetworkingServer::onUpdate()
 		uint16 networkGameObjectsCount;
 		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
 		GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-		if (connectedProxies == 0 && networkGameObjectsCount > 0)
+		if (connectedProxies == 0 && networkGameObjectsCount > 0 && AITanksObject->size() == 0)
 		{
 			for (uint16 i = 0; i < networkGameObjectsCount; ++i)
 			{
@@ -514,7 +518,9 @@ void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
 	GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(aiTank);
 	GameManager::getInstance()->CreateAIPlayerTank(aiTank->networkId, aiTank->position);
 
-	AITanksObject->push_back(aiTank);
+	aiTank->name = (int)aiTank->networkId;
+
+	AITanksObject->push_back(GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(aiTank->networkId));
 
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)

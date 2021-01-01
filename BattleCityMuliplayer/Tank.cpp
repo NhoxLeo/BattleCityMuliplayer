@@ -126,6 +126,8 @@ void Tank::fire()
 			BulletNumber++;
 			TheBullet.push_back(bullet);
 			GameManager::getInstance()->getScene()->addActiveChild(bullet);
+
+			if (!camp) SetShootTrigger(true);
 		}
 	}
 }
@@ -493,6 +495,7 @@ void TankArray::UpdateAITanks()
 {
 	for (int i = 0; i < TankNumber; i++)
 	{
+		TankArray::getInstance()->getTankArray()[i]->SetShootTrigger(false);
 		if (!(TankArray::getInstance()->getTankArray()[i]->getCamp()))
 		{
 			if (YESFIRE) TankArray::getInstance()->getTankArray()[i]->fire();
@@ -538,6 +541,20 @@ void TankArray::removeTank(Tank* tank)
 		if (Tankarray[i] == tank)
 		{
 			Tankarray.erase(Tankarray.begin() + i);
+			TankNumber--;
+			return;
+		}
+	}
+}
+
+void TankArray::removeAllTank()
+{
+	for (int i = 0; i < TankNumber; i++)
+	{
+		if (Tankarray[i] != nullptr)
+		{
+			Tankarray.erase(Tankarray.begin() + i);
+			Tankarray[i]->release();
 			TankNumber--;
 			return;
 		}

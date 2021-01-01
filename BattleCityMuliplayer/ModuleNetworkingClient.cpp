@@ -292,6 +292,7 @@ void ModuleNetworkingClient::onDisconnect()
 	GameManager::getInstance()->GetModLinkingContext()->clear();
 
 	players.clear();
+	GameManager::getInstance()->DeleteAllPlayerTank();
 	//App->modUI->isPlaying = false;
 	//App->modUI->debugUI = true;
 
