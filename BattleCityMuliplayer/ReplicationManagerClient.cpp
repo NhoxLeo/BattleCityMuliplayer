@@ -49,7 +49,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//go->final_angle = go->angle;
 			//go->initial_angle = go->angle;
 
-			if(go->isAI) GameManager::getInstance()->CreateAIPlayerTank(networkId, go->position);
+			if (go->isAI) GameManager::getInstance()->CreateAIPlayerTank(networkId, go->position);
 			else GameManager::getInstance()->CreatePlayerTank(networkId, go->position);
 		}
 		else if (action == ReplicationAction::Update_Position)
@@ -57,7 +57,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
 			float angle;
-			bool isShooted;
+			bool isShooted = false;
 			packet >> tickCount;
 			packet >> position.x;
 			packet >> position.y;
@@ -93,7 +93,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 							int lateFrames = (int)((GetTickCount() - go->tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 							GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
 							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->SinglePlayerBulletVisitAllWithLatency(go->networkId, lateFrames);
-							else for (int i = 0; i < lateFrames; i++) GameManager::getInstance()->SinglePlayerBulletVisitAll(go->networkId);
+							else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);
 						}
 					}
 				}
