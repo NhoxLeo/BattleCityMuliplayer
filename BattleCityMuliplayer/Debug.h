@@ -19,6 +19,7 @@ public:
 	Debug();
 	~Debug();
 
+	void ResetDebugPosition();
 	void SetDebugPositionX(int x);
 	void SetDebugPositionY(int y);
 	D3DXVECTOR3 GetDebugPosition();

@@ -10,6 +10,11 @@ Debug::~Debug()
 
 }
 
+void Debug::ResetDebugPosition()
+{
+	debugPosition.x = 0;
+	debugPosition.y = 0;
+}
 void Debug::SetDebugPositionX(int x)
 {
 	debugPosition.x = x;

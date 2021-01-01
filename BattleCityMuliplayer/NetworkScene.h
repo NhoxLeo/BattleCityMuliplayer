@@ -19,9 +19,11 @@ public:
 private:
 	ActiveSprite* background;
 	Tank* MyTank1;
+	Tank* MyTank2;
+
 	Map* nowmap;
 	Debug debug;
-	//vector<Debug> debugs;
+	vector<Debug> debugs;
 	vector<ofstream> files;
 	int debugIndex;
 	bool isDebug;
