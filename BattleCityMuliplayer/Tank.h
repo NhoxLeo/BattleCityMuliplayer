@@ -68,6 +68,11 @@ public:
 	bool IsPlayer() { return isPlayer; }
 	void SetShootTrigger(bool _shootTrigger) { shootTrigger = _shootTrigger; }
 	bool GetShootTrigger() { return shootTrigger; }
+
+	void SetPreviousPosition(D3DXVECTOR3 _prevPos) { previousPosition = _prevPos; }
+	void SetCurrentPosition(D3DXVECTOR3 _curPos) { currentPosition = _curPos; }
+	D3DXVECTOR3 GetPreviousPosition() { return previousPosition; }
+	D3DXVECTOR3 GetCurrentPosition() { return currentPosition; }
 private:
 	int Life;
 	int Timer;
@@ -84,6 +89,7 @@ private:
 	bool m_boom;
 	bool isPlayer = true;
 	bool shootTrigger = false;
+	D3DXVECTOR3 previousPosition, currentPosition;
 };
 
 class TankArray

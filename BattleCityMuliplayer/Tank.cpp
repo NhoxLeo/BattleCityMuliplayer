@@ -68,6 +68,8 @@ bool Tank::init()
 	Life = 1;
 	InvincibleTimer = 0;
 	BulletNumber = 0;
+	previousPosition = D3DXVECTOR3(0, 0, 0);
+	currentPosition = D3DXVECTOR3(0, 0, 0);
 	return true;
 }
 

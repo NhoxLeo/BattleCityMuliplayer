@@ -54,6 +54,15 @@ public:
 	void setClick3();
 	void setClick4();
 
+	D3DXVECTOR3 Lerp(D3DXVECTOR3 a, D3DXVECTOR3 b, float f)
+	{
+		D3DXVECTOR3 result;
+		result.x = a.x + f * (b.x - a.x);
+		result.y = a.y + f * (b.y - a.y);
+		return result;
+		//return a + f * (b - a);
+	}
+
 	void UpdateColl(Tank* tank, Bullet* bullet);
 	void UpdateColl(Bullet* bullet1, Bullet* bullet2);
 	void UpdateColl(StaticSprite* sp1, Bullet* bullet);

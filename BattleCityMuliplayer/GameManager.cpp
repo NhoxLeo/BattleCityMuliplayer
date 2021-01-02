@@ -1449,6 +1449,8 @@ void GameManager::CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position)
 	playerTank->setPlayer((int)_networkID);
 	playerTank->setCamp(true);
 	playerTank->setPosition(position);
+	playerTank->SetPreviousPosition(position);
+	playerTank->SetCurrentPosition(position);
 	nowScene->addActiveChild(playerTank);
 	playerTank->SetIsPlayer(true);
 }
@@ -1509,6 +1511,11 @@ void GameManager::SinglePlayerTankVisitAll(UINT32 _networkID)
 }
 void GameManager::AllTanksExceptPlayerVisitAll(UINT32 _networkID)
 {
+	/*vector<Tank*> tanklist = TankArray::getInstance()->getTankArray();
+	for (int i = 0; i < tanklist.size(); i++)
+	{
+		if (tanklist.at(i)->getPlayer() != (int)_networkID) tanklist.at(i)->setPosition(GameManager::getInstance()->Lerp(tanklist.at(i)->GetPreviousPosition(), tanklist.at(i)->GetCurrentPosition(), Time.deltaTime * 2));
+	}*/
 	TankArray::getInstance()->AllButOneTankVisitAll((int)_networkID);
 }
 void GameManager::AllPlayerTankVisitAll()
@@ -1544,11 +1551,14 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
 		}
 	}*/
+	TankArray::getInstance()->GetTank(_networkID)->SetPreviousPosition(TankArray::getInstance()->GetTank(_networkID)->getPosition());
 	GameManager::getInstance()->UpdatePlayerTank(_networkID, position, rotation, speed);
 	for (int i = 0; i < lateframes; i++)
 	{
 		GameManager::getInstance()->SinglePlayerTankVisitAll(_networkID);
 	}
+	D3DXVECTOR3 currentPosition = TankArray::getInstance()->GetTank(_networkID)->getPosition();
+	TankArray::getInstance()->GetTank(_networkID)->SetCurrentPosition(TankArray::getInstance()->GetTank(_networkID)->getPosition());
 }
 
 void GameManager::UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input)
