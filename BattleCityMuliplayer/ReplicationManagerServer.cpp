@@ -25,6 +25,11 @@ void ReplicationManagerServer::server_snapshot(uint32 networkId)
 	commands[networkId] = ReplicationAction::Server_Snapshot;
 }
 
+void ReplicationManagerServer::CreateAward(uint32 networkId)
+{
+	commands[networkId] = ReplicationAction::Create_Award;
+}
+
 std::map<uint32, ReplicationAction> ReplicationManagerServer::GetCommands()
 {
 	return commands;
@@ -48,6 +53,8 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
 			go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
 			go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
+			packet << GameManager::getInstance()->GetPlayerTankID((int)(*it_c).first);
+			packet << GameManager::getInstance()->GetPlayerTankLevel((int)(*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
 			packet << go->size.x;
@@ -95,10 +102,18 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << true;
 				packet << destroyedBrickIDs->size();
 				if (destroyedBrickIDs->size() > 0)
-				{
 					for (int i = 0; i < destroyedBrickIDs->size(); i++) packet << destroyedBrickIDs->at(i);
-				}
 			}
+			else
+				packet << false;
+		}
+		else if ((*it_c).second == ReplicationAction::Create_Award)
+		{
+			D3DXVECTOR3 awdPos = GameManager::getInstance()->getAwardPosition();
+			int awdType = GameManager::getInstance()->getAwardType();
+			packet << awdPos.x;
+			packet << awdPos.y;
+			packet << awdType;
 		}
 	}
 

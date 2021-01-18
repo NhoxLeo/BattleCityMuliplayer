@@ -147,6 +147,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			packet >> networkId;
 			LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
 			state = ClientState::Playing;
+			//state = ClientState::Lobby;
 		}
 		else if (message == ServerMessage::Unwelcome)
 		{
@@ -197,6 +198,25 @@ void ModuleNetworkingClient::onUpdate()
 	}
 	else if (state == ClientState::WaitingWelcome)
 	{
+	}
+	else if (state == ClientState::Lobby)
+	{
+		secondsSinceLastPing += Time.deltaTime;
+		//Send pings to server
+		if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+		{
+			secondsSinceLastPing = 0.0f;
+			OutputMemoryStream ping;
+			ping << ClientMessage::Ping;
+			GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumberPendingAck(ping);
+			sendPacket(ping, serverAddress);
+			ping.Clear();
+		}
+		//Disconnect if waited too long
+		if (Time.time - lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
+		{
+			disconnect();
+		}
 	}
 	else if (state == ClientState::Playing)
 	{
@@ -269,11 +289,14 @@ void ModuleNetworkingClient::onUpdate()
 
 		Module* modGameObj = GameManager::getInstance()->GetModGameObject();
 		modGameObj->update();
-		GameManager::getInstance()->AllTanksExceptPlayerVisitAll((UINT32)networkId);
+		GameManager::getInstance()->TankVisitAll((UINT32)networkId,CollisionCheckMethod::AllExceptOne);
 		GameManager::getInstance()->BulletVisitAll();
+		GameManager::getInstance()->UpdateAllTanks();
 
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
+
+		if(Input.buttons[8] == ButtonState::Press) GameManager::getInstance()->CreatePlayerBullet(playerClientGameObject->networkId, playerClientGameObject->position);
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)

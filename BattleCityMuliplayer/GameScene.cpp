@@ -15,6 +15,11 @@ bool GameScene::init()
 {
 	//StartSound = Sound::create(_T("../sound/StartGame.mp3"));
 
+	GameManager::getInstance()->setMyLife(InitLife, 1);
+	GameManager::getInstance()->setMyLife(InitLife, 2);
+	GameManager::getInstance()->setGrade(1, InitGrade);
+	GameManager::getInstance()->setGrade(2, InitGrade);
+
 	win = true;
 	counter = 0;
 	EnemyNumber = 3;
@@ -35,6 +40,9 @@ bool GameScene::init()
 	addActiveChild(Enemy2);
 	Tank* Enemy3 = Tank::create();
 	Enemy3->setPosition(EnemyPosition3);
+	Enemy1->setLevel(1);
+	Enemy2->setLevel(2);
+	Enemy3->setLevel(3);
 	addActiveChild(Enemy3);
 
 	MyTank1 = Tank::create();
@@ -71,24 +79,12 @@ void GameScene::setPlayerTank()
 {
 	bool x1 = true;
 	bool x2 = true;
-	if (GameManager::getInstance()->getMyLife(1)<1)
+	if (GameManager::getInstance()->getMyLife(1) < 1) x1 = false;
+	if (GameManager::getInstance()->getMyLife(2) < 1) x2 = false;
+	for (int t = 0; t < TankArray::getInstance()->getNumber(); t++)
 	{
-		x1 = false;
-	}
-	if (GameManager::getInstance()->getMyLife(2)<1)
-	{
-		x2 = false;
-	}
-	for (int t = 0; t < TankArray::getInstance()->getNumber();t++)
-	{
-		if (TankArray::getInstance()->getTankArray()[t]->getPlayer() == 1)
-		{
-			x1 = false;
-		}
-		if (TankArray::getInstance()->getTankArray()[t]->getPlayer() == 2)
-		{
-			x2 = false;
-		}
+		if (TankArray::getInstance()->getTankArray()[t]->getPlayer() == 1) x1 = false;
+		if (TankArray::getInstance()->getTankArray()[t]->getPlayer() == 2) x2 = false;
 	}
 	if (x1)
 	{
@@ -99,7 +95,7 @@ void GameScene::setPlayerTank()
 		addActiveChild(MyTank1);
 		GameManager::getInstance()->LostLife(1);
 	}
-	if (x2&&(GameManager::getInstance()->getPlayer() == 2))
+	if (x2 && (GameManager::getInstance()->getPlayer() == 2))
 	{
 		MyTank2 = Tank::create();
 		MyTank2->setPlayer(2);
@@ -187,7 +183,7 @@ void GameScene::setScene()
 		player_2_blood = ActiveSprite::create();
 		player_2_blood->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
 		player_2_blood->setPosition(D3DXVECTOR3(571, 391, 0));
-		player_2_blood->setRet(Ret(Size(14, 14),player_2_blood->getPosition()));
+		player_2_blood->setRet(Ret(Size(14, 14), player_2_blood->getPosition()));
 		addActiveChild(player_2_blood);
 	}
 
@@ -233,10 +229,7 @@ void GameScene::setScene()
 
 void GameScene::Update()
 {
-	if (nowAward != NULL)
-	{
-		nowAward->Update();
-	}
+	if (nowAward != NULL) nowAward->Update();
 	if (checkEnemy() == 0 && EnemyNumber == 20)
 	{
 		if (GameManager::getInstance()->getMapMake())
@@ -247,7 +240,7 @@ void GameScene::Update()
 		resetScene();
 	}
 	setPlayerTank();
-	if (win == false || (MyTank1 == NULL&&MyTank2 == NULL))
+	if (win == false || (MyTank1 == NULL && MyTank2 == NULL))
 	{
 		if (GameManager::getInstance()->getMapMake())
 		{
@@ -255,7 +248,7 @@ void GameScene::Update()
 			GameManager::getInstance()->changeMapMake();
 		}
 		OverScene* scene = OverScene::create();
- 		GameManager::getInstance()->setScene(scene);
+		GameManager::getInstance()->setScene(scene);
 		release();
 		return;
 	}
@@ -316,7 +309,7 @@ void GameScene::Update()
 			MyTank2->setSpeed(Speed(1, 0));
 			MyTank2->setDirection(D3DXVECTOR3(1, 0, 0));
 		}
-		if (GameManager::getInstance()->getClick4() == NUMBERZEROBUTTON_ON||GameManager::getInstance()->getClick4() == ENTERBUTTON_ON)
+		if (GameManager::getInstance()->getClick4() == NUMBERZEROBUTTON_ON || GameManager::getInstance()->getClick4() == ENTERBUTTON_ON)
 		{
 			MyTank2->fire();
 		}
@@ -327,25 +320,16 @@ void GameScene::Update()
 	nowEnemyNumber = checkEnemy();
 	if (GameManager::getInstance()->getPlayer() == 1)
 	{
-		if (EnemyTimer > 60*EnemyTime)
+		if (EnemyTimer > 60 * EnemyTime)
 		{
-			if (nowEnemyNumber<3)
+			if (nowEnemyNumber < 3)
 			{
-				if ((3 - nowEnemyNumber)>(20-EnemyNumber))
-				{
-					setEnemy(20 - EnemyNumber);
-				}
-				else
-				{
-					setEnemy(3 - nowEnemyNumber);
-				}
+				if ((3 - nowEnemyNumber) > (20 - EnemyNumber)) setEnemy(20 - EnemyNumber);
+				else setEnemy(3 - nowEnemyNumber);
 			}
 			EnemyTimer = 0;
 		}
-		else
-		{
-			EnemyTimer++;
-		}
+		else EnemyTimer++;
 	}
 	if (GameManager::getInstance()->getPlayer() == 2)
 	{
@@ -353,28 +337,16 @@ void GameScene::Update()
 		{
 			if (nowEnemyNumber < 5)
 			{
-				if ((5 - nowEnemyNumber) > (20 - EnemyNumber))
-				{
-					setEnemy(20 - EnemyNumber);
-				}
-				else
-				{
-					setEnemy(5 - nowEnemyNumber);
-				}
+				if ((5 - nowEnemyNumber) > (20 - EnemyNumber)) setEnemy(20 - EnemyNumber);
+				else setEnemy(5 - nowEnemyNumber);
 			}
 			EnemyTimer = 0;
 		}
-		else
-		{
-			EnemyTimer++;
-		}
+		else EnemyTimer++;
 	}
 
 	player_1_blood->setRenderRet(14, 14, 14 * GameManager::getInstance()->getMyLife(1), 0);
-	if (GameManager::getInstance()->getPlayer() == 2)
-	{
-		player_2_blood->setRenderRet(14, 14, 14 * GameManager::getInstance()->getMyLife(2), 0);
-	}
+	if (GameManager::getInstance()->getPlayer() == 2) player_2_blood->setRenderRet(14, 14, 14 * GameManager::getInstance()->getMyLife(2), 0);
 
 	{
 		int level_decade = GameManager::getInstance()->getLevel() / 10;
@@ -382,24 +354,20 @@ void GameScene::Update()
 		levelArray[0]->setRenderRet(14, 14, 14 * level_decade, 0);
 		levelArray[1]->setRenderRet(14, 14, 14 * level_unit, 0);
 	}
-
 	{
 		n = 100000;
 		Grade_1 = GameManager::getInstance()->getGrade(1);
-		if (GameManager::getInstance()->getPlayer() == 2)
-		{
-			Grade_2 = GameManager::getInstance()->getGrade(2);
-		}
+		if (GameManager::getInstance()->getPlayer() == 2) Grade_2 = GameManager::getInstance()->getGrade(2);
 		for (int i = 0; i < 6; i++)
 		{
 			j_1 = Grade_1 / n;
-			Grade_1 = Grade_1%n;
+			Grade_1 = Grade_1 % n;
 			player_1_grade[i]->setRenderRet(14, 14, 14 * j_1, 0);
 
 			if (GameManager::getInstance()->getPlayer() == 2)
 			{
 				j_2 = Grade_2 / n;
-				Grade_2 = Grade_2%n;
+				Grade_2 = Grade_2 % n;
 				player_2_grade[i]->setRenderRet(14, 14, 14 * j_2, 0);
 			}
 			n = n / 10;
@@ -411,7 +379,7 @@ void GameScene::setEnemy(int number)
 {
 	Tank* enemy;
 	srand(time(0));
-	for (int t = 0; t < number;t++)
+	for (int t = 0; t < number; t++)
 	{
 		switch (rand() % 5)
 		{
@@ -420,10 +388,7 @@ void GameScene::setEnemy(int number)
 			{
 				enemy = Tank::create();
 				int x = rand() % AwardNumber;
-				if (x == 0)
-				{
-					enemy->changeAwardAble();
-				}
+				if (x == 0) enemy->changeAwardAble();
 				enemy->setLevel(rand() % 3 + 1);
 				enemy->setPosition(EnemyPosition1);
 				addActiveChild(enemy);
@@ -507,25 +472,15 @@ void GameScene::setEnemy(int number)
 int GameScene::checkEnemy()
 {
 	int x = 0;
-	for (int t = 0; t < TankArray::getInstance()->getNumber();t++)
-	{
-		if (!TankArray::getInstance()->getTankArray()[t]->getCamp())
-		{
-			x++;
-		}
-	}
+	for (int t = 0; t < TankArray::getInstance()->getNumber(); t++)
+		if (!TankArray::getInstance()->getTankArray()[t]->getCamp()) x++;
 	return x;
 }
 
 bool GameScene::checkTank(D3DXVECTOR3 po)
 {
 	for (int i = 0; i < TankArray::getInstance()->getNumber(); i++)
-	{
-		if (Ret(Size(28, 28), po).Collision(TankArray::getInstance()->getTankArray()[i]->getRet()))
-		{
-			return true;
-		}
-	}
+		if (Ret(Size(28, 28), po).Collision(TankArray::getInstance()->getTankArray()[i]->getRet())) return true;
 	return false;
 }
 
@@ -535,35 +490,19 @@ void GameScene::EnemyControl()
 	{
 		if (!(TankArray::getInstance()->getTankArray()[i]->getCamp()))
 		{
-			if (YESFIRE)
-			{
-				TankArray::getInstance()->getTankArray()[i]->fire();
-			}
-			if ((TankArray::getInstance()->getTankArray()[i]->getTimer() % 180) == 0 ||
-				(TankArray::getInstance()->getTankArray()[i]->getSpeed().x == 0 &&
-				TankArray::getInstance()->getTankArray()[i]->getSpeed().y == 0))
+			if (YESFIRE) TankArray::getInstance()->getTankArray()[i]->fire();
+			if ((TankArray::getInstance()->getTankArray()[i]->getTimer() % 180) == 0 || (TankArray::getInstance()->getTankArray()[i]->getSpeed().x == 0 && TankArray::getInstance()->getTankArray()[i]->getSpeed().y == 0))
 			{
 				int weight = rand() % 100 + 1;
 
-
-				if (weight >= 0 && weight <= 20)//setDirection(Up)
-					TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(0, -1, 0));
-				if (weight >20 && weight <= 45)//setDirection(Left)
-					TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(-1, 0, 0));
-				if (weight > 45 && weight <= 75)//setDirection(Right)
-					TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(1, 0, 0));
-				if (weight > 75 && weight <= 100)//setDirection(Down)
-					TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(0, 1, 0));
+				if (weight >= 0 && weight <= 20) TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(0, -1, 0));//setDirection(Up)
+				if (weight > 20 && weight <= 45) TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(-1, 0, 0));//setDirection(Left)
+				if (weight > 45 && weight <= 75) TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(1, 0, 0));//setDirection(Right)
+				if (weight > 75 && weight <= 100) TankArray::getInstance()->getTankArray()[i]->setDirection(D3DXVECTOR3(0, 1, 0));//setDirection(Down)
 				if (TankArray::getInstance()->getTankArray()[i]->getLevel() == 2)
-				{
-					TankArray::getInstance()->getTankArray()[i]->setSpeed(Speed(2*TankArray::getInstance()->getTankArray()[i]->getDirection().x,
-						2*TankArray::getInstance()->getTankArray()[i]->getDirection().y));
-				}
+					TankArray::getInstance()->getTankArray()[i]->setSpeed(Speed(2 * TankArray::getInstance()->getTankArray()[i]->getDirection().x, 2 * TankArray::getInstance()->getTankArray()[i]->getDirection().y));
 				else
-				{
-					TankArray::getInstance()->getTankArray()[i]->setSpeed(Speed(TankArray::getInstance()->getTankArray()[i]->getDirection().x,
-						TankArray::getInstance()->getTankArray()[i]->getDirection().y));
-				}
+					TankArray::getInstance()->getTankArray()[i]->setSpeed(Speed(TankArray::getInstance()->getTankArray()[i]->getDirection().x, TankArray::getInstance()->getTankArray()[i]->getDirection().y));
 			}
 		}
 	}
@@ -571,24 +510,13 @@ void GameScene::EnemyControl()
 
 float GameScene::getWeight(D3DXVECTOR3 op, D3DXVECTOR3 dir)
 {
-	D3DXVECTOR3 NewPosition((op.x + 16*dir.x), (op.y + 16*dir.y),0);
-	if (NewPosition.x < 128 ||
-		NewPosition.x > 512 ||
-		NewPosition.y < 60 ||
-		NewPosition.y > 446 ||
-		nowMap->getMap()[(int)((26*NewPosition.x-128)/16+(NewPosition.y-44)/16)] == 2 ||
+	D3DXVECTOR3 NewPosition((op.x + 16 * dir.x), (op.y + 16 * dir.y), 0);
+	if (NewPosition.x < 128 || NewPosition.x > 512 || NewPosition.y < 60 || NewPosition.y > 446 ||
+		nowMap->getMap()[(int)((26 * NewPosition.x - 128) / 16 + (NewPosition.y - 44) / 16)] == 2 ||
 		nowMap->getMap()[(int)((26 * NewPosition.x - 128) / 16 + (NewPosition.y - 44) / 16)] == 4)
-	{
 		return 0;
-	}
-	else if (nowMap->getMap()[(int)((26 * NewPosition.x - 128) / 16 + (NewPosition.y - 44) / 16)] == 1)
-	{
-		return getWeight(NewPosition, dir) + 0.8;
-	}
-	else
-	{
-		return getWeight(NewPosition, dir) + 1;
-	}
+	else if (nowMap->getMap()[(int)((26 * NewPosition.x - 128) / 16 + (NewPosition.y - 44) / 16)] == 1) return getWeight(NewPosition, dir) + 0.8;
+	else return getWeight(NewPosition, dir) + 1;
 }
 
 void GameScene::setMap(Map* map)
@@ -610,13 +538,7 @@ void GameScene::LoadMap()
 				addStaticChild(sp);
 				sp->setPosition(SpritePosition);
 				sp->setRet(Ret(Size(16, 16), sp->getPosition()));
-				if (nowMap->getMap()[i * 26 + k] == 6||
-					nowMap->getMap()[i * 26 + k] == 7||
-					nowMap->getMap()[i * 26 + k] == 8||
-					nowMap->getMap()[i * 26 + k] == 9)
-				{
-					home.push_back(sp);
-				}
+				if (nowMap->getMap()[i * 26 + k] == 6 || nowMap->getMap()[i * 26 + k] == 7 || nowMap->getMap()[i * 26 + k] == 8 || nowMap->getMap()[i * 26 + k] == 9) home.push_back(sp);
 			}
 			SpritePosition += D3DXVECTOR3(16, 0, 0);
 		}
@@ -625,7 +547,7 @@ void GameScene::LoadMap()
 
 void GameScene::clear()
 {
-	for (int i = 0; i < StaticNumber;i++)
+	for (int i = 0; i < StaticNumber; i++)
 	{
 		Static_children[i]->release();
 	}
@@ -637,12 +559,12 @@ void GameScene::resetScene()
 	GameManager::getInstance()->setLevel(GameManager::getInstance()->getLevel() + 1);
 	MapManager::getInstance()->LoadMap(this, GameManager::getInstance()->getLevel());
 	LoadMap();
-	if (MyTank1!=NULL)
+	if (MyTank1 != NULL)
 	{
 		MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
 		MyTank1->setDirection(D3DXVECTOR3(0, -1, 0));
 	}
-	if (MyTank2!=NULL)
+	if (MyTank2 != NULL)
 	{
 		MyTank2->setPosition(D3DXVECTOR3(368, 444, 0));
 		MyTank2->setDirection(D3DXVECTOR3(0, -1, 0));
@@ -655,8 +577,8 @@ void GameScene::resetScene()
 
 GameScene::~GameScene()
 {
-//	levelArray.~vector();
-//	player_1_grade.~vector();
-//	player_2_grade.clear();
-//	NumberOfEnemy.clear();
+	//	levelArray.~vector();
+	//	player_1_grade.~vector();
+	//	player_2_grade.clear();
+	//	NumberOfEnemy.clear();
 }

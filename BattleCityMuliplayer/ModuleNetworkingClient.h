@@ -61,6 +61,7 @@ private:
 		Stopped,
 		Start,
 		WaitingWelcome,
+		Lobby,
 		Playing
 	};
 

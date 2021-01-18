@@ -152,24 +152,20 @@ struct Player : public Behaviour
 		if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f /*true*/)
 		{
 			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId) + inputVector, D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
-			GameManager::getInstance()->SinglePlayerTankVisitAll(gameObject->networkId);
+			GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 		}
 		if (input.buttons[8] == ButtonState::Press)
 		{
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
-			if (Time.time - lastShotTime > shotingDelay)
+			if (GameManager::getInstance()->GetModNetServer()!=nullptr)
 			{
-				lastShotTime = Time.time;
-				if (isServer)
-				{
-					gameObject->isShooted = true;
-					int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
-					GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
-					if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->SinglePlayerBulletVisitAllWithLatency(gameObject->networkId, lateFrames);
-					else GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
-				}
-				else GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
+				gameObject->isShooted = true;
+				int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
+				GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
+				if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(gameObject->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
+				else GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);
 			}
+			//else GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 		}
 		GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
 		gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);

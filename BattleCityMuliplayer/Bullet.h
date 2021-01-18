@@ -49,9 +49,8 @@ public:
 	vector<Bullet*> getBulletArray(){ return Bulletarray; }
 
 	void VisitAll();
-	void SingleBulletVisitAll(int _networkID);
-	void SingleBulletVisitAllWithLatency(int _networkID,int lateframes);
-	void AllButOneBulletVisitAll(int _networkID);
+	void VisitAll(int _networkID, CollisionCheckMethod method);
+	void VisitAllWithLatency(int _networkID, CollisionCheckMethod method,int lateFrames);
 
 	void pushBullet(Bullet* m_Bullet)
 	{

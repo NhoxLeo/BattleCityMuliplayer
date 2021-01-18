@@ -40,6 +40,9 @@ public:
 	void clearAward(){ nowAward = NULL; }
 
 	Award* getAward(){ return nowAward; }
+
+	bool IsWinning() { return win; }
+	void SetWinning(bool _win) { win = _win; }
 protected:
 	int ActiveNumber;
 	int StaticNumber;

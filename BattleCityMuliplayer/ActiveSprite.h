@@ -15,12 +15,16 @@ protected:
 	bool camp;
 	int Level;
 	int Player;
+	int ID = 0;
 public:
 	~ActiveSprite();
 
 	void setPlayer(int p){ Player = p; }
 
 	int getPlayer(){ return Player; }
+
+	int getID() { return ID; }
+	void setID(int id) { ID = id; }
 
 	void removeFromParent();
 

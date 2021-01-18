@@ -1,4 +1,4 @@
-#include "NetworkScene.h"
+#include "LobbyScene.h"
 #include "GameManager.h"
 #include "Tank.h"
 #include "Bullet.h"
@@ -8,9 +8,7 @@
 #include "Networks.h"
 #include "KeyboardInput.h"
 
-
-
-bool NetworkScene::init()
+bool LobbyScene::init()
 {
 	Scene::init();
 
@@ -32,69 +30,14 @@ bool NetworkScene::init()
 	MyTank2->setPosition(D3DXVECTOR3(126, 58, 0));
 	addActiveChild(MyTank2);*/
 
-
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
-
-	isDebug = false;
-	debugIndex = 0;
-
-	/*for (int i = 0; i < 20; i++)
-	{
-		ofstream tempFile(to_string(i) + "Log.txt");
-		files.push_back(tempFile);
-	}*/
 	return true;
 }
-
-void NetworkScene::DebugUINT(UINT uint)
-{
-	UINT newint = uint;
-	char newchar[10] = "";
-	sprintf(newchar, "%d", newint);
-	ImGui::Text("Debug: ");
-	ImGui::Text((const char*)newchar);
-}
-void NetworkScene::DebugBool(bool b)
-{
-	if (b)
-	{
-		ImGui::Text("Debug: ");
-		ImGui::Text("True");
-	}
-	else
-	{
-		ImGui::Text("Debug: ");
-		ImGui::Text("False");
-	}
-}
-
-void NetworkScene::Update()
+void LobbyScene::Update()
 {
 	Scene::Update();
-
-	GameManager::getInstance()->UpdateAllPlayerTank();
-	//vector<StaticSprite*> asd = StaticSpriteArray::getInstance()->getArray();
-
-
-	/*MyTank1->Update();
-	MyTank1->setSpeed(Speed(0, 0));
-	MyTank1->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
-	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
-	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
-	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();
-
-	MyTank2->Update();
-	MyTank2->setSpeed(Speed(0, 0));
-	MyTank2->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
-	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank2->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
-	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank2->fire();
-	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();*/
-
-
 	static int localServerPort = 8888;
 	if (GameManager::getInstance()->GetModNetServer() == nullptr && GameManager::getInstance()->GetModNetClient() == nullptr)
 	{
@@ -108,7 +51,6 @@ void NetworkScene::Update()
 		ImGui::InputInt("Server port", &localServerPort);
 		if (ImGui::Button("Start server"))
 		{
-			isServer = true;
 			GameManager::getInstance()->CreateServer();
 			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
 			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
@@ -128,7 +70,6 @@ void NetworkScene::Update()
 		static bool showInvalidUserName = false;
 		if (ImGui::Button("Connect to server"))
 		{
-			isClient = true;
 			GameManager::getInstance()->CreateClient();
 			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
 			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
@@ -140,91 +81,6 @@ void NetworkScene::Update()
 				if (modNetClientptr->start() == false);
 			}
 		}
-		if (ImGui::Button("Debug log"))
-		{
-			//debug.Log(MyTank1->getHeight());
-			//debug.LogTank(MyTank1);
-
-			//debug.LogTank20(MyTank1);
-
-			isDebug = true;
-			debugIndex = 0;
-
-		}
-
-		if (ImGui::Button("Read log and save position."))
-		{
-			string line;
-			ifstream fileRead("10Log.txt");
-			ofstream fileWrite("20Log.txt");
-			if (fileRead.is_open())
-			{
-				int index = 0;
-				while (getline(fileRead, line))
-				{
-					//c = line.c_str();
-					//fileWrite << line;
-					size_t posv = line.find(": ");
-					string v = line.substr(posv + 2);
-					string f = line.substr(9, 4);
-					string i = line.substr(0, 1);
-
-					if (f == "posX")
-					{
-						stringstream str(v);
-						int x = 0;
-						str >> x;
-						debug.SetDebugPositionX(x);
-					}
-					else if (f == "posY")
-					{
-						stringstream str(v);
-						int y = 0;
-						str >> y;
-						debug.SetDebugPositionY(y);
-					}
-					//fileWrite << i;
-					//fileWrite << "\n";
-
-					stringstream str(i);
-					int z = 0;
-					str >> z;
-					index = z;
-
-					if (index != 0 && index != debugs.size())
-					{
-						fileWrite << "Index: ";
-						fileWrite << index;
-						fileWrite << "\n";
-
-						debugs.push_back(debug);
-						fileWrite << debug.GetDebugPosition().x;
-						fileWrite << "\n";
-						fileWrite << debug.GetDebugPosition().y;
-						fileWrite << "\n";
-					}
-
-				}
-				fileWrite << "debugs' size: ";
-				fileWrite << debugs.size();
-
-				fileRead.close();
-				fileWrite.close();
-			}
-
-
-		}
-
-		if (ImGui::Button("Reverse"))
-		{
-			MyTank1->setPosition(debugs[0].GetDebugPosition());
-			MyTank2->setPosition(debugs[1].GetDebugPosition());
-			//MyTank2->setPosition();
-
-
-
-		}
-
 		ImGui::PopItemWidth();
 		ImGui::End();
 	}
@@ -247,54 +103,13 @@ void NetworkScene::Update()
 			modNetClientptr->stop();
 			delete[] modNetClientptr;
 			GameManager::getInstance()->DeleteClient();
-			isClient = false;
-		}
-	}
-
-	if (isDebug == true)
-	{
-		debugs.clear();
-		if (debugIndex < 20)
-		{
-			ofstream file(to_string(debugIndex) + "Log.txt");
-
-			for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
-			{
-				file << "  Tank's posX: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getPosition().x;
-				file << "\n";
-				file << to_string(i + 1) + ".Tank's posY: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getPosition().y;
-				file << "\n";
-				file << "  Tank's speX: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().x;
-				file << "\n";
-				file << "  Tank's speY: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getSpeed().y;
-				file << "\n";
-				file << "  Tank's dirX: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getDirection().x;
-				file << "\n";
-				file << "  Tank's dirY: ";
-				file << TankArray::getInstance()->getTankArray()[i]->getDirection().y;
-				file << "\n-----------------\n";
-			}
-
-			file.close();
-			debugIndex++;
-		}
-		else
-		{
-			isDebug = false;
 		}
 	}
 }
-
-void NetworkScene::clear()
+void LobbyScene::clear()
 {
 }
-
-void NetworkScene::LoadMap()
+void LobbyScene::LoadMap()
 {
 	nowmap = Map::create();
 	int mapArray1[676] = {

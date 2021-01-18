@@ -7,7 +7,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 {
 	while (packet.RemainingByteCount() > 0)
 	{
-		uint32 networkId, tickCount;
+		uint32 networkId, tickCount, playerID, level;
 		ReplicationAction action;
 		packet >> networkId;
 		packet >> action;
@@ -22,6 +22,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			}
 			go = Instantiate();
 			GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObjectWithNetworkId(go, networkId);
+			packet >> playerID;
+			packet >> level;
 			packet >> go->position.x;
 			packet >> go->position.y;
 			packet >> go->size.x;
@@ -49,8 +51,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//go->final_angle = go->angle;
 			//go->initial_angle = go->angle;
 
-			if (go->isAI) GameManager::getInstance()->CreateAIPlayerTank(networkId, go->position);
-			else GameManager::getInstance()->CreatePlayerTank(networkId, go->position);
+			if (go->isAI)
+				GameManager::getInstance()->CreateAIPlayerTank(networkId, (int)level, go->position);
+			else
+				GameManager::getInstance()->CreatePlayerTank(networkId, playerID, (int)level, go->position);
 		}
 		else if (action == ReplicationAction::Update_Position)
 		{
@@ -92,7 +96,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 						{
 							int lateFrames = (int)((GetTickCount() - go->tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 							GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
-							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->SinglePlayerBulletVisitAllWithLatency(go->networkId, lateFrames);
+							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
 							else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);
 						}
 					}
@@ -101,28 +105,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		}
 		else if (action == ReplicationAction::Destroy)
 		{
-			if (networkId == clientNetworkId)
-			{
-				GameManager::getInstance()->GetModNetClient()->disconnect();
-			}
-			else
-			{
-				GameManager::getInstance()->DeletePlayerTank(networkId);
-			}
-			//GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
-			//if (go)
-			//{
-			//	//if (go->texture && go->texture->UID == App->modResources->zombie->UID) //If it is a zombie
-			//	//{
-			//	//	App->modNetClient->zombieDeathCount++;
-			//	//}
-			//	//if (go->texture && go->texture->UID == GameManager::getInstance()->getmod()->modResources->robot->UID) //If it is a player
-			//	//{
-			//	//	GameManager::getInstance()->GetModNetClient()->players.remove(go);
-			//	//}
-			//	GameManager::getInstance()->GetModLinkingContext()->unregisterNetworkGameObject(go);
-			//	Destroy(go);
-			//}
+			/*if (networkId == clientNetworkId) GameManager::getInstance()->GetModNetClient()->disconnect();
+			else */
+			GameManager::getInstance()->DeletePlayerTank(networkId);
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{
@@ -141,6 +126,16 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
 				}
 			}
+		}
+		else if (action == ReplicationAction::Create_Award)
+		{
+			int awdType = -1;
+			D3DXVECTOR3 awdPos = D3DXVECTOR3(0, 0, 0);
+			packet >> awdPos.x;
+			packet >> awdPos.y;
+			packet >> awdType;
+			if (awdType != -1 && (awdPos.x + awdPos.y != 0))
+				GameManager::getInstance()->setAward(awdType, awdPos);
 		}
 	}
 }

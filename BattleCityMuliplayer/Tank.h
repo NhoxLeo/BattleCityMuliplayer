@@ -107,10 +107,10 @@ public:
 	vector<Tank*> getTankArray() { return Tankarray; }
 
 	void VisitAll();
-	void SingleTankVisitAll(int _networkID);
-	void AllButOneTankVisitAll(int _networkID);
+	void VisitAll(int _networkID,CollisionCheckMethod method);
 	void AllAITankVisitAll();
 	void UpdateAITanks();
+	void UpdateAllTanks();
 	Tank* GetTank(int _networkID);
 
 	void pushTank(Tank* m_Tank)

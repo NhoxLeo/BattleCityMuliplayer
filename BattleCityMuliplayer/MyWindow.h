@@ -46,7 +46,7 @@ private:
 	bool RegisterWindow();
 public:
 	MyWindow();
-	~MyWindow(){};
+	~MyWindow() {};
 
 	bool Create();
 
@@ -61,6 +61,8 @@ public:
 	int getWindowwidth();
 
 	void Update(float dwElapsedTime);
+
+	float shootTime = 0;
 };
 
 #endif

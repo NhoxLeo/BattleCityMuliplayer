@@ -9,6 +9,7 @@
 #include "OverScene.h"
 #include "GameScene.h"
 #include "NetworkScene.h"
+#include "LobbyScene.h"
 //#include "Sound.h"
 #include "Networks.h"
 #include "KeyboardInput.h"
@@ -141,6 +142,7 @@ int MyWindow::getWindowwidth()
 LRESULT CALLBACK MyWindow::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	MyRender::getInstance()->HandleWindowsEvents(hwnd, msg, wParam, lParam);
+	//KeyboardInput::GetInstance()->Create(hwnd);
 	if (msg == WM_DESTROY)
 	{
 		PostQuitMessage(0);
@@ -159,8 +161,10 @@ int MyWindow::MessageProc()
 	//OverScene* scene = OverScene::create();
 	//StartScene* scene = StartScene::create();
 	GameManager::getInstance()->setLevel(1);
+	//GameManager::getInstance()->setPlayer(1);
 	//GameScene* scene = GameScene::create();
-	NetworkScene* scene = NetworkScene::create();
+	//NetworkScene* scene = NetworkScene::create();
+	LobbyScene* scene = LobbyScene::create();
 	GameManager::getInstance()->setScene(scene);
 	Controller::getInstance1()->InitControl(m_hwnd, m_hInstance);
 	Controller::getInstance2()->InitControl(m_hwnd, m_hInstance);
@@ -183,6 +187,8 @@ int MyWindow::MessageProc()
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
 			Input.horizontalAxis = Input.verticalAxis = 0;
+			Input.buttons[8] = ButtonState::Idle;
+			shootTime += Time.deltaTime;
 			bool SpaceKeyWasDown = false;
 			switch (msg.message)
 			{
@@ -201,7 +207,6 @@ int MyWindow::MessageProc()
 
 					Input.horizontalAxis = (VKCode == VK_LEFT) ? -1 : ((VKCode == VK_RIGHT) ? 1 : 0);
 					Input.verticalAxis = (VKCode == VK_DOWN) ? -1 : ((VKCode == VK_UP) ? 1 : 0);
-
 				}
 			case WM_KEYUP:
 				if (ImGui::GetIO().WantCaptureKeyboard == false)
@@ -246,7 +251,6 @@ int MyWindow::MessageProc()
 
 			default:;
 			}
-
 			static bool firstIteration = true;
 			if (firstIteration)
 			{
@@ -260,12 +264,14 @@ int MyWindow::MessageProc()
 			Time.time += (double)Time.deltaTime;
 			StartTime = EndTime;
 
-			//Win32ProcessKeyboardButton(&Input.buttons[8], GetKeyState(VK_SPACE) & (1 << 15));
-			if (SpaceKeyWasDown)
-				Input.buttons[8] = ButtonState::Press;
-			else
-				Input.buttons[8] = ButtonState::Idle;
-
+			if (shootTime > 0.6f)
+			{
+				if (SpaceKeyWasDown)
+				{
+					Input.buttons[8] = ButtonState::Press;
+					shootTime = 0;
+				}
+			}
 
 			m_NowTime = GetTickCount();
 			m_DeltaTime = m_NowTime - m_PrevTime;
@@ -309,27 +315,34 @@ void MyWindow::Update(float ElapsedTime)
 	ZeroMemory(&szBuf, sizeof(char) * 10);
 	wstring x;
 	LPCTSTR Text;
-	/*if (ElapsedTime < 1000 / FRAME)
-	{
-		sprintf_s(szBuf, "%d", FRAME);
-	}
-	else
-	{
-		sprintf_s(szBuf, "%d", 1 / (ElapsedTime / 1000));
-	}*/
+	/*if (ElapsedTime < 1000 / FRAME) sprintf_s(szBuf, "%d", FRAME);
+	else sprintf_s(szBuf, "%d", 1 / (ElapsedTime / 1000));*/
 	x = ANSIToUnicode(szBuf);
 	Text = (LPCWSTR)x.c_str();
 	RECT rect = { 0,40, 100, 90 };
-	KeyboardInput::getInstance()->Update();
+
+	
+	/*KeyboardInput::GetInstance()->Update();
+	Input.horizontalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D)) ? 1 : 0);
+	Input.verticalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_S)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_W)) ? 1 : 0);
+	if (shootTime > 0.5f)
+	{
+		if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_SPACE))
+		{
+			Input.buttons[8] = ButtonState::Press;
+			shootTime = 0;
+		}
+	}*/
+
 	GameManager::getInstance()->checkclick1();
 	GameManager::getInstance()->checkclick2();
 	GameManager::getInstance()->checkclick3();
 	GameManager::getInstance()->checkclick4();
 	MyRender::getInstance()->getDevice()->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_XRGB(255, 251, 240), 1.0f, 0);
+
 	MyRender::getInstance()->getDevice()->BeginScene();
 	MyRender::getInstance()->preUpdateGUI();
 	GameManager::getInstance()->getScene()->Update();
-	//GameManager::getInstance()->getScene()->Update(ElapsedTime);
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();
 	GameManager::getInstance()->getScene()->DrawAllActive();
@@ -338,6 +351,7 @@ void MyWindow::Update(float ElapsedTime)
 	MyRender::getInstance()->updateGUI();
 	MyRender::getInstance()->lateUpdateGUI();
 	MyRender::getInstance()->getDevice()->EndScene();
+
 	MyRender::getInstance()->getDevice()->Present(NULL, NULL, NULL, NULL);
 	/*if (ElapsedTime < 1000 / FRAME)
 	{

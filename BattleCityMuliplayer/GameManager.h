@@ -139,32 +139,37 @@ public:
 	void setMap();
 	void changeMapMake() { MapMake = !MapMake; }
 	bool getMapMake() { return MapMake; }
+	D3DXVECTOR3 getAwardPosition();
+	int getAwardType();
+	void setAward();
+	void setAward(int type,D3DXVECTOR3 pos);
 
-	void CreatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
-	void CreateAIPlayerTank(UINT32 _networkID, D3DXVECTOR3 position);
+	void CreatePlayerTank(UINT32 _networkID, UINT32 _playerID,int level, D3DXVECTOR3 position);
+	void CreateAIPlayerTank(UINT32 _networkID,int level, D3DXVECTOR3 position);
 	void DeletePlayerTank(UINT32 _networkID);
 	void DeleteAllPlayerTank();
 	void UpdateAllPlayerTank();
-	void SinglePlayerTankVisitAll(UINT32 _networkID);
-	void AllTanksExceptPlayerVisitAll(UINT32 _networkID);
 	void AllPlayerTankVisitAll();
 	void AllAIPlayerTankVisitAll();
+	void TankVisitAll(UINT32 _networkID, CollisionCheckMethod method);
+	void UpdateAllTanks();
 	void UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed);
 	void UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed,int lateframes);
 	void UpdatePlayerTankWithInput(UINT32 _networkID, D3DXVECTOR3 _input);
 	Tank* GetPlayerTank(int _networkID);
+	int GetPlayerTankID(int _networkID);
 	D3DXVECTOR3 GetPlayerTankPosition(int _networkID);
 	D3DXVECTOR3 GetPlayerTankRotation(int _networkID);
 	D3DXVECTOR3 GetPlayerTankSpeed(int _networkID);
+	int GetPlayerTankLevel(int _networkID);
 	int GetTanksCount();
 	void AITankControl();
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);
 	void BulletVisitAll();
-	void SinglePlayerBulletVisitAll(UINT32 _networkID);
-	void SinglePlayerBulletVisitAllWithLatency(UINT32 _networkID,int lateframes);
-	void AllBulletsExceptPlayerVisitAll(UINT32 _networkID);
+	void BulletVisitAll(UINT32 _networkID, CollisionCheckMethod method);
+	void BulletVisitAllWithLatency(UINT32 _networkID, CollisionCheckMethod method, int lateframes);
 
 	ModuleNetworkingServer* GetModNetServer() { return modNetServer; }
 	ModuleNetworkingClient* GetModNetClient() { return modNetClient; }

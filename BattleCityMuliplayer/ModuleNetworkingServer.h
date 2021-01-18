@@ -12,8 +12,6 @@ public:
 
 	void setListenPort(int port);
 
-
-
 private:
 
 	//////////////////////////////////////////////////////////////////////
@@ -87,11 +85,14 @@ public:
 	void DestroyAINetworkObject(GameObject* gameObject)
 	{ 
 		for (int i = 0; i < AITanksObject->size(); i++)
-		{
 			if (AITanksObject->at(i)->networkId == gameObject->networkId) AITanksObject->erase(AITanksObject->begin() + i);
-		}
 		destroyNetworkObject(gameObject);
 	}
+	void DestroyPlayerNetworkObject(GameObject* gameObject)
+	{
+		destroyNetworkObject(gameObject);
+	}
+	void CreateAwardEvent();
 
 	float initialZombieSpawnRatio = 5.0;
 	float guiFinalZombieSpawnRatio = 0;
@@ -147,6 +148,7 @@ private:
 	uint16 listenPort = 0;
 
 	float secondsSinceLastPing = 0.0f;
+	float serverSnapshotCounter = 0.5f;
 	
 	float replicationDeliveryIntervalSeconds = REPLICATION_INTERVAL_SECONDS;
 };

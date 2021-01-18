@@ -49,6 +49,8 @@ using namespace std;
 #define EnemyPosition3 (D3DXVECTOR3(512,60,0))
 #define EnemyPosition4 (D3DXVECTOR3(128,252,0))
 #define EnemyPosition5 (D3DXVECTOR3(512,252,0))
+#define PlayerPosition (D3DXVECTOR3(272,444,0))
+#define PlayerPosition1 (D3DXVECTOR3(368,444,0))
 #define EnemyTime 10//检测敌方坦克数量的时间间隔
 #define MapNumber 34
 #define GradeAdd 100//攻击敌方坦克时得分
@@ -121,3 +123,4 @@ static __TYPE__* create() \
 			    } \
 }
 
+enum CollisionCheckMethod { All, OneExceptAll, AllExceptOne, ArtificialIntelligence };

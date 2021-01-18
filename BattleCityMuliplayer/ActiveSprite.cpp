@@ -24,6 +24,7 @@ bool ActiveSprite::init()
 	Level = 1;
 	Direction = D3DXVECTOR3(0, 1, 0);
 	Moveable = true;
+	ID = 0;
 	return true;
 }
 

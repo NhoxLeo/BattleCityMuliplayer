@@ -15,6 +15,11 @@ private:
 public:
 	void Update();
 	int getType(){ return m_type; }
+	void setType(int _type)
+	{
+		m_type = _type;
+		setRenderRet(30, 28, 30 * m_type, 0);
+	}
 	bool init();
 	CREATE_FUNC(Award);
 	~Award();
