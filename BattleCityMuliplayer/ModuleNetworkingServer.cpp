@@ -241,16 +241,16 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					welcomePacket << proxy->gameObject->networkId;
 					sendPacket(welcomePacket, fromAddress);
 
-					//// Send all network objects to the new player
-					//uint16 networkGameObjectsCount;
-					//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
-					//GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-					//// Notify the new client proxy's replication manager about the creation of other game objects
-					//for (uint16 i = 0; i < networkGameObjectsCount; ++i)  proxy->replicationManager.create(networkGameObjects[i]->networkId);
-					//// Notify all client proxies' replication manager to create the object remotely
-					//for (int i = 0; i < MAX_CLIENTS; ++i)
-					//	if (clientProxies[i].connected && clientProxies[i].gameObject->networkId != proxy->gameObject->networkId) clientProxies[i].replicationManager.create(proxy->gameObject->networkId);
-					//GameManager::getInstance()->CreatePlayerTank(proxy->gameObject->networkId, proxy->clientId, proxy->gameObject->position);
+					// Send all network objects to the new player
+					uint16 networkGameObjectsCount;
+					GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+					GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					// Notify the new client proxy's replication manager about the creation of other game objects
+					for (uint16 i = 0; i < networkGameObjectsCount; ++i)  proxy->replicationManager.create(networkGameObjects[i]->networkId);
+					// Notify all client proxies' replication manager to create the object remotely
+					for (int i = 0; i < MAX_CLIENTS; ++i)
+						if (clientProxies[i].connected && clientProxies[i].gameObject->networkId != proxy->gameObject->networkId) clientProxies[i].replicationManager.create(proxy->gameObject->networkId);
+					GameManager::getInstance()->CreatePlayerTank(proxy->gameObject->networkId, proxy->clientId, 1, proxy->gameObject->position);
 				}
 			}
 			if (!newClient)
