@@ -1513,7 +1513,7 @@ void GameManager::TankVisitAll(UINT32 _networkID, CollisionCheckMethod method)
 void GameManager::UpdateAllTanks()
 {
 	TankArray::getInstance()->UpdateAllTanks();
-	std::vector<Tank*> tankArray = TankArray::getInstance()->getTankArray();
+	/*std::vector<Tank*> tankArray = TankArray::getInstance()->getTankArray();
 	for (int i = 0; i < tankArray.size(); i++)
 	{
 		if (modNetClient != nullptr && tankArray.at(i)->getPlayer() != modNetClient->GetNetworkID())
@@ -1531,7 +1531,7 @@ void GameManager::UpdateAllTanks()
 				}
 			}
 		}
-	}
+	}*/
 }
 void GameManager::UpdatePlayerTank(UINT32 _networkID, D3DXVECTOR3 position, D3DXVECTOR3 rotation, D3DXVECTOR3 speed)
 {
@@ -1565,12 +1565,10 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 				for (int i = 0; i < lateframes; i++) TankArray::getInstance()->VisitAll(_networkID, CollisionCheckMethod::OneExceptAll);
 			}
 			currentPosition = TankArray::getInstance()->getTankArray().at(i)->getPosition();
-			float lerpX = previousPosition.x + Time.deltaTime * (currentPosition.x - previousPosition.x) * 2;
-			float lerpY = previousPosition.y + Time.deltaTime * (currentPosition.y - previousPosition.y) * 2;
-			if (!TankArray::getInstance()->getTankArray().at(i)->IsPlayer()) TankArray::getInstance()->getTankArray().at(i)->setPosition(currentPosition);
-			else TankArray::getInstance()->getTankArray().at(i)->setPosition(previousPosition);
-			TankArray::getInstance()->getTankArray().at(i)->SetCurrentPosition(currentPosition);
-			//TankArray::getInstance()->getTankArray().at(i)->setPosition(D3DXVECTOR3(lerpX, lerpY, 0));
+			//if (!TankArray::getInstance()->getTankArray().at(i)->IsPlayer()) 
+			TankArray::getInstance()->getTankArray().at(i)->setPosition(currentPosition);
+			//else TankArray::getInstance()->getTankArray().at(i)->setPosition(previousPosition);
+			//TankArray::getInstance()->getTankArray().at(i)->SetCurrentPosition(currentPosition);
 		}
 	}
 }
