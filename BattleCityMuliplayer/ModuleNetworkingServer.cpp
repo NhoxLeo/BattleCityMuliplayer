@@ -182,16 +182,19 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				newClient = true;
 				std::string playerName;
 				packet >> playerName;
-				bool usedName = false;
+				bool usedName = false, firstClientconnected = false, secondClientconnected = false;
 				for (int i = 0; i < MAX_CLIENTS; ++i)
 				{
-					if (clientProxies[i].name == playerName)
+					/*if (clientProxies[i].name == playerName)
 					{
 						usedName = true;
 						break;
-					}
+					}*/
+					if (clientProxies[i].connected == true && (int)clientProxies[i].clientId == 0)						firstClientconnected = true;
+					if (clientProxies[i].connected == true && (int)clientProxies[i].clientId == 1)						secondClientconnected = true;
+					if (firstClientconnected && secondClientconnected) break;
 				}
-				/*if (usedName)
+				if (/*usedName*/ firstClientconnected && secondClientconnected)
 				{
 					OutputMemoryStream unwelcomePacket;
 					unwelcomePacket << ServerMessage::Unwelcome;
@@ -201,7 +204,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 
 					WLOG("Message received: UNWELCOMED hello - from player %s", playerName.c_str());
 				}
-				else*/
+				else
 				{
 					proxy = createClientProxy();
 					connectedProxies++;
@@ -210,7 +213,12 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					proxy->address.sin_port = fromAddress.sin_port;
 					proxy->connected = true;
 					proxy->name = playerName;
-					proxy->clientId = nextClientId++;
+					if (!firstClientconnected) proxy->clientId = 0;
+					else
+					{
+						if (!secondClientconnected) proxy->clientId = 1;
+						else proxy->clientId = nextClientId++;
+					}
 
 					// Create a new game object with the player properties
 					proxy->gameObject = Instantiate();
@@ -304,7 +312,6 @@ void ModuleNetworkingServer::onUpdate()
 			if (clientProxy.connected)
 			{
 				clientProxy.secondsSinceLastReplication += Time.deltaTime;
-
 				// TODO(jesus): If the replication interval passed and the replication manager of this proxy
 				//              has pending data, write and send a replication packet to this client.
 				if (clientProxy.secondsSinceLastReplication > replicationDeliveryIntervalSeconds && clientProxy.replicationManager.commands.size() > 0)
@@ -325,8 +332,6 @@ void ModuleNetworkingServer::onUpdate()
 					}
 				}
 
-				if (serverSnapshotCounter > 5) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
-
 				//Send ping to clients
 				if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
 				{
@@ -338,6 +343,12 @@ void ModuleNetworkingServer::onUpdate()
 				//Disconnect client if waited too long
 				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
 					onConnectionReset(clientProxy.address);
+
+				if (serverSnapshotCounter > 1)
+				{
+					if (GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
+					serverSnapshotCounter = 0;
+				}
 			}
 		}
 
@@ -346,7 +357,6 @@ void ModuleNetworkingServer::onUpdate()
 		{
 			secondsSinceLastPing = 0.0f;
 		}
-		if (serverSnapshotCounter > 5) serverSnapshotCounter = 0;
 
 		//Check for TimeOutPackets DeliveryManager
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();

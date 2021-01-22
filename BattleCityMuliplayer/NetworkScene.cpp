@@ -7,6 +7,7 @@
 #include "ActiveSprite.h"
 #include "Networks.h"
 #include "KeyboardInput.h"
+#include "OverScene.h"
 
 
 
@@ -37,14 +38,17 @@ bool NetworkScene::init()
 	GameManager::getInstance()->setScene(scene);
 	LoadMap();
 
+	LoadUI();
+
 	isDebug = false;
 	debugIndex = 0;
-
 	/*for (int i = 0; i < 20; i++)
 	{
 		ofstream tempFile(to_string(i) + "Log.txt");
 		files.push_back(tempFile);
 	}*/
+
+	win = true;
 	return true;
 }
 
@@ -70,13 +74,135 @@ void NetworkScene::DebugBool(bool b)
 	}
 }
 
+void NetworkScene::LoadUI()
+{
+	GameManager::getInstance()->setGrade(1, InitGrade);
+	GameManager::getInstance()->setGrade(2, InitGrade);
+
+	//Player 1
+	{
+		playerSign_R_1 = ActiveSprite::create();
+		playerSign_R_1->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerSign_R_1->setRenderRet(14, 28, 28, 0);
+		playerSign_R_1->setPosition(D3DXVECTOR3(564, 337, 0));
+		playerSign_R_1->setRet(Ret(Size(14, 28), playerSign_R_1->getPosition()));
+		addActiveChild(playerSign_R_1);
+
+		playerSign_T_1 = ActiveSprite::create();
+		playerSign_T_1->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerSign_T_1->setRenderRet(14, 28, 28, 0);
+		playerSign_T_1->setPosition(D3DXVECTOR3(30, 17, 0));
+		playerSign_T_1->setRet(Ret(Size(14, 28), playerSign_T_1->getPosition()));
+		addActiveChild(playerSign_T_1);
+
+		playerIco_1 = ActiveSprite::create();
+		playerIco_1->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerIco_1->setRenderRet(14, 14, 14, 0);
+		playerIco_1->setPosition(D3DXVECTOR3(557, 353, 0));
+		playerIco_1->setRet(Ret(Size(14, 14), playerIco_1->getPosition()));
+		addActiveChild(playerIco_1);
+
+		//Score
+		for (int i = 0; i < 6; i++)
+		{
+			ActiveSprite* op = ActiveSprite::create();
+			player_1_grade.push_back(op);
+			player_1_grade[i]->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+			player_1_grade[i]->setRenderRet(14, 14, 0, 0);
+			player_1_grade[i]->setPosition(D3DXVECTOR3(60 + 14 * i, 17, 0));
+			player_1_grade[i]->setRet(Ret(Size(14, 14), player_1_grade[i]->getPosition()));
+			addActiveChild(player_1_grade[i]);
+		}
+
+		/*player_1_blood = ActiveSprite::create();
+		player_1_blood->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+		player_1_blood->setPosition(D3DXVECTOR3(571, 353, 0));
+		player_1_blood->setRet(Ret(Size(14, 14), player_1_blood->getPosition()));
+		addActiveChild(player_1_blood);*/
+	}
+	//Player 2
+	{
+		playerSign_R_2 = ActiveSprite::create();
+		playerSign_R_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerSign_R_2->setRenderRet(14, 28, 56, 0);
+		playerSign_R_2->setPosition(D3DXVECTOR3(564, 375, 0));
+		playerSign_R_2->setRet(Ret(Size(14, 28), playerSign_R_2->getPosition()));
+		addActiveChild(playerSign_R_2);
+
+		playerSign_T_2 = ActiveSprite::create();
+		playerSign_T_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerSign_T_2->setRenderRet(14, 28, 56, 0);
+		playerSign_T_2->setPosition(D3DXVECTOR3(500, 17, 0));
+		playerSign_T_2->setRet(Ret(Size(14, 28), playerSign_T_2->getPosition()));
+		addActiveChild(playerSign_T_2);
+
+		playerIco_2 = ActiveSprite::create();
+		playerIco_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		playerIco_2->setRenderRet(14, 14, 14, 0);
+		playerIco_2->setPosition(D3DXVECTOR3(557, 391, 0));
+		playerIco_2->setRet(Ret(Size(14, 14), playerIco_2->getPosition()));
+		addActiveChild(playerIco_2);
+
+		//Score
+		for (int i = 0; i < 6; i++)
+		{
+			ActiveSprite* op = ActiveSprite::create();
+			player_2_grade.push_back(op);
+			player_2_grade[i]->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+			player_2_grade[i]->setRenderRet(14, 14, 0, 0);
+			player_2_grade[i]->setPosition(D3DXVECTOR3(530 + 14 * i, 17, 0));
+			player_2_grade[i]->setRet(Ret(Size(14, 14), player_2_grade[i]->getPosition()));
+			addActiveChild(player_2_grade[i]);
+		}
+
+		/*player_2_blood = ActiveSprite::create();
+		player_2_blood->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+		player_2_blood->setPosition(D3DXVECTOR3(571, 391, 0));
+		player_2_blood->setRet(Ret(Size(14, 14), player_2_blood->getPosition()));
+		addActiveChild(player_2_blood);*/
+	}
+	//Enemy list
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 2; j++)
+		{
+			ActiveSprite* op;
+			op = ActiveSprite::create();
+			op->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+			op->setRenderRet(14, 14, 0, 0);
+			op->setPosition(D3DXVECTOR3(557 + j * 14, 60 + i * 14, 0));
+			op->setRet(Ret(Size(14, 14), op->getPosition()));
+			NumberOfEnemy.push_back(op);
+			addActiveChild(op);
+		}
+	}
+	//Level Info
+	{
+		flag = ActiveSprite::create();
+		flag->LoadTexture(_T("../Sprite/flag.bmp"), 32, 32, 1);
+		flag->setPosition(D3DXVECTOR3(566, 424, 0));
+		flag->setRet(Ret(Size(14, 28), flag->getPosition()));
+		addActiveChild(flag);
+		for (int i = 0; i < 2; i++)
+		{
+			ActiveSprite* op = ActiveSprite::create();
+			levelArray.push_back(op);
+			levelArray[i]->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+			levelArray[i]->setRenderRet(14, 14, 0 + 14 * i, 0);
+			levelArray[i]->setPosition(D3DXVECTOR3(590 + 14 * i, 443, 0));
+			levelArray[i]->setRet(Ret(Size(14, 14), levelArray[i]->getPosition()));
+			addActiveChild(levelArray[i]);
+		}
+		//for (int i = 0; i < 20; i++) NumberOfEnemy[i]->OnShow();
+	}
+}
+
 void NetworkScene::Update()
 {
 	Scene::Update();
 
 	GameManager::getInstance()->UpdateAllPlayerTank();
 	//vector<StaticSprite*> asd = StaticSpriteArray::getInstance()->getArray();
-
 
 	/*MyTank1->Update();
 	MyTank1->setSpeed(Speed(0, 0));
@@ -94,7 +220,6 @@ void NetworkScene::Update()
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();*/
 
-
 	static int localServerPort = 8888;
 	if (GameManager::getInstance()->GetModNetServer() == nullptr && GameManager::getInstance()->GetModNetClient() == nullptr)
 	{
@@ -108,7 +233,6 @@ void NetworkScene::Update()
 		ImGui::InputInt("Server port", &localServerPort);
 		if (ImGui::Button("Start server"))
 		{
-			isServer = true;
 			GameManager::getInstance()->CreateServer();
 			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
 			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
@@ -128,7 +252,6 @@ void NetworkScene::Update()
 		static bool showInvalidUserName = false;
 		if (ImGui::Button("Connect to server"))
 		{
-			isClient = true;
 			GameManager::getInstance()->CreateClient();
 			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
 			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
@@ -140,91 +263,6 @@ void NetworkScene::Update()
 				if (modNetClientptr->start() == false);
 			}
 		}
-		if (ImGui::Button("Debug log"))
-		{
-			//debug.Log(MyTank1->getHeight());
-			//debug.LogTank(MyTank1);
-
-			//debug.LogTank20(MyTank1);
-
-			isDebug = true;
-			debugIndex = 0;
-
-		}
-
-		if (ImGui::Button("Read log and save position."))
-		{
-			string line;
-			ifstream fileRead("10Log.txt");
-			ofstream fileWrite("20Log.txt");
-			if (fileRead.is_open())
-			{
-				int index = 0;
-				while (getline(fileRead, line))
-				{
-					//c = line.c_str();
-					//fileWrite << line;
-					size_t posv = line.find(": ");
-					string v = line.substr(posv + 2);
-					string f = line.substr(9, 4);
-					string i = line.substr(0, 1);
-
-					if (f == "posX")
-					{
-						stringstream str(v);
-						int x = 0;
-						str >> x;
-						debug.SetDebugPositionX(x);
-					}
-					else if (f == "posY")
-					{
-						stringstream str(v);
-						int y = 0;
-						str >> y;
-						debug.SetDebugPositionY(y);
-					}
-					//fileWrite << i;
-					//fileWrite << "\n";
-
-					stringstream str(i);
-					int z = 0;
-					str >> z;
-					index = z;
-
-					if (index != 0 && index != debugs.size())
-					{
-						fileWrite << "Index: ";
-						fileWrite << index;
-						fileWrite << "\n";
-
-						debugs.push_back(debug);
-						fileWrite << debug.GetDebugPosition().x;
-						fileWrite << "\n";
-						fileWrite << debug.GetDebugPosition().y;
-						fileWrite << "\n";
-					}
-
-				}
-				fileWrite << "debugs' size: ";
-				fileWrite << debugs.size();
-
-				fileRead.close();
-				fileWrite.close();
-			}
-
-
-		}
-
-		if (ImGui::Button("Reverse"))
-		{
-			MyTank1->setPosition(debugs[0].GetDebugPosition());
-			MyTank2->setPosition(debugs[1].GetDebugPosition());
-			//MyTank2->setPosition();
-
-
-
-		}
-
 		ImGui::PopItemWidth();
 		ImGui::End();
 	}
@@ -247,7 +285,6 @@ void NetworkScene::Update()
 			modNetClientptr->stop();
 			delete[] modNetClientptr;
 			GameManager::getInstance()->DeleteClient();
-			isClient = false;
 		}
 	}
 
@@ -288,6 +325,40 @@ void NetworkScene::Update()
 			isDebug = false;
 		}
 	}
+
+	// UI
+	{
+		n = 100000;
+		Grade_1 = GameManager::getInstance()->getGrade(1);
+		if (GameManager::getInstance()->getPlayer() == 2) Grade_2 = GameManager::getInstance()->getGrade(2);
+		for (int i = 0; i < 6; i++)
+		{
+			j_1 = Grade_1 / n;
+			Grade_1 = Grade_1 % n;
+			player_1_grade[i]->setRenderRet(14, 14, 14 * j_1, 0);
+
+			if (GameManager::getInstance()->getPlayer() == 2)
+			{
+				j_2 = Grade_2 / n;
+				Grade_2 = Grade_2 % n;
+				player_2_grade[i]->setRenderRet(14, 14, 14 * j_2, 0);
+			}
+			n = n / 10;
+		}
+	}
+
+	/*if (!win)
+	{
+		if (GameManager::getInstance()->getMapMake())
+		{
+			MapManager::getInstance()->removeLast();
+			GameManager::getInstance()->changeMapMake();
+		}
+		OverScene* scene = OverScene::create();
+		GameManager::getInstance()->setScene(scene);
+		release();
+		return;
+	}*/
 }
 
 void NetworkScene::clear()

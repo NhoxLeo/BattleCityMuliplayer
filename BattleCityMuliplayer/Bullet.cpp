@@ -91,13 +91,8 @@ void BulletArray::VisitAll()
 		if (!Bulletarray[t]->getBoom())
 		{
 			D3DXVECTOR3 m_Position = Bulletarray[t]->getPosition();
-			for (int k = 0; k < BulletNumber; k++)
-			{
-				if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet()))
-				{
-					GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);
-				}
-			}
+			/*for (int k = 0; k < BulletNumber; k++)
+				if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet())) GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);*/
 			for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
 			{
 				if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), TankArray::getInstance()->getTankArray()[k]->getRet()))
@@ -134,31 +129,15 @@ void BulletArray::VisitAll(int _networkID, CollisionCheckMethod method)
 				if (!Bulletarray[t]->getBoom())
 				{
 					D3DXVECTOR3 m_Position = Bulletarray[t]->getPosition();
-					for (int k = 0; k < BulletNumber; k++)
-					{
-						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet()))
-						{
-							GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);
-						}
-					}
+					/*for (int k = 0; k < BulletNumber; k++)
+						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet())) GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);*/
 					for (int k = 0; k < TankArray::getInstance()->getNumber(); k++)
-					{
 						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), TankArray::getInstance()->getTankArray()[k]->getRet()))
-						{
 							GameManager::getInstance()->UpdateColl(TankArray::getInstance()->getTankArray()[k], Bulletarray[t]);
-						}
-					}
 					for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
-					{
 						if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
-						{
 							GameManager::getInstance()->UpdateColl(StaticSpriteArray::getInstance()->getArray()[k], Bulletarray[t]);
-						}
-					}
-					if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460)
-					{
-						Bulletarray[t]->detain();
-					}
+					if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460) Bulletarray[t]->detain();
 				}
 				if (Bulletarray.size() > 0 && t < Bulletarray.size()) Bulletarray[t]->Update();
 			}
@@ -182,19 +161,18 @@ void BulletArray::VisitAllWithLatency(int _networkID, CollisionCheckMethod metho
 					if (!Bulletarray[t]->getBoom())
 					{
 						D3DXVECTOR3 m_Position = Bulletarray[t]->getPosition();
-						for (int k = 0; k < BulletNumber; k++)
-						{
-							if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet()))
-							{
-								GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);
-							}
-						}
+						/*for (int k = 0; k < BulletNumber; k++)
+							if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), Bulletarray[k]->getRet())) GameManager::getInstance()->UpdateColl(Bulletarray[t], Bulletarray[k]);*/
 						for (int k = 0; k < lastFrameObjectsInfo->at(startingFrameIndex)->size(); k++)
 						{
 							if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), lastFrameObjectsInfo->at(startingFrameIndex)->at(k)->getRet()))
 							{
 								Tank* tank = TankArray::getInstance()->GetTank(lastFrameObjectsInfo->at(startingFrameIndex)->at(k)->getPlayer());
-								if (tank != NULL)GameManager::getInstance()->UpdateColl(tank, Bulletarray[t]);
+								if (tank != NULL)
+								{
+									GameManager::getInstance()->UpdateColl(tank, Bulletarray[t]);
+									return;
+								}
 							}
 						}
 						for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
@@ -202,12 +180,10 @@ void BulletArray::VisitAllWithLatency(int _networkID, CollisionCheckMethod metho
 							if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
 							{
 								GameManager::getInstance()->UpdateColl(StaticSpriteArray::getInstance()->getArray()[k], Bulletarray[t]);
+								return;
 							}
 						}
-						if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460)
-						{
-							Bulletarray[t]->detain();
-						}
+						if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460) Bulletarray[t]->detain();
 					}
 					if (Bulletarray.size() > 0 && t < Bulletarray.size()) Bulletarray[t]->Update();
 				}

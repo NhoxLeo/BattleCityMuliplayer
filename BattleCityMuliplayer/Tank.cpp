@@ -389,11 +389,11 @@ void TankArray::UpdateAITanks()
 				if (weight > 20 && weight <= 45) Tankarray[i]->setDirection(D3DXVECTOR3(-1, 0, 0));//setDirection(Left)
 				if (weight > 45 && weight <= 75) Tankarray[i]->setDirection(D3DXVECTOR3(1, 0, 0));//setDirection(Right)
 				if (weight > 75 && weight <= 100) Tankarray[i]->setDirection(D3DXVECTOR3(0, 1, 0));//setDirection(Down)
-				if (Tankarray[i]->getLevel() == 2)
+				/*if (Tankarray[i]->getLevel() == 2)
 				{
 					Tankarray[i]->setSpeed(Speed(2 * Tankarray[i]->getDirection().x, 2 * Tankarray[i]->getDirection().y));
 				}
-				else
+				else*/
 				{
 					Tankarray[i]->setSpeed(Speed(Tankarray[i]->getDirection().x, Tankarray[i]->getDirection().y));
 				}
@@ -582,11 +582,11 @@ void Tank::setLevel(int level)
 	Level = level;
 	if (level == 2)
 	{
-		setSpeed(Speed(getSpeed().x * 2, getSpeed().y * 2));
+		//setSpeed(Speed(getSpeed().x * 2, getSpeed().y * 2));
 	}
 	if (level == 3)
 	{
-		setLife(3);
+		//setLife(3);
 	}
 }
 void Tank::boom()

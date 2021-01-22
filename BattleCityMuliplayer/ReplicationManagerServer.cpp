@@ -57,8 +57,8 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << GameManager::getInstance()->GetPlayerTankLevel((int)(*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
-			packet << go->size.x;
-			packet << go->size.y;
+			packet << go->position.x;
+			packet << go->rotation.y;
 			packet << go->name;
 			packet << go->isAI;
 		}
@@ -73,8 +73,6 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << go->tickCount;
 				packet << go->position.x;
 				packet << go->position.y;
-				packet << go->rotation.x;
-				packet << go->rotation.y;
 				packet << go->speed.x;
 				packet << go->speed.y;
 				packet << go->isShooted;
@@ -88,14 +86,13 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << 0;
 				packet << 0;
 				packet << 0;
-				packet << 0;
-				packet << 0;
 				packet << false;
 				//packet << go->angle;
 			}
 		}
 		else if ((*it_c).second == ReplicationAction::Server_Snapshot)
 		{
+			packet << GameManager::getInstance()->getGrade(1);
 			vector<int>* destroyedBrickIDs = GameManager::getInstance()->GetModNetServer()->getDestroyedBricksID();
 			if (destroyedBrickIDs->size() > 0)
 			{

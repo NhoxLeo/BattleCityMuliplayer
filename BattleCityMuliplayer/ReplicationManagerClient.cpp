@@ -65,8 +65,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			packet >> tickCount;
 			packet >> position.x;
 			packet >> position.y;
-			packet >> rotation.x;
-			packet >> rotation.y;
 			packet >> speed.x;
 			packet >> speed.y;
 			packet >> isShooted;
@@ -80,13 +78,13 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 				if (/*!GameManager::getInstance()->GetModGameObject()->interpolateEntities || !go->doInterpolation*/ true)
 				{
 					go->position = position;
-					go->rotation = rotation;
+					go->rotation = D3DXVECTOR3(speed.x, speed.y, 0);
 					go->speed = speed;
 					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
 					else
 					{
-						if (speed.x + speed.y == 0)  GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-						else GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
+						//if (speed.x + speed.y == 0) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+						GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
 					}
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 
@@ -111,13 +109,15 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{
+			int grade = 0;
 			bool destroyedBricks = false;
+			packet >> grade;
 			packet >> destroyedBricks;
+			GameManager::getInstance()->setGrade(1, grade);
 			if (destroyedBricks)
 			{
 				int destroyedBrickSize = 0;
 				packet >> destroyedBrickSize;
-				vector<int>* destroyedBrickArray = new vector<int>();
 				for (int i = 0; i < destroyedBrickSize; i++)
 				{
 					int cloneID = 0;
