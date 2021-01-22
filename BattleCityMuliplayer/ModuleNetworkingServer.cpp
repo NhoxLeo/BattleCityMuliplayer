@@ -344,11 +344,11 @@ void ModuleNetworkingServer::onUpdate()
 				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
 					onConnectionReset(clientProxy.address);
 
-				if (serverSnapshotCounter > 1)
+				/*if (serverSnapshotCounter > 1)
 				{
 					if (GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
 					serverSnapshotCounter = 0;
-				}
+				}*/
 			}
 		}
 
