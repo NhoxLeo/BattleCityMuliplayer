@@ -26,8 +26,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			packet >> level;
 			packet >> go->position.x;
 			packet >> go->position.y;
-			packet >> go->size.x;
-			packet >> go->size.y;
+			//packet >> go->rotation.x;
+			//packet >> go->rotation.y;
 			packet >> go->name;
 			packet >> go->isAI;
 			if (networkId == clientNetworkId)

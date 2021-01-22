@@ -57,8 +57,8 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << GameManager::getInstance()->GetPlayerTankLevel((int)(*it_c).first);
 			packet << go->position.x;
 			packet << go->position.y;
-			packet << go->position.x;
-			packet << go->rotation.y;
+			/*packet << go->rotation.x;
+			packet << go->rotation.y;*/
 			packet << go->name;
 			packet << go->isAI;
 		}
