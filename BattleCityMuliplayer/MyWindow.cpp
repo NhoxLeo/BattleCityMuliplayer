@@ -159,11 +159,11 @@ int MyWindow::MessageProc()
 	ZeroMemory(&msg, sizeof(MSG));
 
 	//OverScene* scene = OverScene::create();
-	//StartScene* scene = StartScene::create();
+	StartScene* scene = StartScene::create();
 	GameManager::getInstance()->setLevel(1);
 	//GameManager::getInstance()->setPlayer(1);
 	//GameScene* scene = GameScene::create();
-	NetworkScene* scene = NetworkScene::create();
+	//NetworkScene* scene = NetworkScene::create();
 	//LobbyScene* scene = LobbyScene::create();
 	GameManager::getInstance()->setScene(scene);
 	Controller::getInstance1()->InitControl(m_hwnd, m_hInstance);
@@ -188,6 +188,7 @@ int MyWindow::MessageProc()
 			dwTime = dwCurrentTime;*/
 			Input.horizontalAxis = Input.verticalAxis = 0;
 			Input.buttons[8] = ButtonState::Idle;
+			Input.shoot = false;
 			shootTime += Time.deltaTime;
 			bool SpaceKeyWasDown = false;
 			switch (msg.message)
@@ -264,11 +265,12 @@ int MyWindow::MessageProc()
 			Time.time += (double)Time.deltaTime;
 			StartTime = EndTime;
 
-			if (shootTime > 0.6f)
+			if (shootTime > 0.5f)
 			{
 				if (SpaceKeyWasDown)
 				{
-					Input.buttons[8] = ButtonState::Press;
+					//Input.buttons[8] = ButtonState::Press;
+					Input.shoot = true;
 					shootTime = 0;
 				}
 			}
@@ -330,6 +332,7 @@ void MyWindow::Update(float ElapsedTime)
 		if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_SPACE))
 		{
 			Input.buttons[8] = ButtonState::Press;
+			Input.shoot = true;
 			shootTime = 0;
 		}
 	}*/

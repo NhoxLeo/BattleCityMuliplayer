@@ -100,6 +100,32 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					}
 				}
 			}
+
+			//bool serverSnap = false;
+			//packet >> serverSnap;
+			//if (serverSnap)
+			//{
+			//	bool Iswinning = true;
+			//	int grade = 0;
+			//	bool destroyedBricks = false;
+			//	packet >> Iswinning;
+			//	packet >> grade;
+			//	packet >> destroyedBricks;
+			//	GameManager::getInstance()->setGrade(1, grade);
+			//	if (destroyedBricks)
+			//	{
+			//		int destroyedBrickSize = 0;
+			//		packet >> destroyedBrickSize;
+			//		for (int i = 0; i < destroyedBrickSize; i++)
+			//		{
+			//			int cloneID = 0;
+			//			packet >> cloneID;
+			//			//destroyedBrickArray->push_back(cloneID);
+			//			StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
+			//		}
+			//	}
+			//	GameManager::getInstance()->SetWinning(Iswinning);
+			//}
 		}
 		else if (action == ReplicationAction::Destroy)
 		{
@@ -109,8 +135,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{
+			bool Iswinning = true;
 			int grade = 0;
 			bool destroyedBricks = false;
+			packet >> Iswinning;
 			packet >> grade;
 			packet >> destroyedBricks;
 			GameManager::getInstance()->setGrade(1, grade);
@@ -126,6 +154,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
 				}
 			}
+			GameManager::getInstance()->SetWinning(Iswinning);
 		}
 		else if (action == ReplicationAction::Create_Award)
 		{

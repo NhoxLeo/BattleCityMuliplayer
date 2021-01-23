@@ -154,10 +154,10 @@ struct Player : public Behaviour
 			//GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId) + inputVector, D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 			GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 		}
-		if (input.buttons[8] == ButtonState::Press)
+		if (input.shoot /*input.buttons[8] == ButtonState::Press*/)
 		{
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
-			if (GameManager::getInstance()->GetModNetServer()!=nullptr)
+			if (GameManager::getInstance()->GetModNetServer() != nullptr)
 			{
 				gameObject->isShooted = true;
 				int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));

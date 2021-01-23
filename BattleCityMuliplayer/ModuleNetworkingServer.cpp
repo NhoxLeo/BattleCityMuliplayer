@@ -158,6 +158,30 @@ void ModuleNetworkingServer::onGui()
 						}
 					}
 				}
+				if (ImGui::Button("Server Snapshot"))
+				{
+					/*for (ClientProxy& clientProxy : clientProxies)
+					{
+						if (clientProxy.connected)
+						{
+							GameManager::getInstance()->SetFrameSnapshotTick(0);
+							OutputMemoryStream packet;
+							packet << true;
+							packet << GameManager::getInstance()->IsWinning();
+							packet << GameManager::getInstance()->getGrade(1);
+							if (destroyedBricksID->size() > 0)
+							{
+								packet << true;
+								packet << destroyedBricksID->size();
+								if (destroyedBricksID->size() > 0) for (int i = 0; i < destroyedBricksID->size(); i++) packet << destroyedBricksID->at(i);
+							}
+							else packet << false;
+							if (clientProxy.replicationManager.write(packet))
+								sendPacket(packet, clientProxy.address);
+						}
+					}*/
+					for(ClientProxy clientProxy : clientProxies) if (clientProxy.connected && GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
+				}
 			}
 		}
 	}
@@ -278,32 +302,52 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					packet >> inputData.tickCount;
 					packet >> inputData.horizontalAxis;
 					packet >> inputData.verticalAxis;
-					packet >> inputData.buttonBits;
-					packet >> inputData.mouseX;
-					packet >> inputData.mouseY;
-					packet >> inputData.leftButton;
+					packet >> inputData.shoot;
+					//packet >> inputData.buttonBits;
 					if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
 					{
 						proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
 						proxy->gamepad.tickcount = inputData.tickCount;
-						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
+						proxy->gamepad.shoot = inputData.shoot;
+						//unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
 						proxy->gameObject->tickCount = inputData.tickCount;
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
+					}
+				}
+
+				if (GameManager::getInstance()->IsWinning())
+				{
+					for (int k = 0; k < AITanksObject->size(); k++)
+					{
+						AITanksObject->at(k)->tickCount = GetTickCount();
+						AITanksObject->at(k)->position = GameManager::getInstance()->GetPlayerTankPosition((int)AITanksObject->at(k)->networkId);
+						AITanksObject->at(k)->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)AITanksObject->at(k)->networkId);
+						AITanksObject->at(k)->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)AITanksObject->at(k)->networkId);
+						//for (int i = 0; i < MAX_CLIENTS; ++i)
+						//{
+						//	if (clientProxies[i].connected)
+						//	{
+						//		// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+						//		clientProxies[i].replicationManager.update(AITanksObject->at(k)->networkId, ReplicationAction::Update_Position);
+						//	}
+						//}
+						proxy->replicationManager.update(AITanksObject->at(k)->networkId, ReplicationAction::Update_Position);
+
 					}
 				}
 			}
 		}
 		else if (message == ClientMessage::Ping) GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
 		if (proxy != nullptr) proxy->lastPacketReceivedTime = Time.time;
-
 	}
 }
 void ModuleNetworkingServer::onUpdate()
 {
 	if (state == ServerState::Listening)
 	{
+		GameManager::getInstance()->SetFrameSnapshotTick(GameManager::getInstance()->GetFrameSnapshotTick() + 1);
 		serverSnapshotCounter += Time.deltaTime;
 		secondsSinceLastPing += Time.deltaTime;
 		// Replication
@@ -314,24 +358,33 @@ void ModuleNetworkingServer::onUpdate()
 				clientProxy.secondsSinceLastReplication += Time.deltaTime;
 				// TODO(jesus): If the replication interval passed and the replication manager of this proxy
 				//              has pending data, write and send a replication packet to this client.
-				if (clientProxy.secondsSinceLastReplication > replicationDeliveryIntervalSeconds && clientProxy.replicationManager.commands.size() > 0)
+				if (!GameManager::getInstance()->IsWinning())
 				{
 					OutputMemoryStream packet;
-					packet << ServerMessage::Replication;
-					packet << clientProxy.nextExpectedInputSequenceNumber; //ACK of last received input
-
-					Delivery* delivery = GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumber(packet);
-					delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
-					((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
-					((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
-
-					clientProxy.secondsSinceLastReplication = 0.0f;
+					packet << ServerMessage::StopGame;
 					if (clientProxy.replicationManager.write(packet))
-					{
 						sendPacket(packet, clientProxy.address);
+				}
+				else
+				{
+					if (clientProxy.secondsSinceLastReplication > replicationDeliveryIntervalSeconds && clientProxy.replicationManager.commands.size() > 0)
+					{
+						OutputMemoryStream packet;
+						packet << ServerMessage::Replication;
+						packet << clientProxy.nextExpectedInputSequenceNumber; //ACK of last received input
+
+						Delivery* delivery = GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumber(packet);
+						delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
+						((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
+						((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
+
+						clientProxy.secondsSinceLastReplication = 0.0f;
+						if (clientProxy.replicationManager.write(packet))
+						{
+							sendPacket(packet, clientProxy.address);
+						}
 					}
 				}
-
 				//Send ping to clients
 				if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
 				{
@@ -344,7 +397,7 @@ void ModuleNetworkingServer::onUpdate()
 				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
 					onConnectionReset(clientProxy.address);
 
-				if (serverSnapshotCounter > 1)
+				if (serverSnapshotCounter > 5)
 				{
 					if (GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
 					serverSnapshotCounter = 0;
@@ -361,26 +414,15 @@ void ModuleNetworkingServer::onUpdate()
 		//Check for TimeOutPackets DeliveryManager
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
-		//Update Tank Players on Server
-		GameManager::getInstance()->AITankControl();
-		GameManager::getInstance()->AllAIPlayerTankVisitAll();
-		GameManager::getInstance()->BulletVisitAll();
-		GameManager::getInstance()->UpdateAllTanks();
-		for (int k = 0; k < AITanksObject->size(); k++)
+		if (GameManager::getInstance()->IsWinning())
 		{
-			AITanksObject->at(k)->tickCount = GetTickCount();
-			AITanksObject->at(k)->position = GameManager::getInstance()->GetPlayerTankPosition((int)AITanksObject->at(k)->networkId);
-			AITanksObject->at(k)->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)AITanksObject->at(k)->networkId);
-			AITanksObject->at(k)->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)AITanksObject->at(k)->networkId);
-			for (int i = 0; i < MAX_CLIENTS; ++i)
-			{
-				if (clientProxies[i].connected)
-				{
-					// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
-					clientProxies[i].replicationManager.update(AITanksObject->at(k)->networkId, ReplicationAction::Update_Position);
-				}
-			}
+			//Update Tank Players on Server
+			GameManager::getInstance()->AITankControl();
+			GameManager::getInstance()->AllAIPlayerTankVisitAll();
+			GameManager::getInstance()->BulletVisitAll();
+			GameManager::getInstance()->UpdateAllTanks();
 		}
+		
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
 

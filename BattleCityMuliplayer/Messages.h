@@ -13,5 +13,7 @@ enum class ServerMessage
 	Unwelcome,
 	Replication,
 	StartGame,
+	StopGame,
+	SnapShot,
 	Ping
 };

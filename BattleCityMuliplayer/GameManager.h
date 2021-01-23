@@ -60,7 +60,6 @@ public:
 		result.x = a.x + f * (b.x - a.x);
 		result.y = a.y + f * (b.y - a.y);
 		return result;
-		//return a + f * (b - a);
 	}
 
 	void UpdateColl(Tank* tank, Bullet* bullet);
@@ -143,6 +142,10 @@ public:
 	int getAwardType();
 	void setAward();
 	void setAward(int type,D3DXVECTOR3 pos);
+	bool IsWinning() { return win; }
+	void SetWinning(bool _win) { win = _win; }
+	int GetFrameSnapshotTick() { return frametick; }
+	void SetFrameSnapshotTick(int _tick) { frametick = _tick; }
 
 	void CreatePlayerTank(UINT32 _networkID, UINT32 _playerID,int level, D3DXVECTOR3 position);
 	void CreateAIPlayerTank(UINT32 _networkID,int level, D3DXVECTOR3 position);
@@ -183,8 +186,10 @@ public:
 
 	deque<std::vector<Tank*>*>* GetLastFrameObjectsInfo() { return lastFrameObjectsInfo; }
 	void AddThisFrameObjects();
+	void ServerSnapShotDeleteBrickID(int _cloneID);
 
 private:
+	int frametick = 0;
 	bool MapMake;
 	int Player;
 	GameManager() {};
@@ -198,6 +203,7 @@ private:
 	int Level;
 	int Grade1;
 	int Grade2;
+	int win;
 	/*Sound* award;
 	Sound* LifeAdd;
 	Sound* boom;*/

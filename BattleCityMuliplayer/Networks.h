@@ -130,10 +130,10 @@ struct InputController
 	float horizontalAxis = 0.0f;
 
 	uint32 tickcount = 0;
-
+	bool shoot;
 	union
 	{
-		ButtonState buttons[9] = {};
+		ButtonState buttons[8] = {};
 		struct
 		{
 			ButtonState actionUp;
@@ -144,7 +144,6 @@ struct InputController
 			ButtonState rightShoulder;
 			ButtonState back;
 			ButtonState start;
-			ButtonState shoot;
 		};
 	};
 };

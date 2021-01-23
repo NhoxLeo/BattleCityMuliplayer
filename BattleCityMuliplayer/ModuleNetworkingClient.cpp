@@ -161,7 +161,38 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 	else if (state == ClientState::Playing)
 	{
 		// TODO(jesus): Handle incoming messages from server
-		if (message == ServerMessage::Replication)
+		if (message == ServerMessage::StopGame)
+		{
+			GameManager::getInstance()->SetWinning(false);
+		}
+		else if (message == ServerMessage::SnapShot)
+		{
+			bool serverSnap = false;
+			packet >> serverSnap;
+			if (serverSnap)
+			{
+				bool Iswinning = true;
+				int grade = 0;
+				bool destroyedBricks = false;
+				packet >> Iswinning;
+				packet >> grade;
+				packet >> destroyedBricks;
+				GameManager::getInstance()->setGrade(1, grade);
+				if (destroyedBricks)
+				{
+					int destroyedBrickSize = 0;
+					packet >> destroyedBrickSize;
+					for (int i = 0; i < destroyedBrickSize; i++)
+					{
+						int cloneID = 0;
+						packet >> cloneID;
+						GameManager::getInstance()->ServerSnapShotDeleteBrickID(cloneID);
+					}
+				}
+				GameManager::getInstance()->SetWinning(Iswinning);
+			}
+		}
+		else if (message == ServerMessage::Replication)
 		{
 			replicationPing = Time.time - lastReplicationTime;
 			lastReplicationTime = Time.time;
@@ -244,10 +275,8 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.tickCount = GetTickCount();
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
+			inputPacketData.shoot = Input.shoot;
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
-			inputPacketData.mouseX = Mouse.x - Window.width / 2;
-			inputPacketData.mouseY = Mouse.y - Window.height / 2;
-			inputPacketData.leftButton = Mouse.buttons[0];
 			// Create packet (if there's input and the input delivery interval exceeded)
 			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
 			{
@@ -261,10 +290,8 @@ void ModuleNetworkingClient::onUpdate()
 					packet << inputPacketData.tickCount;
 					packet << inputPacketData.horizontalAxis;
 					packet << inputPacketData.verticalAxis;
-					packet << inputPacketData.buttonBits;
-					packet << inputPacketData.mouseX;
-					packet << inputPacketData.mouseY;
-					packet << inputPacketData.leftButton;
+					packet << inputPacketData.shoot;
+					//packet << inputPacketData.buttonBits;
 				}
 				// Clear the queue
 				inputDataFront = inputDataBack;
@@ -296,7 +323,7 @@ void ModuleNetworkingClient::onUpdate()
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
 
-		if(Input.buttons[8] == ButtonState::Press) GameManager::getInstance()->CreatePlayerBullet(playerClientGameObject->networkId, playerClientGameObject->position);
+		if(Input.shoot /*Input.buttons[8] == ButtonState::Press*/) GameManager::getInstance()->CreatePlayerBullet(playerClientGameObject->networkId, playerClientGameObject->position);
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)
@@ -369,11 +396,11 @@ void ModuleNetworkingClient::processAllInputs()
 			unpackInputControllerButtons(inputPacketData.buttonBits, input);
 			playerClientGameObject->behaviour->onInput(input);
 
-			//Process Mouse
-			mouse.x = inputPacketData.mouseX;
-			mouse.y = inputPacketData.mouseY;
-			mouse.buttons[0] = (ButtonState)inputPacketData.leftButton;
-			playerClientGameObject->behaviour->onMouse(mouse);
+			////Process Mouse
+			//mouse.x = inputPacketData.mouseX;
+			//mouse.y = inputPacketData.mouseY;
+			//mouse.buttons[0] = (ButtonState)inputPacketData.leftButton;
+			//playerClientGameObject->behaviour->onMouse(mouse);
 		}
 	}
 }

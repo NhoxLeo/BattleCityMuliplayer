@@ -122,44 +122,44 @@ void NetworkScene::LoadUI()
 	}
 	//Player 2
 	{
-		playerSign_R_2 = ActiveSprite::create();
-		playerSign_R_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
-		playerSign_R_2->setRenderRet(14, 28, 56, 0);
-		playerSign_R_2->setPosition(D3DXVECTOR3(564, 375, 0));
-		playerSign_R_2->setRet(Ret(Size(14, 28), playerSign_R_2->getPosition()));
-		addActiveChild(playerSign_R_2);
+		//playerSign_R_2 = ActiveSprite::create();
+		//playerSign_R_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		//playerSign_R_2->setRenderRet(14, 28, 56, 0);
+		//playerSign_R_2->setPosition(D3DXVECTOR3(564, 375, 0));
+		//playerSign_R_2->setRet(Ret(Size(14, 28), playerSign_R_2->getPosition()));
+		//addActiveChild(playerSign_R_2);
 
-		playerSign_T_2 = ActiveSprite::create();
-		playerSign_T_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
-		playerSign_T_2->setRenderRet(14, 28, 56, 0);
-		playerSign_T_2->setPosition(D3DXVECTOR3(500, 17, 0));
-		playerSign_T_2->setRet(Ret(Size(14, 28), playerSign_T_2->getPosition()));
-		addActiveChild(playerSign_T_2);
+		//playerSign_T_2 = ActiveSprite::create();
+		//playerSign_T_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		//playerSign_T_2->setRenderRet(14, 28, 56, 0);
+		//playerSign_T_2->setPosition(D3DXVECTOR3(500, 17, 0));
+		//playerSign_T_2->setRet(Ret(Size(14, 28), playerSign_T_2->getPosition()));
+		//addActiveChild(playerSign_T_2);
 
-		playerIco_2 = ActiveSprite::create();
-		playerIco_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
-		playerIco_2->setRenderRet(14, 14, 14, 0);
-		playerIco_2->setPosition(D3DXVECTOR3(557, 391, 0));
-		playerIco_2->setRet(Ret(Size(14, 14), playerIco_2->getPosition()));
-		addActiveChild(playerIco_2);
+		//playerIco_2 = ActiveSprite::create();
+		//playerIco_2->LoadTexture(_T("../Sprite/misc.bmp"), 84, 14, 1);
+		//playerIco_2->setRenderRet(14, 14, 14, 0);
+		//playerIco_2->setPosition(D3DXVECTOR3(557, 391, 0));
+		//playerIco_2->setRet(Ret(Size(14, 14), playerIco_2->getPosition()));
+		//addActiveChild(playerIco_2);
 
-		//Score
-		for (int i = 0; i < 6; i++)
-		{
-			ActiveSprite* op = ActiveSprite::create();
-			player_2_grade.push_back(op);
-			player_2_grade[i]->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
-			player_2_grade[i]->setRenderRet(14, 14, 0, 0);
-			player_2_grade[i]->setPosition(D3DXVECTOR3(530 + 14 * i, 17, 0));
-			player_2_grade[i]->setRet(Ret(Size(14, 14), player_2_grade[i]->getPosition()));
-			addActiveChild(player_2_grade[i]);
-		}
+		////Score
+		//for (int i = 0; i < 6; i++)
+		//{
+		//	ActiveSprite* op = ActiveSprite::create();
+		//	player_2_grade.push_back(op);
+		//	player_2_grade[i]->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+		//	player_2_grade[i]->setRenderRet(14, 14, 0, 0);
+		//	player_2_grade[i]->setPosition(D3DXVECTOR3(530 + 14 * i, 17, 0));
+		//	player_2_grade[i]->setRet(Ret(Size(14, 14), player_2_grade[i]->getPosition()));
+		//	addActiveChild(player_2_grade[i]);
+		//}
 
-		/*player_2_blood = ActiveSprite::create();
-		player_2_blood->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
-		player_2_blood->setPosition(D3DXVECTOR3(571, 391, 0));
-		player_2_blood->setRet(Ret(Size(14, 14), player_2_blood->getPosition()));
-		addActiveChild(player_2_blood);*/
+		///*player_2_blood = ActiveSprite::create();
+		//player_2_blood->LoadTexture(_T("../Sprite/num.bmp"), 140, 14, 1);
+		//player_2_blood->setPosition(D3DXVECTOR3(571, 391, 0));
+		//player_2_blood->setRet(Ret(Size(14, 14), player_2_blood->getPosition()));
+		//addActiveChild(player_2_blood);*/
 	}
 	//Enemy list
 	for (int i = 0; i < 10; i++)
@@ -347,18 +347,18 @@ void NetworkScene::Update()
 		}
 	}
 
-	/*if (!win)
+	if (!GameManager::getInstance()->IsWinning())
 	{
-		if (GameManager::getInstance()->getMapMake())
+		/*if (GameManager::getInstance()->getMapMake())
 		{
 			MapManager::getInstance()->removeLast();
 			GameManager::getInstance()->changeMapMake();
-		}
+		}*/
 		OverScene* scene = OverScene::create();
 		GameManager::getInstance()->setScene(scene);
-		release();
+		//release();
 		return;
-	}*/
+	}
 }
 
 void NetworkScene::clear()

@@ -28,6 +28,8 @@ bool GameManager::Create(HWND hwnd, HINSTANCE hInstance)
 	Module* a = modGameObject;
 	a->init();
 	lastFrameObjectsInfo = new deque<std::vector<Tank*>*>();
+	win = true;
+	frametick = 0;
 
 	return true;
 }
@@ -210,7 +212,12 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 		bullet->SmallBoom();
 		return;
 	}
-	if (sp1->getType() == 6 || sp1->getType() == 7 || sp1->getType() == 8 || sp1->getType() == 9) nowScene->homeBoom();
+	if (sp1->getType() == 6 || sp1->getType() == 7 || sp1->getType() == 8 || sp1->getType() == 9)
+	{
+		if (modNetServer != nullptr) 
+			win = false;
+		//nowScene->homeBoom();
+	}
 }
 void GameManager::UpdateColl(Award* aw, Tank* tank)
 {
@@ -247,6 +254,18 @@ void GameManager::UpdateColl(Award* aw, Tank* tank)
 				if (!TankArray::getInstance()->getTankArray()[i]->getCamp())
 				{
 					TankArray::getInstance()->getTankArray()[i]->boom();
+
+					//TankArray::getInstance()->removeTank(TankArray::getInstance()->getTankArray()[i]);
+					//TankArray::getInstance()->getTankArray()[i]->release();
+					//if (GameManager::getInstance()->GetModNetServer() != NULL)
+					//{
+					//	GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)TankArray::getInstance()->getTankArray()[i]->getPlayer());
+					//	if (go != nullptr)
+					//	{
+					//		if (!TankArray::getInstance()->getTankArray()[i]->IsPlayer()) GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
+					//		//else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
+					//	}
+					//}
 				}
 			}
 		}
@@ -1558,11 +1577,10 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 			//D3DXVECTOR3 previousPosition = position;
 			D3DXVECTOR3 currentPosition = position;
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
-			//TankArray::getInstance()->GetTank(_networkID)->setSpeed(Speed(speed.x * 3 / lateframes, speed.y * 3 / lateframes));
 			if (speed.x + speed.y != 0)
 			{
-				TankArray::getInstance()->getTankArray().at(i)->setDirection(speed);
 				for (int i = 0; i < lateframes; i++) TankArray::getInstance()->VisitAll(_networkID, CollisionCheckMethod::OneExceptAll);
+				TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
 			}
 			currentPosition = TankArray::getInstance()->getTankArray().at(i)->getPosition();
 			if (!TankArray::getInstance()->getTankArray().at(i)->IsPlayer())
@@ -1752,6 +1770,10 @@ void GameManager::AddThisFrameObjects()
 
 	if (lastFrameObjectsInfo->size() > MAX_LATE_FRAMES - 1) lastFrameObjectsInfo->pop_front();
 	lastFrameObjectsInfo->push_back(thisFrameUserData);
+}
+void GameManager::ServerSnapShotDeleteBrickID(int _cloneID)
+{
+	StaticSpriteArray::getInstance()->removeStaticSpriteWithID(_cloneID);
 }
 void GameManager::CreateClient()
 {
