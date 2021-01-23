@@ -214,7 +214,7 @@ void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 	}
 	if (sp1->getType() == 6 || sp1->getType() == 7 || sp1->getType() == 8 || sp1->getType() == 9)
 	{
-		if (modNetServer != nullptr) 
+		if (modNetServer != nullptr)
 			win = false;
 		//nowScene->homeBoom();
 	}
@@ -1577,7 +1577,7 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 			//D3DXVECTOR3 previousPosition = position;
 			D3DXVECTOR3 currentPosition = position;
 			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
-			if (speed.x + speed.y != 0)
+			if (speed.x + speed.y != 0 && lateframes < MAX_LATE_FRAMES)
 			{
 				for (int i = 0; i < lateframes; i++) TankArray::getInstance()->VisitAll(_networkID, CollisionCheckMethod::OneExceptAll);
 				TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
