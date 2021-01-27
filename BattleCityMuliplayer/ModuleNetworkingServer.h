@@ -66,6 +66,7 @@ private:
 	vector<int>* destroyedBricksID;
 
 	vector<GameObject*>* AITanksObject;
+	int maxAITanks = 12;
 
 public:
 
@@ -80,7 +81,7 @@ public:
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
-	void AITankSpawner(D3DXVECTOR3 position);
+	void AITankSpawner(bool _randomPos,D3DXVECTOR3 _pos);
 	float RandomFloat(float min, float max);
 	void DestroyAINetworkObject(GameObject* gameObject)
 	{ 
@@ -155,6 +156,7 @@ private:
 	float secondsSinceLastPing = 0.0f;
 	float secondsSinceLastServerSnapshot = 0.0f;
 	float serverSnapshotCounter = 0.5f;
+	float AITankSpawnerCounter = 0.0f;
 	
 	float replicationDeliveryIntervalSeconds = REPLICATION_INTERVAL_SECONDS;
 };

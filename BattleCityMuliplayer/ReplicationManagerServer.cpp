@@ -91,24 +91,6 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << false;
 				//packet << go->angle;
 			}
-
-			/*if (GameManager::getInstance()->GetFrameSnapshotTick() > 60)
-			{
-				GameManager::getInstance()->SetFrameSnapshotTick(0);
-				packet << true;
-				packet << GameManager::getInstance()->IsWinning();
-				packet << GameManager::getInstance()->getGrade(1);
-				vector<int>* destroyedBrickIDs = GameManager::getInstance()->GetModNetServer()->getDestroyedBricksID();
-				if (destroyedBrickIDs->size() > 0)
-				{
-					packet << true;
-					packet << destroyedBrickIDs->size();
-					if (destroyedBrickIDs->size() > 0)
-						for (int i = 0; i < destroyedBrickIDs->size(); i++) packet << destroyedBrickIDs->at(i);
-				}
-				else packet << false;
-			}
-			else packet << false;*/
 		}
 		else if ((*it_c).second == ReplicationAction::Server_Snapshot)
 		{
@@ -125,10 +107,12 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			}
 			else packet << false;*/
 
+			vector<StaticSprite*> wallList = StaticSpriteArray::getInstance()->getArray();
+			if (wallList.size() > 0) for (int i = 0; i < wallList.size(); i++) packet << wallList.at(i)->IsEnabled();
 			if (GameManager::getInstance()->GetCurrentMap())
 			{
-				vector<StaticSprite*>* wallList = GameManager::getInstance()->GetCurrentMap()->GetWallArray();
-				if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) packet << wallList->at(i)->IsEnabled();
+				//vector<StaticSprite*>* wallList = GameManager::getInstance()->GetCurrentMap()->GetWallArray();
+				//if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) packet << wallList->at(i)->IsEnabled();
 			}
 		}
 		else if ((*it_c).second == ReplicationAction::Create_Award)

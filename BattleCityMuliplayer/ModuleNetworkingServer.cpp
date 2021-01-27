@@ -42,12 +42,10 @@ void ModuleNetworkingServer::onStart()
 	serverSnapshotCounter = 0.0f;
 	destroyedBricksID = new vector<int>();
 	AITanksObject = new vector<GameObject*>();
+	maxAITanks = 5;
 	GameManager::getInstance()->GetModLinkingContext()->clear();
 
-	for (ClientProxy& var : clientProxies)
-	{
-		var.connected = false;
-	}
+	for (ClientProxy& proxy : clientProxies) proxy.connected = false;
 }
 void ModuleNetworkingServer::onGui()
 {
@@ -133,29 +131,7 @@ void ModuleNetworkingServer::onGui()
 						ImGui::Separator();
 					}
 				}*/
-				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0)
-				{
-					D3DXVECTOR3 enemypos = D3DXVECTOR3(126, 58, 0);
-					switch (rand() % 5)
-					{
-					case 0:
-						enemypos = EnemyPosition1;
-						break;
-					case 1:
-						enemypos = EnemyPosition2;
-						break;
-					case 2:
-						enemypos = EnemyPosition3;
-						break;
-					case 3:
-						enemypos = EnemyPosition4;
-						break;
-					case 4:
-						enemypos = EnemyPosition5;
-						break;
-					}
-					AITankSpawner(enemypos);
-				}
+				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0) AITankSpawner(false, EnemyPosition1);
 				if (ImGui::Button("Create Award"))
 				{
 					GameManager::getInstance()->setAward();
@@ -421,9 +397,6 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					for (int k = 0; k < AITanksObject->size(); k++)
 					{
 						AITanksObject->at(k)->tickCount = GetTickCount();
-						AITanksObject->at(k)->position = GameManager::getInstance()->GetPlayerTankPosition((int)AITanksObject->at(k)->networkId);
-						AITanksObject->at(k)->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)AITanksObject->at(k)->networkId);
-						AITanksObject->at(k)->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)AITanksObject->at(k)->networkId);
 						//for (int i = 0; i < MAX_CLIENTS; ++i)
 						//{
 						//	if (clientProxies[i].connected)
@@ -433,7 +406,6 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						//	}
 						//}
 						proxy->replicationManager.update(AITanksObject->at(k)->networkId, ReplicationAction::Update_Position);
-
 					}
 				}
 			}
@@ -496,6 +468,7 @@ void ModuleNetworkingServer::onUpdate()
 		serverSnapshotCounter += Time.deltaTime;
 		secondsSinceLastPing += Time.deltaTime;
 		secondsSinceLastServerSnapshot += Time.deltaTime;
+		AITankSpawnerCounter += Time.deltaTime;
 		// Replication
 		for (ClientProxy& clientProxy : clientProxies)
 			//for (int i = 0; i < MAX_CLIENTS; ++i)
@@ -564,7 +537,22 @@ void ModuleNetworkingServer::onUpdate()
 		{
 			for (int i = 0; i < MAX_CLIENTS; ++i)
 			{
-				if (clientProxies[i].connected) clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
+				if (clientProxies[i].connected)
+				{
+					//clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
+					vector<bool>* vec = GameManager::getInstance()->GetWallEnabledArray();
+					int arraysize = vec->size();
+					OutputMemoryStream serverSnapshot;
+					serverSnapshot << ServerMessage::Snapshot;
+					serverSnapshot << arraysize;
+					bool check;
+					for (int i = 0; i < vec->size(); i++)
+					{
+						check = vec->at(i);
+						serverSnapshot << check;
+					}
+					sendPacket(serverSnapshot, clientProxies[i].address);
+				}
 			}
 			serverSnapshotCounter = 0;
 		}
@@ -575,6 +563,13 @@ void ModuleNetworkingServer::onUpdate()
 			GameManager::getInstance()->AllAIPlayerTankVisitAll();
 			GameManager::getInstance()->BulletVisitAll();
 			GameManager::getInstance()->UpdateAllTanks();
+			if (AITankSpawnerCounter > 5 && connectedProxies > 0 && maxAITanks > 0 && AITanksObject->size() == 0)
+			{
+				AITankSpawner(true, EnemyPosition1);
+				maxAITanks -= 1;
+			}
+			if (AITankSpawnerCounter > 6) secondsSinceLastServerSnapshot = 0.0f;
+			if (maxAITanks == 0 && AITanksObject->size() == 0) GameManager::getInstance()->SetWinning(false);
 		}
 		GameManager::getInstance()->AddThisFrameObjects();
 
@@ -743,10 +738,32 @@ GameObject* ModuleNetworkingServer::spawnPlayer(ClientProxy& clientProxy)
 //
 //	return gameObject;
 //}
-void ModuleNetworkingServer::AITankSpawner(D3DXVECTOR3 position)
+void ModuleNetworkingServer::AITankSpawner(bool _randomPos, D3DXVECTOR3 _pos)
 {
+	D3DXVECTOR3 enemypos = _pos;
+	if (_randomPos)
+	{
+		switch (rand() % 5)
+		{
+		case 0:
+			enemypos = EnemyPosition1;
+			break;
+		case 1:
+			enemypos = EnemyPosition2;
+			break;
+		case 2:
+			enemypos = EnemyPosition3;
+			break;
+		case 3:
+			enemypos = EnemyPosition4;
+			break;
+		case 4:
+			enemypos = EnemyPosition5;
+			break;
+		}
+	}
 	GameObject* aiTank = Instantiate();
-	aiTank->position = position;
+	aiTank->position = enemypos;
 	aiTank->order = 3;
 	aiTank->isAI = true;
 	aiTank->behaviour = new Player();
@@ -824,7 +841,7 @@ int ModuleNetworkingServer::ClientSize()
 	int num = 0;
 	for (ClientProxy& proxy : clientProxies)
 	{
-		if (proxy.connected) 
+		if (proxy.connected)
 			num += 1;
 	}
 	return num;

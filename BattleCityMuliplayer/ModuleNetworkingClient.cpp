@@ -195,10 +195,19 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			if (clientPrediction && serverReconciliation)
 				processAllInputs();
 		}
-		/*else if (message == ServerMessage::Snapshot)
+		else if (message == ServerMessage::Snapshot)
 		{
-
-		}*/
+			int arraysize;
+			packet >> arraysize;
+			vector<bool>* wallList = new vector<bool>();
+			bool check = true;
+			for (int i = 0; i < arraysize; i++)
+			{
+				packet >> check;
+				wallList->push_back(check);
+			}
+			GameManager::getInstance()->SetWallEnabledArray(wallList);
+		}
 		
 	}
 	

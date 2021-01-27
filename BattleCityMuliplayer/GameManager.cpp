@@ -1461,26 +1461,25 @@ void GameManager::setAward(int type, D3DXVECTOR3 pos)
 vector<bool>* GameManager::GetWallEnabledArray()
 {
 	vector<bool>* walllist = new vector<bool>();
-	if (GameManager::getInstance()->GetCurrentMap())
-	{
-		vector<StaticSprite*>* wallList = getInstance()->GetCurrentMap()->GetWallArray();
-		if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) walllist->push_back(wallList->at(i)->IsEnabled());
-	}
-	else
-	{
-		walllist->push_back(false);
-	}
+	vector<StaticSprite*> wallList = StaticSpriteArray::getInstance()->getArray();
+	if (wallList.size() > 0) for (int i = 0; i < wallList.size(); i++) walllist->push_back(wallList.at(i)->IsEnabled());
 	return walllist;
 }
 
 void GameManager::SetWallEnabledArray(vector<bool>* _list)
 {
+	vector<StaticSprite*> wallList = StaticSpriteArray::getInstance()->getArray();
 	for (int i = 0; i < _list->size(); i++)
 	{
-		if (GameManager::getInstance()->GetCurrentMap())
+		/*if (GameManager::getInstance()->GetCurrentMap())
 		{
 			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetEnabled(_list->at(i));
 			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetShow(_list->at(i));
+		}*/
+		if (i < wallList.size() && wallList.at(i) != NULL)
+		{
+			wallList.at(i)->SetEnabled(_list->at(i));
+			wallList.at(i)->SetShow(_list->at(i));
 		}
 	}
 }

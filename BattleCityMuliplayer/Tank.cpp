@@ -586,6 +586,7 @@ void Tank::directionRenderRet()
 void Tank::setLevel(int level)
 {
 	Level = level;
+	setLife(level);
 	if (level == 2)
 	{
 		//setSpeed(Speed(getSpeed().x * 2, getSpeed().y * 2));

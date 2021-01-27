@@ -133,6 +133,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			/*if (networkId == clientNetworkId) GameManager::getInstance()->GetModNetClient()->disconnect();
 			else */
 			GameManager::getInstance()->DeletePlayerTank(networkId);
+			//GameManager::getInstance()->ReduceLife(networkId);
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{
@@ -159,20 +160,13 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//GameManager::getInstance()->SetWinning(Iswinning);
 			//GameManager::getInstance()->setGrade(1, grade);
 
-			int wallSize = GameManager::getInstance()->GetCurrentMap()->GetWallArray()->size();
-			vector<bool>* walls = new vector<bool>();
-			for (int l = 0; l < 232; l++) walls->push_back(true);
 			bool wallcheck = true;
-			for (int i = 0; i < wallSize; i++)
+			vector<StaticSprite*> wallList = StaticSpriteArray::getInstance()->getArray();
+			for (int i = 0; i < wallList.size(); i++)
 			{
-				wallcheck = true;
 				packet >> wallcheck;
-				walls->at(i) = wallcheck;
-				if (GameManager::getInstance()->GetCurrentMap())
-				{
-					GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetEnabled(walls->at(i));
-					GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetShow(walls->at(i));
-				}
+				wallList.at(i)->SetEnabled(wallcheck);
+				wallList.at(i)->SetShow(wallcheck);
 			}
 		}
 		else if (action == ReplicationAction::Create_Award)
