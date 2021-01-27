@@ -1,5 +1,7 @@
 #include "Networks.h"
 #include "GameManager.h"
+#include "StaticSprite.h"
+#include "Map.h"
 #include "ReplicationManagerServer.h"
 
 void ReplicationManagerServer::create(uint32 networkId)
@@ -112,7 +114,8 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 		{
 			packet << GameManager::getInstance()->IsWinning();
 			packet << GameManager::getInstance()->getGrade(1);
-			vector<int>* destroyedBrickIDs = GameManager::getInstance()->GetModNetServer()->getDestroyedBricksID();
+
+			/*vector<int>* destroyedBrickIDs = GameManager::getInstance()->GetModNetServer()->getDestroyedBricksID();
 			if (destroyedBrickIDs->size() > 0)
 			{
 				packet << true;
@@ -120,7 +123,13 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				if (destroyedBrickIDs->size() > 0)
 					for (int i = 0; i < destroyedBrickIDs->size(); i++) packet << destroyedBrickIDs->at(i);
 			}
-			else packet << false;
+			else packet << false;*/
+
+			if (GameManager::getInstance()->GetCurrentMap())
+			{
+				vector<StaticSprite*>* wallList = GameManager::getInstance()->GetCurrentMap()->GetWallArray();
+				if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) packet << wallList->at(i)->IsEnabled();
+			}
 		}
 		else if ((*it_c).second == ReplicationAction::Create_Award)
 		{

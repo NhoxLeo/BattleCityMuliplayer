@@ -30,6 +30,7 @@ private:
 	bool isDebug;
 	bool isServer = false;
 	bool isClient = false;
+	float StartGameTimer = 0;
 
 	ActiveSprite* flag;
 	ActiveSprite* playerSign_T_1;

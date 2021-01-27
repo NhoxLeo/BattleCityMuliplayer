@@ -46,6 +46,7 @@ bool Map::init()
 	{
 		m_wall[i] = 0;
 	}
+	walls = new vector<StaticSprite*>();
 	return true;
 }
 

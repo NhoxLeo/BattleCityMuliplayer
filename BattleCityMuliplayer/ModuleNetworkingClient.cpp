@@ -146,8 +146,8 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			packet >> playerId;
 			packet >> networkId;
 			LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
-			state = ClientState::Playing;
-			//state = ClientState::Lobby;
+			//state = ClientState::Playing;
+			state = ClientState::Lobby;
 		}
 		else if (message == ServerMessage::Unwelcome)
 		{
@@ -158,39 +158,25 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			disconnect();
 		}
 	}
+	else if (state == ClientState::Lobby)
+	{
+		if (message == ServerMessage::StartGame)
+		{
+			state = ClientState::Playing;
+		}
+		else if (message == ServerMessage::ClientSize)
+		{
+			packet >> numberofPlayers;
+			int a = 1;
+		}
+	}
 	else if (state == ClientState::Playing)
 	{
 		// TODO(jesus): Handle incoming messages from server
 		if (message == ServerMessage::StopGame)
 		{
 			GameManager::getInstance()->SetWinning(false);
-		}
-		else if (message == ServerMessage::SnapShot)
-		{
-			bool serverSnap = false;
-			packet >> serverSnap;
-			if (serverSnap)
-			{
-				bool Iswinning = true;
-				int grade = 0;
-				bool destroyedBricks = false;
-				packet >> Iswinning;
-				packet >> grade;
-				packet >> destroyedBricks;
-				GameManager::getInstance()->setGrade(1, grade);
-				if (destroyedBricks)
-				{
-					int destroyedBrickSize = 0;
-					packet >> destroyedBrickSize;
-					for (int i = 0; i < destroyedBrickSize; i++)
-					{
-						int cloneID = 0;
-						packet >> cloneID;
-						GameManager::getInstance()->ServerSnapShotDeleteBrickID(cloneID);
-					}
-				}
-				GameManager::getInstance()->SetWinning(Iswinning);
-			}
+			state = ClientState::Lobby;
 		}
 		else if (message == ServerMessage::Replication)
 		{
@@ -209,7 +195,13 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			if (clientPrediction && serverReconciliation)
 				processAllInputs();
 		}
+		/*else if (message == ServerMessage::Snapshot)
+		{
+
+		}*/
+		
 	}
+	
 }
 void ModuleNetworkingClient::onUpdate()
 {

@@ -3,6 +3,7 @@
 bool Ref::init()
 {
 	tain = 0;
+	enabled = true;
 	return true;
 }
 
@@ -20,6 +21,16 @@ void Ref::release()
 int Ref::getTain()
 {
 	return tain;
+}
+
+bool Ref::IsEnabled()
+{
+	return enabled;
+}
+
+void Ref::SetEnabled(bool _enabled)
+{
+	enabled = _enabled;
 }
 
 Ref::~Ref()

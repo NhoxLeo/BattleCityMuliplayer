@@ -14,6 +14,8 @@ enum class ServerMessage
 	Replication,
 	StartGame,
 	StopGame,
-	SnapShot,
+	Snapshot,
+	SwitchScene,
+	ClientSize,
 	Ping
 };

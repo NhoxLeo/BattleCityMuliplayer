@@ -31,6 +31,7 @@ bool Sprite::init()
 	ret = Ret(Size(0, 0), D3DXVECTOR3(0, 0, 0));
 	m_position = ret.getPosition();
 	m_Center = D3DXVECTOR3(0, 0, 0);
+	enabled = true;
 	SpriteArray::getInstance()->addSprite(this);
 	return true;
 }

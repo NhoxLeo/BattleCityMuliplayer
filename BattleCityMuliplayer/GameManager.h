@@ -136,6 +136,8 @@ public:
 		}
 	}
 	void setMap();
+	void SetCurrentMap(Map* _map) { currentmap = _map; };
+	Map* GetCurrentMap() { return currentmap; };
 	void changeMapMake() { MapMake = !MapMake; }
 	bool getMapMake() { return MapMake; }
 	D3DXVECTOR3 getAwardPosition();
@@ -146,6 +148,9 @@ public:
 	void SetWinning(bool _win) { win = _win; }
 	int GetFrameSnapshotTick() { return frametick; }
 	void SetFrameSnapshotTick(int _tick) { frametick = _tick; }
+	vector<bool>* GetWallEnabledArray();
+	void SetWallEnabledArray(vector<bool>* _list);
+	void LoadNetworkScene();
 
 	void CreatePlayerTank(UINT32 _networkID, UINT32 _playerID,int level, D3DXVECTOR3 position);
 	void CreateAIPlayerTank(UINT32 _networkID,int level, D3DXVECTOR3 position);
@@ -167,6 +172,7 @@ public:
 	int GetPlayerTankLevel(int _networkID);
 	int GetTanksCount();
 	void AITankControl();
+	void ReduceLife(int _networkID);
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);
@@ -183,6 +189,7 @@ public:
 	DeliveryManager* GetDeliveryManager() { return delManager; }
 	ModuleLinkingContext* GetModLinkingContext() { return modLinkingContext; }
 	ModuleGameObject* GetModGameObject() { return modGameObject; }
+	void NetworkUpdate();
 
 	deque<std::vector<Tank*>*>* GetLastFrameObjectsInfo() { return lastFrameObjectsInfo; }
 	void AddThisFrameObjects();
@@ -204,6 +211,7 @@ private:
 	int Grade1;
 	int Grade2;
 	int win;
+	Map* currentmap;
 	/*Sound* award;
 	Sound* LifeAdd;
 	Sound* boom;*/

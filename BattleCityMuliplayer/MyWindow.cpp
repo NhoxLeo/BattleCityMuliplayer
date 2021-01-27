@@ -345,6 +345,7 @@ void MyWindow::Update(float ElapsedTime)
 
 	MyRender::getInstance()->getDevice()->BeginScene();
 	MyRender::getInstance()->preUpdateGUI();
+	GameManager::getInstance()->NetworkUpdate();
 	GameManager::getInstance()->getScene()->Update();
 	AutoRef::getInstance()->visitAll();
 	ActionManager::getInstance()->Ac();

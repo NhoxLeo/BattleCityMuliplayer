@@ -10,13 +10,15 @@ public:
 	// ModuleNetworkingClient public methods
 	//////////////////////////////////////////////////////////////////////
 
-	void setServerAddress(const char *serverAddress, uint16 serverPort);
+	void setServerAddress(const char* serverAddress, uint16 serverPort);
 
-	void setPlayerInfo(const char *playerName);
+	void setPlayerInfo(const char* playerName);
 
 	GameObject* spawnLaser(GameObject* player);
 
 	uint32 GetNetworkID() { return networkId; }
+
+	int GetNUmberofPlayers() { return numberofPlayers; }
 
 	// Replication Delay
 	float replicationPing = 0.0f;
@@ -40,11 +42,11 @@ private:
 
 	void onGui() override;
 
-	void onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress) override;
+	void onPacketReceived(const InputMemoryStream& packet, const sockaddr_in& fromAddress) override;
 
 	void onUpdate() override;
 
-	void onConnectionReset(const sockaddr_in &fromAddress) override;
+	void onConnectionReset(const sockaddr_in& fromAddress) override;
 
 	void onDisconnect() override;
 
@@ -100,5 +102,7 @@ private:
 	double lastPacketReceivedTime = 0.0f; // NOTE(jesus): Use this to implement client timeout
 	float secondsSinceLastPing = 0.0f;    // NOTE(jesus): Use this to implement ping to server
 	double lastReplicationTime = 0.0f;
+
+	int numberofPlayers = 0;
 };
 

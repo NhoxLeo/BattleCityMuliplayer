@@ -1,6 +1,7 @@
 #include "Networks.h"
 #include "GameManager.h"
 #include "StaticSprite.h"
+#include "Map.h"
 #include "ReplicationManagerClient.h"
 
 void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clientNetworkId)
@@ -40,16 +41,12 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 				Player* script = new Player();
 				script->gameObject = go;
 				script->isServer = false;
-				//script->laser = GameManager::getInstance()->GetModNetClient()->spawnLaser(go);
-				//script->laser->doInterpolation = false;
 				go->behaviour = script;
 			}
 			go->final_position = go->position;
 			go->initial_position = go->position;
 			go->final_rotation = go->rotation;
 			go->initial_rotation = go->rotation;
-			//go->final_angle = go->angle;
-			//go->initial_angle = go->angle;
 
 			if (go->isAI)
 				GameManager::getInstance()->CreateAIPlayerTank(networkId, (int)level, go->position);
@@ -127,6 +124,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//	GameManager::getInstance()->SetWinning(Iswinning);
 			//}
 		}
+		else if (action == ReplicationAction::ReduceLife)
+		{
+
+		}
 		else if (action == ReplicationAction::Destroy)
 		{
 			/*if (networkId == clientNetworkId) GameManager::getInstance()->GetModNetClient()->disconnect();
@@ -135,26 +136,44 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{
+
 			bool Iswinning = true;
 			int grade = 0;
 			bool destroyedBricks = false;
 			packet >> Iswinning;
 			packet >> grade;
-			packet >> destroyedBricks;
-			GameManager::getInstance()->setGrade(1, grade);
-			if (destroyedBricks)
+
+			//packet >> destroyedBricks;
+			//if (destroyedBricks)
+			//{
+			//	int destroyedBrickSize = 0;
+			//	packet >> destroyedBrickSize;
+			//	for (int i = 0; i < destroyedBrickSize; i++)
+			//	{
+			//		int cloneID = 0;
+			//		packet >> cloneID;
+			//		//destroyedBrickArray->push_back(cloneID);
+			//		StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
+			//	}
+			//}
+			//GameManager::getInstance()->SetWinning(Iswinning);
+			//GameManager::getInstance()->setGrade(1, grade);
+
+			int wallSize = GameManager::getInstance()->GetCurrentMap()->GetWallArray()->size();
+			vector<bool>* walls = new vector<bool>();
+			for (int l = 0; l < 232; l++) walls->push_back(true);
+			bool wallcheck = true;
+			for (int i = 0; i < wallSize; i++)
 			{
-				int destroyedBrickSize = 0;
-				packet >> destroyedBrickSize;
-				for (int i = 0; i < destroyedBrickSize; i++)
+				wallcheck = true;
+				packet >> wallcheck;
+				walls->at(i) = wallcheck;
+				if (GameManager::getInstance()->GetCurrentMap())
 				{
-					int cloneID = 0;
-					packet >> cloneID;
-					//destroyedBrickArray->push_back(cloneID);
-					StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
+					GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetEnabled(walls->at(i));
+					GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetShow(walls->at(i));
 				}
 			}
-			GameManager::getInstance()->SetWinning(Iswinning);
 		}
 		else if (action == ReplicationAction::Create_Award)
 		{

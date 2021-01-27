@@ -12,6 +12,7 @@
 //#include "Sound.h"
 #include "Texture.h"
 #include "Networks.h"
+#include "NetworkScene.h"
 
 UINT GameManager::nowclick1 = 0;
 UINT GameManager::nowclick2 = 0;
@@ -187,36 +188,45 @@ void GameManager::UpdateColl(Bullet* bullet1, Bullet* bullet2)
 }
 void GameManager::UpdateColl(StaticSprite* sp1, Bullet* bullet)
 {
-	if (sp1->getType() == 1)
+	if (sp1->IsEnabled())
 	{
-		if (bullet->getLevel() == 4)
+		if (sp1->getType() == 1)
 		{
-			sp1->release();
+			if (bullet->getLevel() == 4)
+			{
+				//sp1->release();
+				sp1->SetEnabled(false);
+				sp1->SetShow(false);
+				bullet->SmallBoom();
+				return;
+			}
+			else
+			{
+				//sp1->release();
+				sp1->SetEnabled(false);
+				sp1->SetShow(false);
+				bullet->SmallBoom();
+				if (modNetServer != nullptr) modNetServer->AddDestroyedBrickID(sp1->getID());
+				return;
+			}
+		}
+		if (sp1->getType() == 2)
+		{
+			if (bullet->getLevel() == 4)
+			{
+				//sp1->release();
+				sp1->SetEnabled(false);
+				sp1->SetShow(false);
+			}
 			bullet->SmallBoom();
 			return;
 		}
-		else
+		if (sp1->getType() == 6 || sp1->getType() == 7 || sp1->getType() == 8 || sp1->getType() == 9)
 		{
-			sp1->release();
-			bullet->SmallBoom();
-			if (modNetServer != nullptr) modNetServer->AddDestroyedBrickID(sp1->getID());
-			return;
+			if (modNetServer != nullptr)
+				win = false;
+			//nowScene->homeBoom();
 		}
-	}
-	if (sp1->getType() == 2)
-	{
-		if (bullet->getLevel() == 4)
-		{
-			sp1->release();
-		}
-		bullet->SmallBoom();
-		return;
-	}
-	if (sp1->getType() == 6 || sp1->getType() == 7 || sp1->getType() == 8 || sp1->getType() == 9)
-	{
-		if (modNetServer != nullptr)
-			win = false;
-		//nowScene->homeBoom();
 	}
 }
 void GameManager::UpdateColl(Award* aw, Tank* tank)
@@ -1448,6 +1458,42 @@ void GameManager::setAward(int type, D3DXVECTOR3 pos)
 	nowScene->getAward()->setPosition(pos);
 }
 
+vector<bool>* GameManager::GetWallEnabledArray()
+{
+	vector<bool>* walllist = new vector<bool>();
+	if (GameManager::getInstance()->GetCurrentMap())
+	{
+		vector<StaticSprite*>* wallList = getInstance()->GetCurrentMap()->GetWallArray();
+		if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) walllist->push_back(wallList->at(i)->IsEnabled());
+	}
+	else
+	{
+		walllist->push_back(false);
+	}
+	return walllist;
+}
+
+void GameManager::SetWallEnabledArray(vector<bool>* _list)
+{
+	for (int i = 0; i < _list->size(); i++)
+	{
+		if (GameManager::getInstance()->GetCurrentMap())
+		{
+			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetEnabled(_list->at(i));
+			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetShow(_list->at(i));
+		}
+	}
+}
+
+void GameManager::LoadNetworkScene()
+{
+	GameManager::getInstance()->setPlayer(1);
+	NetworkScene* scene = NetworkScene::create();
+	//GameManager::getInstance()->getScene()->release();
+	GameManager::getInstance()->setScene(scene);
+	return;
+}
+
 void GameManager::CreatePlayerTank(UINT32 _networkID, UINT32 _playerID, int level, D3DXVECTOR3 position)
 {
 	if (TankArray::getInstance()->GetTank((int)_networkID) != NULL) return;
@@ -1568,25 +1614,31 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 {
 	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
 	{
-		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		Tank* currentTank = TankArray::getInstance()->getTankArray().at(i);
+		if (currentTank->getPlayer() == (int)_networkID)
 		{
-			if (rotation.x + rotation.y != 0) TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
+			if (rotation.x + rotation.y != 0) currentTank->setDirection(rotation);
 
-			D3DXVECTOR3 previousPosition = TankArray::getInstance()->getTankArray().at(i)->getPosition();
-			TankArray::getInstance()->getTankArray().at(i)->setPosition(position);
-			//D3DXVECTOR3 previousPosition = position;
+			D3DXVECTOR3 previousPosition = currentTank->getPosition();
+			currentTank->setPosition(position);
 			D3DXVECTOR3 currentPosition = position;
-			TankArray::getInstance()->getTankArray().at(i)->setSpeed(Speed(speed.x, speed.y));
-			if (speed.x + speed.y != 0 && lateframes < MAX_LATE_FRAMES)
+			currentTank->setSpeed(Speed(speed.x, speed.y));
+			if (speed.x + speed.y != 0)
 			{
-				for (int i = 0; i < lateframes; i++) TankArray::getInstance()->VisitAll(_networkID, CollisionCheckMethod::OneExceptAll);
-				TankArray::getInstance()->getTankArray().at(i)->setDirection(rotation);
+				if (lateframes > 0 && lateframes < MAX_LATE_FRAMES)
+				{
+					for (int i = 0; i < lateframes; i++) TankArray::getInstance()->VisitAll(_networkID, CollisionCheckMethod::OneExceptAll);
+					currentTank->setDirection(rotation);
+				}
+				else
+				{
+					currentTank->setPosition(position);
+				}
 			}
-			currentPosition = TankArray::getInstance()->getTankArray().at(i)->getPosition();
-			if (!TankArray::getInstance()->getTankArray().at(i)->IsPlayer())
-				TankArray::getInstance()->getTankArray().at(i)->setPosition(currentPosition);
-			else TankArray::getInstance()->getTankArray().at(i)->setPosition(previousPosition);
-			TankArray::getInstance()->getTankArray().at(i)->SetCurrentPosition(currentPosition);
+			currentPosition = currentTank->getPosition();
+			if (!currentTank->IsPlayer()) currentTank->setPosition(currentPosition);
+			else currentTank->setPosition(previousPosition);
+			currentTank->SetCurrentPosition(currentPosition);
 		}
 	}
 }
@@ -1689,6 +1741,22 @@ void GameManager::AITankControl()
 		}
 	}
 }
+void GameManager::ReduceLife(int _networkID)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		Tank* currentTank = TankArray::getInstance()->getTankArray().at(i);
+		if (currentTank->getPlayer() == (int)_networkID)
+		{
+			currentTank->setLife(currentTank->getLife() - 1);
+			if (currentTank->getLife() == 0)
+			{
+				TankArray::getInstance()->removeTank(currentTank);
+				currentTank->release();
+			}
+		}
+	}
+}
 Bullet* GameManager::CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position)
 {
 	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
@@ -1746,6 +1814,76 @@ void GameManager::DeleteServer()
 void GameManager::DeleteClient()
 {
 	modNetClient = nullptr;
+}
+void GameManager::NetworkUpdate()
+{
+	static int localServerPort = 8888;
+	if (GameManager::getInstance()->GetModNetServer() == nullptr && GameManager::getInstance()->GetModNetClient() == nullptr)
+	{
+		//GameManager::getInstance()->GetModLinkingContext()->clear();
+		//TankArray::getInstance()->removeAllTank();
+
+		ImGui::Begin("Main Menu");
+		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+		ImGui::Spacing();
+		ImGui::Text("Server");
+		ImGui::InputInt("Server port", &localServerPort);
+		if (ImGui::Button("Start server"))
+		{
+			GameManager::getInstance()->CreateServer();
+			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
+			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
+			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+			modNetServerptr->start();
+		}
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+		ImGui::Text("Client");
+		static char serverAddressStr[64] = "127.0.0.1";
+		ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
+		static int remoteServerPort = 8888;
+		ImGui::InputInt("Server port", &remoteServerPort);
+		static char playerNameStr[64] = "Player";
+		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
+		static bool showInvalidUserName = false;
+		if (ImGui::Button("Connect to server"))
+		{
+			GameManager::getInstance()->CreateClient();
+			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
+			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
+			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
+			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+			if (modNetClientptr->needsStart())
+			{
+				modNetClientptr->updateEnabledState();
+				if (modNetClientptr->start() == false);
+			}
+		}
+		ImGui::PopItemWidth();
+		ImGui::End();
+	}
+	if (GameManager::getInstance()->GetModNetServer())
+	{
+		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+		modNetServerptr->preUpdate();
+		modNetServerptr->update();
+		modNetServerptr->gui();
+	}
+	if (GameManager::getInstance()->GetModNetClient())
+	{
+		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+		modNetClientptr->preUpdate();
+		modNetClientptr->update();
+		modNetClientptr->gui();
+		if (modNetClientptr->needsStop())
+		{
+			modNetClientptr->cleanUp();
+			modNetClientptr->stop();
+			delete[] modNetClientptr;
+			GameManager::getInstance()->DeleteClient();
+		}
+	}
 }
 void GameManager::AddThisFrameObjects()
 {

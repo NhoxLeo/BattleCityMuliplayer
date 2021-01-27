@@ -23,21 +23,7 @@ public:
 	
 	void LoadMap(GameScene* scene,int Number);
 	~MapManager();
-	/********************************************************
-		*  @brief    :	得到所有地图
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	vector<Map*> getMapArray(){ return MapArray; }
-	/********************************************************
-		*  @brief    :	删掉玩家新建地图
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	void removeLast();
 };
 
@@ -45,49 +31,17 @@ public:
 class Map:public Ref
 {
 	int m_wall[676];
+	vector<StaticSprite*>* walls;
 public:
 	CREATE_FUNC(Map);
-	/********************************************************
-		*  @brief    :	得到当前地图的数据
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	int* getMap(){ return m_wall; }
-	/********************************************************
-		*  @brief    :	初始化该地图
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	bool init();
-	/********************************************************
-		*  @brief    :	设置地图数据
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	void setMap(int wall[]);
-	/********************************************************
-		*  @brief    :	把地图加载到场景上
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	void LoadToScene(GameScene* scene);
-	/********************************************************
-		*  @brief    :	修改地图
-		*  @input	 :
-		*  @output	 :
-		*  @return   :  
-		*  @author   :	Alex
-		********************************************************/
 	void fixMap(int position, int type);
 	void copyTo(int wall[][26]);//未使用
+	void PushWallArray(StaticSprite* sp) { walls->push_back(sp); };
+	vector<StaticSprite*>* GetWallArray() { return walls; }
 };
 
 #endif

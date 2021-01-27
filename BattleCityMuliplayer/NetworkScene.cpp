@@ -25,9 +25,9 @@ bool NetworkScene::init()
 	MyTank1->setPlayer(1);
 	MyTank1->setCamp(true);
 	MyTank1->setPosition(D3DXVECTOR3(272, 444, 0));
-	addActiveChild(MyTank1);
+	addActiveChild(MyTank1);*/
 
-	MyTank2 = Tank::create();
+	/*MyTank2 = Tank::create();
 	MyTank2->setPlayer(2);
 	MyTank2->setCamp(true);
 	MyTank2->setPosition(D3DXVECTOR3(126, 58, 0));
@@ -48,6 +48,7 @@ bool NetworkScene::init()
 		files.push_back(tempFile);
 	}*/
 
+	StartGameTimer = 0;
 	win = true;
 	return true;
 }
@@ -210,9 +211,9 @@ void NetworkScene::Update()
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank1->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
 	if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON) MyTank1->fire();
 	TankArray::getInstance()->VisitAll();
-	BulletArray::getInstance()->VisitAll();
+	BulletArray::getInstance()->VisitAll();*/
 
-	MyTank2->Update();
+	/*MyTank2->Update();
 	MyTank2->setSpeed(Speed(0, 0));
 	MyTank2->setSpeed(Speed(Input.horizontalAxis, -Input.verticalAxis));
 	if (Input.horizontalAxis != 0 || Input.verticalAxis != 0) MyTank2->setDirection(D3DXVECTOR3(Input.horizontalAxis, -Input.verticalAxis, 0));
@@ -220,73 +221,81 @@ void NetworkScene::Update()
 	TankArray::getInstance()->VisitAll();
 	BulletArray::getInstance()->VisitAll();*/
 
-	static int localServerPort = 8888;
-	if (GameManager::getInstance()->GetModNetServer() == nullptr && GameManager::getInstance()->GetModNetClient() == nullptr)
+	/*if (GameManager::getInstance()->getClick2() == SPACEBUTTON_ON)
 	{
-		//GameManager::getInstance()->GetModLinkingContext()->clear();
-		//TankArray::getInstance()->removeAllTank();
+		for (int i = 0; i < 232; i++)
+		{
+			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetEnabled(false);
+			GameManager::getInstance()->GetCurrentMap()->GetWallArray()->at(i)->SetShow(false);
+		}
+	}*/
 
-		ImGui::Begin("Main Menu");
-		ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
-		ImGui::Spacing();
-		ImGui::Text("Server");
-		ImGui::InputInt("Server port", &localServerPort);
-		if (ImGui::Button("Start server"))
-		{
-			GameManager::getInstance()->CreateServer();
-			GameManager::getInstance()->GetModNetServer()->setEnabled(true);
-			GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
-			Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
-			modNetServerptr->start();
-		}
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Spacing();
-		ImGui::Text("Client");
-		static char serverAddressStr[64] = "127.0.0.1";
-		ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
-		static int remoteServerPort = 8888;
-		ImGui::InputInt("Server port", &remoteServerPort);
-		static char playerNameStr[64] = "Player";
-		ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
-		static bool showInvalidUserName = false;
-		if (ImGui::Button("Connect to server"))
-		{
-			GameManager::getInstance()->CreateClient();
-			GameManager::getInstance()->GetModNetClient()->setEnabled(true);
-			GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
-			GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
-			Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-			if (modNetClientptr->needsStart())
-			{
-				modNetClientptr->updateEnabledState();
-				if (modNetClientptr->start() == false);
-			}
-		}
-		ImGui::PopItemWidth();
-		ImGui::End();
-	}
-	if (GameManager::getInstance()->GetModNetServer())
-	{
-		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
-		modNetServerptr->preUpdate();
-		modNetServerptr->update();
-		modNetServerptr->gui();
-	}
-	if (GameManager::getInstance()->GetModNetClient())
-	{
-		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
-		modNetClientptr->preUpdate();
-		modNetClientptr->update();
-		modNetClientptr->gui();
-		if (modNetClientptr->needsStop())
-		{
-			modNetClientptr->cleanUp();
-			modNetClientptr->stop();
-			delete[] modNetClientptr;
-			GameManager::getInstance()->DeleteClient();
-		}
-	}
+	//static int localServerPort = 8888;
+	//if (GameManager::getInstance()->GetModNetServer() == nullptr && GameManager::getInstance()->GetModNetClient() == nullptr)
+	//{
+	//	//GameManager::getInstance()->GetModLinkingContext()->clear();
+	//	//TankArray::getInstance()->removeAllTank();
+	//	ImGui::Begin("Main Menu");
+	//	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.45f);
+	//	ImGui::Spacing();
+	//	ImGui::Text("Server");
+	//	ImGui::InputInt("Server port", &localServerPort);
+	//	if (ImGui::Button("Start server"))
+	//	{
+	//		GameManager::getInstance()->CreateServer();
+	//		GameManager::getInstance()->GetModNetServer()->setEnabled(true);
+	//		GameManager::getInstance()->GetModNetServer()->setListenPort(8888);
+	//		Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+	//		modNetServerptr->start();
+	//	}
+	//	ImGui::Spacing();
+	//	ImGui::Separator();
+	//	ImGui::Spacing();
+	//	ImGui::Text("Client");
+	//	static char serverAddressStr[64] = "127.0.0.1";
+	//	ImGui::InputText("Server address", serverAddressStr, sizeof(serverAddressStr));
+	//	static int remoteServerPort = 8888;
+	//	ImGui::InputInt("Server port", &remoteServerPort);
+	//	static char playerNameStr[64] = "Player";
+	//	ImGui::InputText("Player name", playerNameStr, sizeof(playerNameStr));
+	//	static bool showInvalidUserName = false;
+	//	if (ImGui::Button("Connect to server"))
+	//	{
+	//		GameManager::getInstance()->CreateClient();
+	//		GameManager::getInstance()->GetModNetClient()->setEnabled(true);
+	//		GameManager::getInstance()->GetModNetClient()->setServerAddress(serverAddressStr, remoteServerPort);
+	//		GameManager::getInstance()->GetModNetClient()->setPlayerInfo(playerNameStr);
+	//		Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+	//		if (modNetClientptr->needsStart())
+	//		{
+	//			modNetClientptr->updateEnabledState();
+	//			if (modNetClientptr->start() == false);
+	//		}
+	//	}
+	//	ImGui::PopItemWidth();
+	//	ImGui::End();
+	//}
+	//if (GameManager::getInstance()->GetModNetServer())
+	//{
+	//	Module* modNetServerptr = GameManager::getInstance()->GetModNetServer();
+	//	modNetServerptr->preUpdate();
+	//	modNetServerptr->update();
+	//	modNetServerptr->gui();
+	//}
+	//if (GameManager::getInstance()->GetModNetClient())
+	//{
+	//	Module* modNetClientptr = GameManager::getInstance()->GetModNetClient();
+	//	modNetClientptr->preUpdate();
+	//	modNetClientptr->update();
+	//	modNetClientptr->gui();
+	//	if (modNetClientptr->needsStop())
+	//	{
+	//		modNetClientptr->cleanUp();
+	//		modNetClientptr->stop();
+	//		delete[] modNetClientptr;
+	//		GameManager::getInstance()->DeleteClient();
+	//	}
+	//}
 
 	if (isDebug == true)
 	{
@@ -347,6 +356,14 @@ void NetworkScene::Update()
 		}
 	}
 
+
+	if (StartGameTimer > 5.0f && StartGameTimer < 6.0f && GameManager::getInstance()->GetModNetServer() != nullptr)
+	{
+		GameManager::getInstance()->GetModNetServer()->StartGameServerSide();
+		StartGameTimer = 7.0f;
+	}
+	else if (StartGameTimer <= 5.0f) StartGameTimer += Time.deltaTime;
+
 	if (!GameManager::getInstance()->IsWinning())
 	{
 		/*if (GameManager::getInstance()->getMapMake())
@@ -397,6 +414,7 @@ void NetworkScene::LoadMap()
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 9, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 	nowmap->setMap(mapArray1);
+	GameManager::getInstance()->SetCurrentMap(nowmap);
 
 	D3DXVECTOR3 SpritePosition = D3DXVECTOR3(120, 52, 0);
 	for (int i = 0; i < 26; i++)
@@ -412,6 +430,7 @@ void NetworkScene::LoadMap()
 				sp->setPosition(SpritePosition);
 				sp->setRet(Ret(Size(16, 16), sp->getPosition()));
 				if (nowmap->getMap()[i * 26 + k] == 6 || nowmap->getMap()[i * 26 + k] == 7 || nowmap->getMap()[i * 26 + k] == 8 || nowmap->getMap()[i * 26 + k] == 9) home.push_back(sp);
+				nowmap->PushWallArray(sp);
 			}
 			SpritePosition += D3DXVECTOR3(16, 0, 0);
 		}

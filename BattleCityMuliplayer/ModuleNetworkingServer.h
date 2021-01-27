@@ -93,6 +93,9 @@ public:
 		destroyNetworkObject(gameObject);
 	}
 	void CreateAwardEvent();
+	void StartGameServerSide();
+	int ClientSize();
+	void SwitchScene(int _sceneID);
 
 	float initialZombieSpawnRatio = 5.0;
 	float guiFinalZombieSpawnRatio = 0;
@@ -140,7 +143,9 @@ private:
 	enum class ServerState
 	{
 		Stopped,
-		Listening
+		Lobby,
+		Listening,
+		Synchronizing
 	};
 
 	ServerState state = ServerState::Stopped;
@@ -148,6 +153,7 @@ private:
 	uint16 listenPort = 0;
 
 	float secondsSinceLastPing = 0.0f;
+	float secondsSinceLastServerSnapshot = 0.0f;
 	float serverSnapshotCounter = 0.5f;
 	
 	float replicationDeliveryIntervalSeconds = REPLICATION_INTERVAL_SECONDS;

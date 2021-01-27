@@ -184,13 +184,16 @@ void TankArray::VisitAll()
 			//Tank vs wall, brick, items.
 			for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
 			{
-				if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+				if (StaticSpriteArray::getInstance()->getArray()[k]->IsEnabled())
 				{
-					if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
-						&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
 					{
-						x = false;
-						break;
+						if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
+							&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+						{
+							x = false;
+							break;
+						}
 					}
 				}
 			}
@@ -261,13 +264,16 @@ void TankArray::VisitAll(int _networkID, CollisionCheckMethod method)
 				//Tank vs wall, brick, items.
 				for (int k = 0; k < StaticSpriteArray::getInstance()->getStaticSpriteNumber(); k++)
 				{
-					if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
+					if (StaticSpriteArray::getInstance()->getArray()[k]->IsEnabled())
 					{
-						if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
-							&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+						if (m_Ret.Collision(TankSpeed, Tankarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
 						{
-							x = false;
-							break;
+							if (StaticSpriteArray::getInstance()->getArray()[k]->getType() != 3
+								&& StaticSpriteArray::getInstance()->getArray()[k]->getType() != 5)
+							{
+								x = false;
+								break;
+							}
 						}
 					}
 				}

@@ -34,7 +34,8 @@ void ModuleNetworkingServer::onStart()
 		return;
 	}
 
-	state = ServerState::Listening;
+	//state = ServerState::Listening;
+	state = ServerState::Lobby;
 	GameManager::getInstance()->GetModGameObject()->interpolateEntities = false;
 
 	secondsSinceLastPing = 0.0f;
@@ -43,7 +44,7 @@ void ModuleNetworkingServer::onStart()
 	AITanksObject = new vector<GameObject*>();
 	GameManager::getInstance()->GetModLinkingContext()->clear();
 
-	for (ClientProxy var : clientProxies)
+	for (ClientProxy& var : clientProxies)
 	{
 		var.connected = false;
 	}
@@ -71,10 +72,49 @@ void ModuleNetworkingServer::onGui()
 
 			ImGui::Separator();
 
-			if (state == ServerState::Listening)
+			if (state == ServerState::Lobby || state == ServerState::Listening)
 			{
-				int count = 0;
+				if (ImGui::Button("Start Game"))
+				{
+					state = ServerState::Listening;
+					// Notify all client proxies' replication manager to create the object remotely
+					for (int i = 0; i < MAX_CLIENTS; ++i)
+					{
+						if (clientProxies[i].connected)
+						{
+							OutputMemoryStream packet;
+							packet << ServerMessage::StartGame;
+							sendPacket(packet, clientProxies[i].address);
 
+							// Send all network objects to the new player
+							uint16 networkGameObjectsCount;
+							GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+							GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+							// Notify the new client proxy's replication manager about the creation of other game objects
+							for (uint16 k = 0; k < networkGameObjectsCount; ++k)
+								clientProxies[i].replicationManager.create(networkGameObjects[k]->networkId);
+							// Notify all client proxies' replication manager to create the object remotely
+							for (int l = 0; l < MAX_CLIENTS; ++l)
+							{
+								if (clientProxies[l].connected && clientProxies[l].gameObject->networkId != clientProxies[i].gameObject->networkId)
+									clientProxies[l].replicationManager.create(clientProxies[i].gameObject->networkId);
+							}
+							D3DXVECTOR3 playerpos = D3DXVECTOR3(126, 58, 0);
+							switch (clientProxies[i].clientId % 2)
+							{
+							case 0:
+								playerpos = PlayerPosition;
+								break;
+							case 1:
+								playerpos = PlayerPosition1;
+								break;
+							}
+							clientProxies[i].gameObject->position = playerpos;
+							GameManager::getInstance()->CreatePlayerTank(clientProxies[i].gameObject->networkId, clientProxies[i].clientId, 1, clientProxies[i].gameObject->position);
+						}
+					}
+				}
+				int count = 0;
 				/*for (int i = 0; i < MAX_CLIENTS; ++i)
 				{
 					if (clientProxies[i].name != "")
@@ -93,8 +133,6 @@ void ModuleNetworkingServer::onGui()
 						ImGui::Separator();
 					}
 				}*/
-
-				GameObject* a = GameManager::getInstance()->GetModGameObject()->gameObjects;
 				if (ImGui::Button("Spawn AI") && GameManager::getInstance()->GetTanksCount() > 0)
 				{
 					D3DXVECTOR3 enemypos = D3DXVECTOR3(126, 58, 0);
@@ -124,63 +162,16 @@ void ModuleNetworkingServer::onGui()
 					for (ClientProxy& clientProxy : clientProxies)
 						if (clientProxy.connected) clientProxy.replicationManager.CreateAward(clientProxy.gameObject->networkId);
 				}
-				if (ImGui::Button("Start Game"))
+				if (ImGui::Button("Server Snapshot"))
 				{
-					// Notify all client proxies' replication manager to create the object remotely
 					for (int i = 0; i < MAX_CLIENTS; ++i)
 					{
 						if (clientProxies[i].connected)
 						{
-							// Send all network objects to the new player
-							uint16 networkGameObjectsCount;
-							GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
-							GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-							// Notify the new client proxy's replication manager about the creation of other game objects
-							for (uint16 k = 0; k < networkGameObjectsCount; ++k)
-								clientProxies[i].replicationManager.create(networkGameObjects[k]->networkId);
-							// Notify all client proxies' replication manager to create the object remotely
-							for (int l = 0; l < MAX_CLIENTS; ++l)
-								if (clientProxies[l].connected && clientProxies[l].gameObject->networkId != clientProxies[i].gameObject->networkId)
-									clientProxies[l].replicationManager.create(clientProxies[i].gameObject->networkId);
-
-							D3DXVECTOR3 playerpos = D3DXVECTOR3(126, 58, 0);
-							switch (clientProxies[i].clientId % 2)
-							{
-							case 0:
-								playerpos = PlayerPosition;
-								break;
-							case 1:
-								playerpos = PlayerPosition1;
-								break;
-							}
-							clientProxies[i].gameObject->position = playerpos;
-							GameManager::getInstance()->CreatePlayerTank(clientProxies[i].gameObject->networkId, clientProxies[i].clientId, 1, clientProxies[i].gameObject->position);
+							// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+							clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
 						}
 					}
-				}
-				if (ImGui::Button("Server Snapshot"))
-				{
-					/*for (ClientProxy& clientProxy : clientProxies)
-					{
-						if (clientProxy.connected)
-						{
-							GameManager::getInstance()->SetFrameSnapshotTick(0);
-							OutputMemoryStream packet;
-							packet << true;
-							packet << GameManager::getInstance()->IsWinning();
-							packet << GameManager::getInstance()->getGrade(1);
-							if (destroyedBricksID->size() > 0)
-							{
-								packet << true;
-								packet << destroyedBricksID->size();
-								if (destroyedBricksID->size() > 0) for (int i = 0; i < destroyedBricksID->size(); i++) packet << destroyedBricksID->at(i);
-							}
-							else packet << false;
-							if (clientProxy.replicationManager.write(packet))
-								sendPacket(packet, clientProxy.address);
-						}
-					}*/
-					for(ClientProxy clientProxy : clientProxies) if (clientProxy.connected && GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
 				}
 			}
 		}
@@ -188,15 +179,122 @@ void ModuleNetworkingServer::onGui()
 }
 void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, const sockaddr_in& fromAddress)
 {
-	if (state == ServerState::Listening)
+	if (state == ServerState::Lobby)
 	{
 		// Register player
 		ClientProxy* proxy = getClientProxy(fromAddress);
-
 		// Read the packet type
 		ClientMessage message;
 		packet >> message;
+		// Process the packet depending on its type
+		if (message == ClientMessage::Hello)
+		{
+			bool newClient = false;
+			if (proxy == nullptr)
+			{
+				newClient = true;
+				std::string playerName;
+				packet >> playerName;
+				bool usedName = false, firstClientconnected = false, secondClientconnected = false;
+				for (int i = 0; i < MAX_CLIENTS; ++i)
+				{
+					/*if (clientProxies[i].name == playerName)
+					{
+						usedName = true;
+						break;
+					}*/
+					if (clientProxies[i].connected == true && (int)clientProxies[i].clientId == 0) firstClientconnected = true;
+					if (clientProxies[i].connected == true && (int)clientProxies[i].clientId == 1) secondClientconnected = true;
+					if (firstClientconnected && secondClientconnected) break;
+				}
+				if (/*usedName*/ firstClientconnected && secondClientconnected)
+				{
+					OutputMemoryStream unwelcomePacket;
+					unwelcomePacket << ServerMessage::Unwelcome;
+					std::string errorMsg = "Player Name already in use";
+					unwelcomePacket << errorMsg;
+					sendPacket(unwelcomePacket, fromAddress);
 
+					WLOG("Message received: UNWELCOMED hello - from player %s", playerName.c_str());
+				}
+				else
+				{
+					proxy = createClientProxy();
+					connectedProxies++;
+					proxy->address.sin_family = fromAddress.sin_family;
+					proxy->address.sin_addr.S_un.S_addr = fromAddress.sin_addr.S_un.S_addr;
+					proxy->address.sin_port = fromAddress.sin_port;
+					proxy->connected = true;
+					proxy->name = playerName;
+					if (!firstClientconnected) proxy->clientId = 0;
+					else
+					{
+						if (!secondClientconnected) proxy->clientId = 1;
+						else proxy->clientId = nextClientId++;
+					}
+
+					// Create a new game object with the player properties
+					proxy->gameObject = Instantiate();
+					proxy->gameObject->position = D3DXVECTOR3(272, 444, 0);
+					//proxy->gameObject->size = { 43, 49 };
+					proxy->gameObject->angle = 45.0f;
+					proxy->gameObject->order = 3;
+					proxy->gameObject->isAI = false;
+					proxy->gameObject->name = proxy->name;
+					// Create behaviour
+					proxy->gameObject->behaviour = new Player;
+					proxy->gameObject->behaviour->gameObject = proxy->gameObject;
+					// Assign a new network identity to the object
+					GameManager::getInstance()->GetModLinkingContext()->registerNetworkGameObject(proxy->gameObject);
+
+					// Send welcome to the new player
+					OutputMemoryStream welcomePacket;
+					welcomePacket << ServerMessage::Welcome;
+					welcomePacket << proxy->clientId;
+					welcomePacket << proxy->gameObject->networkId;
+					sendPacket(welcomePacket, fromAddress);
+
+					//// Send all network objects to the new player
+					//uint16 networkGameObjectsCount;
+					//GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+					//GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					//// Notify the new client proxy's replication manager about the creation of other game objects
+					//for (uint16 i = 0; i < networkGameObjectsCount; ++i)  proxy->replicationManager.create(networkGameObjects[i]->networkId);
+					//// Notify all client proxies' replication manager to create the object remotely
+					//for (int i = 0; i < MAX_CLIENTS; ++i)
+					//	if (clientProxies[i].connected && clientProxies[i].gameObject->networkId != proxy->gameObject->networkId) clientProxies[i].replicationManager.create(proxy->gameObject->networkId);
+					//GameManager::getInstance()->CreatePlayerTank(proxy->gameObject->networkId, proxy->clientId, proxy->gameObject->position);
+				}
+			}
+			if (!newClient)
+			{
+				// Send welcome to the new player
+				OutputMemoryStream unwelcomePacket;
+				unwelcomePacket << ServerMessage::Unwelcome;
+				std::string errorMsg = "Client address already connected";
+				unwelcomePacket << errorMsg;
+				sendPacket(unwelcomePacket, fromAddress);
+
+				WLOG("Message received: UNWELCOMED hello - from player %s", proxy->name.c_str());
+			}
+		}
+		else if (message == ClientMessage::Ping) GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
+		if (connectedProxies > 0)
+		{
+			OutputMemoryStream clientSize;
+			clientSize << ServerMessage::ClientSize;
+			clientSize << connectedProxies;
+			sendPacket(clientSize, fromAddress);
+		}
+		if (proxy != nullptr) proxy->lastPacketReceivedTime = Time.time;
+	}
+	else if (state == ServerState::Listening)
+	{
+		// Register player
+		ClientProxy* proxy = getClientProxy(fromAddress);
+		// Read the packet type
+		ClientMessage message;
+		packet >> message;
 		// Process the packet depending on its type
 		if (message == ClientMessage::Hello)
 		{
@@ -289,6 +387,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				WLOG("Message received: UNWELCOMED hello - from player %s", proxy->name.c_str());
 			}
 		}
+		else if (message == ClientMessage::Ping) GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
 		else if (message == ClientMessage::Input)
 		{
 			// Process the input packet and update the corresponding game object
@@ -339,20 +438,69 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 				}
 			}
 		}
-		else if (message == ClientMessage::Ping) GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
 		if (proxy != nullptr) proxy->lastPacketReceivedTime = Time.time;
 	}
 }
 void ModuleNetworkingServer::onUpdate()
 {
-	if (state == ServerState::Listening)
+	if (state == ServerState::Lobby)
 	{
-		GameManager::getInstance()->SetFrameSnapshotTick(GameManager::getInstance()->GetFrameSnapshotTick() + 1);
-		serverSnapshotCounter += Time.deltaTime;
 		secondsSinceLastPing += Time.deltaTime;
 		// Replication
 		for (ClientProxy& clientProxy : clientProxies)
+			//for (int i = 0; i < MAX_CLIENTS; ++i)
 		{
+			//ClientProxy clientProxy = clientProxies[i];
+			if (clientProxy.connected)
+			{
+				clientProxy.secondsSinceLastReplication += Time.deltaTime;
+				// TODO(jesus): If the replication interval passed and the replication manager of this proxy
+				//              has pending data, write and send a replication packet to this client.
+				if (clientProxy.secondsSinceLastReplication > replicationDeliveryIntervalSeconds && clientProxy.replicationManager.commands.size() > 0)
+				{
+					OutputMemoryStream packet;
+					packet << ServerMessage::Replication;
+					packet << clientProxy.nextExpectedInputSequenceNumber; //ACK of last received input
+
+					Delivery* delivery = GameManager::getInstance()->GetDeliveryManager()->writeSequenceNumber(packet);
+					delivery->deleagate = new DeliveryDelegateReplication(); //TODOAdPi
+					((DeliveryDelegateReplication*)delivery->deleagate)->replicationCommands = clientProxy.replicationManager.GetCommands();
+					((DeliveryDelegateReplication*)delivery->deleagate)->repManager = clientProxy.replicationManager;
+
+					clientProxy.secondsSinceLastReplication = 0.0f;
+					if (clientProxy.replicationManager.write(packet))
+					{
+						sendPacket(packet, clientProxy.address);
+					}
+				}
+				//Send ping to clients
+				if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+				{
+					OutputMemoryStream ping;
+					ping << ServerMessage::Ping;
+					sendPacket(ping, clientProxy.address);
+				}
+				//Disconnect client if waited too long
+				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
+					onConnectionReset(clientProxy.address);
+			}
+		}
+		//Reset ping timer
+		if (secondsSinceLastPing > PING_INTERVAL_SECONDS) secondsSinceLastPing = 0.0f;
+		if (secondsSinceLastServerSnapshot > SERVER_SNAPSHOT_SECONDS) secondsSinceLastServerSnapshot = 0.0f;
+		//Check for TimeOutPackets DeliveryManager
+		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
+	}
+	else if (state == ServerState::Listening)
+	{
+		serverSnapshotCounter += Time.deltaTime;
+		secondsSinceLastPing += Time.deltaTime;
+		secondsSinceLastServerSnapshot += Time.deltaTime;
+		// Replication
+		for (ClientProxy& clientProxy : clientProxies)
+			//for (int i = 0; i < MAX_CLIENTS; ++i)
+		{
+			//ClientProxy clientProxy = clientProxies[i];
 			if (clientProxy.connected)
 			{
 				clientProxy.secondsSinceLastReplication += Time.deltaTime;
@@ -362,8 +510,8 @@ void ModuleNetworkingServer::onUpdate()
 				{
 					OutputMemoryStream packet;
 					packet << ServerMessage::StopGame;
-					if (clientProxy.replicationManager.write(packet))
-						sendPacket(packet, clientProxy.address);
+					sendPacket(packet, clientProxy.address);
+					state = ServerState::Lobby;
 				}
 				else
 				{
@@ -392,28 +540,34 @@ void ModuleNetworkingServer::onUpdate()
 					ping << ServerMessage::Ping;
 					sendPacket(ping, clientProxy.address);
 				}
+				/*if (secondsSinceLastServerSnapshot > SERVER_SNAPSHOT_SECONDS)
+				{
+					OutputMemoryStream snapshot;
+					snapshot << ServerMessage::Snapshot;
+					vector<bool>* wallList = GameManager::getInstance()->GetWallEnabledArray();
+					if (wallList->size() > 0) for (int i = 0; i < wallList->size(); i++) snapshot << wallList->at(i);
+					sendPacket(snapshot, clientProxy.address);
+				}*/
 
 				//Disconnect client if waited too long
 				if (Time.time - clientProxy.lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
 					onConnectionReset(clientProxy.address);
-
-				if (serverSnapshotCounter > 5)
-				{
-					if (GameManager::getInstance()->GetTanksCount() > 0) clientProxy.replicationManager.server_snapshot(clientProxy.gameObject->networkId);
-					serverSnapshotCounter = 0;
-				}
 			}
 		}
-
 		//Reset ping timer
-		if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
-		{
-			secondsSinceLastPing = 0.0f;
-		}
-
+		if (secondsSinceLastPing > PING_INTERVAL_SECONDS) secondsSinceLastPing = 0.0f;
+		if (secondsSinceLastServerSnapshot > SERVER_SNAPSHOT_SECONDS) secondsSinceLastServerSnapshot = 0.0f;
 		//Check for TimeOutPackets DeliveryManager
 		GameManager::getInstance()->GetDeliveryManager()->processTimedOutPackets();
 
+		if (serverSnapshotCounter > 1 && GameManager::getInstance()->GetTanksCount() > 0)
+		{
+			for (int i = 0; i < MAX_CLIENTS; ++i)
+			{
+				if (clientProxies[i].connected) clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
+			}
+			serverSnapshotCounter = 0;
+		}
 		if (GameManager::getInstance()->IsWinning())
 		{
 			//Update Tank Players on Server
@@ -422,8 +576,6 @@ void ModuleNetworkingServer::onUpdate()
 			GameManager::getInstance()->BulletVisitAll();
 			GameManager::getInstance()->UpdateAllTanks();
 		}
-		
-		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
 
 		//Server Reset Game Objects when there are no proxies connected
@@ -626,6 +778,69 @@ void ModuleNetworkingServer::CreateAwardEvent()
 	GameManager::getInstance()->setAward();
 	for (ClientProxy& clientProxy : clientProxies)
 		if (clientProxy.connected) clientProxy.replicationManager.CreateAward(clientProxy.gameObject->networkId);
+}
+void ModuleNetworkingServer::StartGameServerSide()
+{
+	state = ServerState::Listening;
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			OutputMemoryStream packet;
+			packet << ServerMessage::StartGame;
+			sendPacket(packet, clientProxies[i].address);
+
+			// Send all network objects to the new player
+			uint16 networkGameObjectsCount;
+			GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
+			GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+			// Notify the new client proxy's replication manager about the creation of other game objects
+			for (uint16 k = 0; k < networkGameObjectsCount; ++k)
+				clientProxies[i].replicationManager.create(networkGameObjects[k]->networkId);
+			// Notify all client proxies' replication manager to create the object remotely
+			for (int l = 0; l < MAX_CLIENTS; ++l)
+			{
+				if (clientProxies[l].connected && clientProxies[l].gameObject->networkId != clientProxies[i].gameObject->networkId)
+					clientProxies[l].replicationManager.create(clientProxies[i].gameObject->networkId);
+			}
+			D3DXVECTOR3 playerpos = D3DXVECTOR3(126, 58, 0);
+			switch (clientProxies[i].clientId % 2)
+			{
+			case 0:
+				playerpos = PlayerPosition;
+				break;
+			case 1:
+				playerpos = PlayerPosition1;
+				break;
+			}
+			clientProxies[i].gameObject->position = playerpos;
+			GameManager::getInstance()->CreatePlayerTank(clientProxies[i].gameObject->networkId, clientProxies[i].clientId, 1, clientProxies[i].gameObject->position);
+		}
+	}
+}
+int ModuleNetworkingServer::ClientSize()
+{
+	int num = 0;
+	for (ClientProxy& proxy : clientProxies)
+	{
+		if (proxy.connected) 
+			num += 1;
+	}
+	return num;
+}
+void ModuleNetworkingServer::SwitchScene(int _sceneID)
+{
+	for (ClientProxy& proxy : clientProxies)
+	{
+		if (proxy.connected)
+		{
+			OutputMemoryStream welcomePacket;
+			welcomePacket << ServerMessage::SwitchScene;
+			welcomePacket << _sceneID;
+			sendPacket(welcomePacket, proxy.address);
+		}
+	}
 }
 //GameObject* ModuleNetworkingServer::spawnBlood(vec2 position, float angle)
 //{

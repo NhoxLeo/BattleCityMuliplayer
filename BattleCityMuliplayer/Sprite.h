@@ -53,6 +53,8 @@ public:
 
 	void StopShow(){ Show = false; }
 
+	void SetShow(bool _isshow) { Show = _isshow; }
+
 	void SwitchShow(){ Show = !Show; }
 
 	bool getShowState(){ return Show; }

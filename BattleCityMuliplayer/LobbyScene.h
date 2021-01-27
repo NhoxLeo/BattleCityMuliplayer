@@ -22,5 +22,6 @@ private:
 	Tank* MyTank2;
 
 	Map* nowmap;
+	float StartGameTimer = 0;
 };
 

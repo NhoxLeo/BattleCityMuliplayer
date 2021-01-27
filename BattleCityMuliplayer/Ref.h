@@ -17,6 +17,7 @@ class Ref
 {
 protected:
 	int tain;
+	bool enabled = true;
 public:
 
 	virtual bool init();
@@ -28,6 +29,8 @@ public:
 	CREATE_FUNC(Ref);
 
 	int getTain();
+	bool IsEnabled();
+	void SetEnabled(bool _enabled);
 
 	void retain(){ tain++; }
 	void detain(){ tain = 0; }

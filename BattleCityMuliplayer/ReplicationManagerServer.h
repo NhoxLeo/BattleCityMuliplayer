@@ -11,6 +11,7 @@ enum class ReplicationAction
 	Update_Animation,
 	Server_Snapshot,
 	Create_Award,
+	ReduceLife,
 	Destroy
 };
 

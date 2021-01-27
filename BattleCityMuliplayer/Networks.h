@@ -44,6 +44,7 @@
 #define PACKET_DELIVERY_TIMEOUT_SECONDS                 0.5f
 #define PACKET_SIZE                             Kilobytes(16)
 #define PING_INTERVAL_SECONDS                           0.5f
+#define SERVER_SNAPSHOT_SECONDS                           1.0f
 #define REPLICATION_INTERVAL_SECONDS					0.128f
 #define MAX_LATE_FRAMES		20
 
