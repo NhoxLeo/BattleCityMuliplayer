@@ -32,6 +32,16 @@ void ReplicationManagerServer::CreateAward(uint32 networkId)
 	commands[networkId] = ReplicationAction::Create_Award;
 }
 
+void ReplicationManagerServer::ReduceLife(uint32 networkId)
+{
+	commands[networkId] = ReplicationAction::ReduceLife;
+}
+
+void ReplicationManagerServer::ShootEvent(uint32 networkId)
+{
+	commands[networkId] = ReplicationAction::ShootEvent;
+}
+
 std::map<uint32, ReplicationAction> ReplicationManagerServer::GetCommands()
 {
 	return commands;
@@ -122,6 +132,14 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			packet << awdPos.x;
 			packet << awdPos.y;
 			packet << awdType;
+		}
+		else if ((*it_c).second == ReplicationAction::ReduceLife)
+		{
+
+		}
+		else if ((*it_c).second == ReplicationAction::ShootEvent)
+		{
+
 		}
 	}
 

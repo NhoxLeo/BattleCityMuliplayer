@@ -171,7 +171,7 @@ void BulletArray::VisitAllWithLatency(int _networkID, CollisionCheckMethod metho
 								if (tank != NULL)
 								{
 									GameManager::getInstance()->UpdateColl(tank, Bulletarray[t]);
-									return;
+									break;
 								}
 							}
 						}
@@ -180,7 +180,7 @@ void BulletArray::VisitAllWithLatency(int _networkID, CollisionCheckMethod metho
 							if (Bulletarray[t]->getRet().Collision(BulletSpeed, Bulletarray[t]->getDirection(), StaticSpriteArray::getInstance()->getArray()[k]->getRet()))
 							{
 								GameManager::getInstance()->UpdateColl(StaticSpriteArray::getInstance()->getArray()[k], Bulletarray[t]);
-								return;
+								//break;
 							}
 						}
 						if (m_Position.x < 112 || m_Position.x>530 || m_Position.y < 44 || m_Position.y>460) Bulletarray[t]->detain();

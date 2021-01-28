@@ -12,6 +12,7 @@ enum class ReplicationAction
 	Server_Snapshot,
 	Create_Award,
 	ReduceLife,
+	ShootEvent,
 	Destroy
 };
 
@@ -24,6 +25,8 @@ public:
 	void destroy(uint32 networkId);
 	void server_snapshot(uint32 networkId);
 	void CreateAward(uint32 networkId);
+	void ReduceLife(uint32 networkId);
+	void ShootEvent(uint32 networkId);
 
 	std::map<uint32, ReplicationAction> GetCommands();
 	void InsertCommands(std::pair<uint32, ReplicationAction> command);

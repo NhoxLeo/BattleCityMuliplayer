@@ -198,6 +198,8 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 		else if (message == ServerMessage::Snapshot)
 		{
 			int arraysize;
+			int grade;
+			packet >> grade;
 			packet >> arraysize;
 			vector<bool>* wallList = new vector<bool>();
 			bool check = true;
@@ -208,9 +210,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 			}
 			GameManager::getInstance()->SetWallEnabledArray(wallList);
 		}
-		
 	}
-	
 }
 void ModuleNetworkingClient::onUpdate()
 {
@@ -317,14 +317,14 @@ void ModuleNetworkingClient::onUpdate()
 
 		Module* modGameObj = GameManager::getInstance()->GetModGameObject();
 		modGameObj->update();
-		GameManager::getInstance()->TankVisitAll((UINT32)networkId,CollisionCheckMethod::AllExceptOne);
+		GameManager::getInstance()->TankVisitAll((UINT32)networkId, CollisionCheckMethod::AllExceptOne);
 		GameManager::getInstance()->BulletVisitAll();
 		GameManager::getInstance()->UpdateAllTanks();
 
 		//Update Queue of Objects of Previous Frames
 		GameManager::getInstance()->AddThisFrameObjects();
 
-		if(Input.shoot /*Input.buttons[8] == ButtonState::Press*/) GameManager::getInstance()->CreatePlayerBullet(playerClientGameObject->networkId, playerClientGameObject->position);
+		if (Input.shoot /*Input.buttons[8] == ButtonState::Press*/) GameManager::getInstance()->CreatePlayerBullet(playerClientGameObject->networkId, playerClientGameObject->position);
 	}
 }
 void ModuleNetworkingClient::onConnectionReset(const sockaddr_in& fromAddress)

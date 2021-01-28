@@ -58,7 +58,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
 			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
 			float angle;
-			bool isShooted = false;
+			bool isShooted;
 			packet >> tickCount;
 			packet >> position.x;
 			packet >> position.y;
@@ -79,20 +79,17 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					go->speed = speed;
 					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
 					else
-					{
-						//if (speed.x + speed.y == 0) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
 						GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
-					}
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 
 					if (isShooted)
 					{
 						if (networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID())
 						{
-							int lateFrames = (int)((GetTickCount() - go->tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
-							GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
+							/*GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
 							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
-							else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);
+							else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);*/
+							GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, go->lateFrames);
 						}
 					}
 				}
@@ -158,7 +155,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			//	}
 			//}
 			//GameManager::getInstance()->SetWinning(Iswinning);
-			//GameManager::getInstance()->setGrade(1, grade);
 
 			bool wallcheck = true;
 			vector<StaticSprite*> wallList = StaticSpriteArray::getInstance()->getArray();
@@ -168,6 +164,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 				wallList.at(i)->SetEnabled(wallcheck);
 				wallList.at(i)->SetShow(wallcheck);
 			}
+			//GameManager::getInstance()->setGrade(1, grade);
 		}
 		else if (action == ReplicationAction::Create_Award)
 		{

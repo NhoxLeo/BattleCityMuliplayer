@@ -95,6 +95,7 @@ public:
 	}
 	void CreateAwardEvent();
 	void StartGameServerSide();
+	void AIPlayerSnapshot();
 	int ClientSize();
 	void SwitchScene(int _sceneID);
 
@@ -157,6 +158,7 @@ private:
 	float secondsSinceLastServerSnapshot = 0.0f;
 	float serverSnapshotCounter = 0.5f;
 	float AITankSpawnerCounter = 0.0f;
+	float AIplayerSnapshotCounter = 0.0f;
 	
 	float replicationDeliveryIntervalSeconds = REPLICATION_INTERVAL_SECONDS;
 };

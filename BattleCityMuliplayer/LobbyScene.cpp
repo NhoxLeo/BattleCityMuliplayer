@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "StaticSprite.h"
 #include "ActiveSprite.h"
+#include "Sprite.h"
 #include "Networks.h"
 #include "KeyboardInput.h"
 
@@ -21,6 +22,24 @@ bool LobbyScene::init()
 	Scene* scene = this;
 	GameManager::getInstance()->setScene(scene);
 	//LoadMap();
+
+	tank1 = Sprite::create();
+	tank1->LoadTexture(_T("../Sprite/Tank/player1/1.png"), 56, 112, 1);
+	tank1->setRet(Ret(Size(28, 28), D3DXVECTOR3(0, 0, 0)));
+	tank1->setPosition(D3DXVECTOR3(256, 256, 0));
+	tank1->setRenderRet(28, 28, 0, 0);
+	tank1->retain();
+	tank1->SetShow(false);
+
+
+	tank2 = Sprite::create();
+	tank2->LoadTexture(_T("../Sprite/Tank/player2/1.png"), 56, 112, 1);
+	tank2->setRet(Ret(Size(28, 28), D3DXVECTOR3(0, 0, 0)));
+	tank2->setPosition(D3DXVECTOR3(384, 256, 0));
+	tank2->setRenderRet(28, 28, 0, 0);
+	tank2->retain();
+	tank2->SetShow(false);
+
 	return true;
 }
 void LobbyScene::Update()
@@ -31,6 +50,8 @@ void LobbyScene::Update()
 	{
 		if (GameManager::getInstance()->GetModNetServer()->ClientSize() == 2)
 		{
+			tank1->SetShow(true);
+			tank2->SetShow(true);
 			if (StartGameTimer > 4.0f && StartGameTimer < 5.0f)
 			{
 				GameManager::getInstance()->LoadNetworkScene();
@@ -38,11 +59,14 @@ void LobbyScene::Update()
 			}
 			else if (StartGameTimer <= 4.0f) StartGameTimer += Time.deltaTime;
 		}
+		else tank1->SetShow(true);
 	}
 	else if (GameManager::getInstance()->GetModNetClient() != nullptr)
 	{
 		if (GameManager::getInstance()->GetModNetClient()->GetNUmberofPlayers() == 2)
 		{
+			tank1->SetShow(true);
+			tank2->SetShow(true);
 			if (StartGameTimer > 4.0f && StartGameTimer < 5.0f)
 			{
 				GameManager::getInstance()->LoadNetworkScene();
@@ -50,6 +74,7 @@ void LobbyScene::Update()
 			}
 			else if (StartGameTimer <= 4.0f) StartGameTimer += Time.deltaTime;
 		}
+		else tank1->SetShow(true);
 	}
 }
 void LobbyScene::clear()
@@ -106,4 +131,11 @@ void LobbyScene::LoadMap()
 			SpritePosition += D3DXVECTOR3(16, 0, 0);
 		}
 	}
+}
+
+void LobbyScene::DrawAllStatic()
+{
+	background->draw();
+	tank1->drawWithPartTexture(*tank1->getRenderRet()->RenderPoint, *tank1->getRenderRet()->RenderSize);
+	tank2->drawWithPartTexture(*tank2->getRenderRet()->RenderPoint, *tank2->getRenderRet()->RenderSize);
 }

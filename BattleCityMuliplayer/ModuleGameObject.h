@@ -66,6 +66,7 @@ struct GameObject
 
 	bool isAI = false;
 	bool isShooted = false;
+	int level = 0;
 
 private:
 

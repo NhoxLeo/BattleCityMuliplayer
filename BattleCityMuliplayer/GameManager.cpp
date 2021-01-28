@@ -122,17 +122,20 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 		{
 			if (!tank->getInvincible())
 			{
-				GameManager::getInstance()->addGrade(1);
 				tank->setLife(tank->getLife() - 1);
 				if (tank->getLife() == 0)
 				{
 					bullet->BigBoom();
-					if (!tank->IsPlayer()) if ((rand() % 3 + 1) == 2) if (GameManager::getInstance()->GetModNetServer() != nullptr) GameManager::getInstance()->GetModNetServer()->CreateAwardEvent();
+					if (!tank->IsPlayer())
+					{
+						if ((rand() % 3 + 1) == 2) if (GameManager::getInstance()->GetModNetServer() != nullptr) GameManager::getInstance()->GetModNetServer()->CreateAwardEvent();
+					}
 
-					TankArray::getInstance()->removeTank(tank);
 					tank->release();
+					TankArray::getInstance()->removeTank(tank);
 					if (GameManager::getInstance()->GetModNetServer() != NULL)
 					{
+						GameManager::getInstance()->addGrade(1);
 						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)tank->getPlayer());
 						if (go != nullptr)
 						{
@@ -1530,8 +1533,7 @@ void GameManager::DeletePlayerTank(UINT32 _networkID)
 	{
 		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
 		{
-			Tank* delTank = nullptr;
-			delTank = TankArray::getInstance()->getTankArray().at(i);
+			Tank* delTank = TankArray::getInstance()->getTankArray().at(i);
 			if (delTank != nullptr)
 			{
 				TankArray::getInstance()->removeTank(delTank);
@@ -1728,6 +1730,13 @@ int GameManager::GetTanksCount()
 {
 	return TankArray::getInstance()->getNumber();
 }
+int GameManager::GetPlayerTanksCount()
+{
+	int count = 0;
+	vector<Tank*> AItanklist = TankArray::getInstance()->getTankArray();
+	for (int i = 0; i < AItanklist.size(); i++) if (AItanklist.at(i)->getCamp()) count++;
+	return count;
+}
 void GameManager::AITankControl()
 {
 	TankArray::getInstance()->UpdateAITanks();
@@ -1782,6 +1791,20 @@ Bullet* GameManager::CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR
 		}
 	}
 	return nullptr;
+}
+
+void GameManager::CreateAndUpdatePlayerBulletWithLatency(UINT32 _networkID, CollisionCheckMethod method, int lateframes)
+{
+	for (int i = 0; i < TankArray::getInstance()->getTankArray().size(); i++)
+	{
+		if (TankArray::getInstance()->getTankArray().at(i)->getPlayer() == (int)_networkID)
+		{
+			Bullet* bullet = Bullet::createWithParent(TankArray::getInstance()->getTankArray().at(i));
+			GameManager::getInstance()->getScene()->addActiveChild(bullet);
+			if (lateframes > 0 && lateframes < MAX_LATE_FRAMES) BulletArray::getInstance()->VisitAllWithLatency((int)_networkID, method, lateframes);
+			//else if (lateframes >= MAX_LATE_FRAMES) bullet->setPosition(bullet->getPosition() + D3DXVECTOR3((int)bullet->getSpeed().x * lateframes, (int)bullet->getSpeed().y * lateframes, 0));
+		}
+	}
 }
 
 void GameManager::BulletVisitAll()

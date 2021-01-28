@@ -71,36 +71,39 @@ public:
 	int getPlayer() { return Player; }
 	int getGrade(int Player)
 	{
-		if (Player == 1)
+		return Grade1;
+		/*if (Player == 1)
 		{
 			return Grade1;
 		}
 		if (Player == 2)
 		{
 			return Grade2;
-		}
+		}*/
 	}
 	void addGrade(int Player)
 	{
-		if (Player == 1)
+		Grade1 += GradeAdd;
+		/*if (Player == 1)
 		{
 			Grade1 += GradeAdd;
 		}
 		if (Player == 2)
 		{
 			Grade2 += GradeAdd;
-		}
+		}*/
 	}
 	void setGrade(int player, int grade)
 	{
-		if (player == 1)
+		Grade1 = grade;
+		/*if (player == 1)
 		{
 			Grade1 = grade;
 		}
 		if (player == 2)
 		{
 			Grade2 = grade;
-		}
+		}*/
 	}
 	int getMyLife(int Player)
 	{
@@ -171,11 +174,13 @@ public:
 	D3DXVECTOR3 GetPlayerTankSpeed(int _networkID);
 	int GetPlayerTankLevel(int _networkID);
 	int GetTanksCount();
+	int GetPlayerTanksCount();
 	void AITankControl();
 	void ReduceLife(int _networkID);
 
 	Bullet* CreatePlayerBullet(UINT32 _networkID, D3DXVECTOR3 position);
 	Bullet* CreatePlayerBulletWithLatency(UINT32 _networkID, D3DXVECTOR3 position,int lateframes);
+	void CreateAndUpdatePlayerBulletWithLatency(UINT32 _networkID, CollisionCheckMethod method, int lateframes);
 	void BulletVisitAll();
 	void BulletVisitAll(UINT32 _networkID, CollisionCheckMethod method);
 	void BulletVisitAllWithLatency(UINT32 _networkID, CollisionCheckMethod method, int lateframes);

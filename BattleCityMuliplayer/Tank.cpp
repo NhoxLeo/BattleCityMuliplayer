@@ -589,11 +589,12 @@ void Tank::setLevel(int level)
 	setLife(level);
 	if (level == 2)
 	{
+		setLife(2);
 		//setSpeed(Speed(getSpeed().x * 2, getSpeed().y * 2));
 	}
 	if (level == 3)
 	{
-		//setLife(3);
+		setLife(3);
 	}
 }
 void Tank::boom()

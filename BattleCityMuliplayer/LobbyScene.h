@@ -5,6 +5,7 @@
 #include <sstream> 
 
 class Tank;
+class Sprite;
 
 class LobbyScene : public Scene
 {
@@ -16,11 +17,11 @@ public:
 	void LoadMap();
 	void DebugUINT(UINT uint);
 	void DebugBool(bool b);
+	void DrawAllStatic();
 private:
 	ActiveSprite* background;
-	Tank* MyTank1;
-	Tank* MyTank2;
-
+	Sprite* tank1;
+	Sprite* tank2;
 	Map* nowmap;
 	float StartGameTimer = 0;
 };
