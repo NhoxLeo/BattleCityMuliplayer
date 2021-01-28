@@ -266,19 +266,21 @@ void GameManager::UpdateColl(Award* aw, Tank* tank)
 			{
 				if (!TankArray::getInstance()->getTankArray()[i]->getCamp())
 				{
-					TankArray::getInstance()->getTankArray()[i]->boom();
-
-					//TankArray::getInstance()->removeTank(TankArray::getInstance()->getTankArray()[i]);
-					//TankArray::getInstance()->getTankArray()[i]->release();
-					//if (GameManager::getInstance()->GetModNetServer() != NULL)
-					//{
-					//	GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)TankArray::getInstance()->getTankArray()[i]->getPlayer());
-					//	if (go != nullptr)
-					//	{
-					//		if (!TankArray::getInstance()->getTankArray()[i]->IsPlayer()) GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
-					//		//else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
-					//	}
-					//}
+					//TankArray::getInstance()->getTankArray()[i]->boom();
+					if (GameManager::getInstance()->GetModNetServer() != NULL)
+					{
+						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)TankArray::getInstance()->getTankArray()[i]->getPlayer());
+						if (go != nullptr)
+						{
+							Tank* clone = TankArray::getInstance()->getTankArray()[i];
+							if (!clone->IsPlayer())
+							{
+								GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
+								break;
+							}
+							//else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
+						}
+					}
 				}
 			}
 		}
