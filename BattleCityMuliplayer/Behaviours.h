@@ -181,6 +181,7 @@ struct Player : public Behaviour
 		int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 		if (GameManager::getInstance()->GetModNetServer() != nullptr)
 		{
+			if (lateFrames > 10000) lateFrames = (int)(GameManager::getInstance()->GetModNetServer()->GetSimulatedLatency() / 0.016f);
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
 			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, D3DXVECTOR3(input.x, input.y, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 			if (input.shoot /*input.buttons[8] == ButtonState::Press*/)
@@ -197,8 +198,7 @@ struct Player : public Behaviour
 					for (int i = 0; i < lateFrames; i++)
 						GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 				}
-				else
-					GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
+				else GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 			}
 		}
 		else if (GameManager::getInstance()->GetModNetClient() != nullptr)
