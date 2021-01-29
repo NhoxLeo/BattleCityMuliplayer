@@ -178,12 +178,11 @@ struct Player : public Behaviour
 		//gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 		//gameObject->speed = D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0);
 		//NetworkCommunication(UPDATE_POSITION, gameObject);
-
+		int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 		if (GameManager::getInstance()->GetModNetServer() != nullptr)
 		{
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
 			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, D3DXVECTOR3(input.x, input.y, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
-			int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 			if (input.shoot /*input.buttons[8] == ButtonState::Press*/)
 			{
 				//gameObject->isShooted = true;
