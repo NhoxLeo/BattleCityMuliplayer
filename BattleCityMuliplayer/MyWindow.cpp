@@ -159,11 +159,11 @@ int MyWindow::MessageProc()
 	ZeroMemory(&msg, sizeof(MSG));
 
 	//OverScene* scene = OverScene::create();
-	//StartScene* scene = StartScene::create();
+	StartScene* scene = StartScene::create();
 	GameManager::getInstance()->setLevel(1);
 	//GameManager::getInstance()->setPlayer(1);
 	//GameScene* scene = GameScene::create();
-	NetworkScene* scene = NetworkScene::create();
+	//NetworkScene* scene = NetworkScene::create();
 	//LobbyScene* scene = LobbyScene::create();
 	GameManager::getInstance()->setScene(scene);
 	Controller::getInstance1()->InitControl(m_hwnd, m_hInstance);
