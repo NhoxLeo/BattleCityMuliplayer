@@ -99,6 +99,7 @@ public:
 	void AIPlayerSnapshot();
 	int ClientSize();
 	void SwitchScene(int _sceneID);
+	void ResetAICounter() { AIplayerSnapshotCounter = 6.0f; };
 
 	float initialZombieSpawnRatio = 5.0;
 	float guiFinalZombieSpawnRatio = 0;

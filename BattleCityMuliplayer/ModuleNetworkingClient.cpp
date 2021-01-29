@@ -256,6 +256,7 @@ void ModuleNetworkingClient::onUpdate()
 
 		// Client side prediction
 		GameObject* playerClientGameObject = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
+		
 		if (clientPrediction && playerClientGameObject)
 		{
 			MouseController mouse;
@@ -275,6 +276,17 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.horizontalAxis = Input.horizontalAxis;
 			inputPacketData.verticalAxis = Input.verticalAxis;
 			inputPacketData.shoot = Input.shoot;
+			if (playerClientGameObject != NULL)
+			{
+				playerClientGameObject->position = GameManager::getInstance()->GetPlayerTankPosition(networkId);
+				inputPacketData.x = playerClientGameObject->position.x;
+				inputPacketData.y = playerClientGameObject->position.y;
+			}
+			else
+			{
+				inputPacketData.x = 0;
+				inputPacketData.y = 0;
+			}
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 			// Create packet (if there's input and the input delivery interval exceeded)
 			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
@@ -290,6 +302,8 @@ void ModuleNetworkingClient::onUpdate()
 					packet << inputPacketData.horizontalAxis;
 					packet << inputPacketData.verticalAxis;
 					packet << inputPacketData.shoot;
+					packet << inputPacketData.x;
+					packet << inputPacketData.y;
 					//packet << inputPacketData.buttonBits;
 				}
 				// Clear the queue

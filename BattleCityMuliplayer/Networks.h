@@ -130,6 +130,9 @@ struct InputController
 	float verticalAxis = 0.0f;
 	float horizontalAxis = 0.0f;
 
+	float x = 0.0f;
+	float y = 0.0f;
+
 	uint32 tickcount = 0;
 	bool shoot;
 	union

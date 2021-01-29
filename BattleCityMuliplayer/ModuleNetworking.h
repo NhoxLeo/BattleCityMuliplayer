@@ -9,6 +9,8 @@ struct InputPacketData
 	real32 horizontalAxis = 0.0f;
 	real32 verticalAxis = 0.0f;
 	uint16 buttonBits = 0;
+	float x = 0.0f;
+	float y = 0.0f;
 	bool shoot = false;
 };
 

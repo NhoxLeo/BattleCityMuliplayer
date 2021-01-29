@@ -126,7 +126,7 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 				if (tank->getLife() == 0)
 				{
 					bullet->BigBoom();
-					if (GameManager::getInstance()->GetModNetServer() != NULL)
+					if (modNetServer!= NULL)
 					{
 						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)tank->getPlayer());
 						if (go != nullptr)
@@ -135,16 +135,17 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 							{
 								if ((rand() % 3 + 1) == 2) GameManager::getInstance()->GetModNetServer()->CreateAwardEvent();
 								GameManager::getInstance()->addGrade(1);
-								GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
+								modNetServer->DestroyAINetworkObject(go);
 							}
-							else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
+							else modNetServer->DestroyPlayerNetworkObject(go);
+							//modNetServer->ResetAICounter();
 						}
 					}
 				}
-				else if (tank->getLevel() == 3)
+				/*else if (tank->getLevel() == 3)
 				{
 					tank->setRenderRet(28, 28, (3 - tank->getLife()) * 56, 0);
-				}
+				}*/
 				if (tank->getAwardAble())
 				{
 					/*if (tank->getLevel() == 3)
@@ -1578,21 +1579,24 @@ void GameManager::TankVisitAll(UINT32 _networkID, CollisionCheckMethod method)
 void GameManager::UpdateAllTanks()
 {
 	TankArray::getInstance()->UpdateAllTanks();
-	std::vector<Tank*> tankArray = TankArray::getInstance()->getTankArray();
-	for (int i = 0; i < tankArray.size(); i++)
+	if (modNetClient != nullptr)
 	{
-		if (modNetClient != nullptr && tankArray.at(i)->getPlayer() != modNetClient->GetNetworkID())
+		std::vector<Tank*> tankArray = TankArray::getInstance()->getTankArray();
+		for (int i = 0; i < tankArray.size(); i++)
 		{
-			if (tankArray.at(i)->IsPlayer())
+			if (tankArray.at(i)->getPlayer() != modNetClient->GetNetworkID())
 			{
-				D3DXVECTOR3 previousPosition = tankArray.at(i)->getPosition();
-				D3DXVECTOR3 currentPosition = tankArray.at(i)->GetCurrentPosition();
-				if (std::abs(currentPosition.x - previousPosition.x) < 3 && std::abs(currentPosition.y - previousPosition.y) < 3) tankArray.at(i)->setPosition(currentPosition);
-				else
+				if (tankArray.at(i)->IsPlayer())
 				{
-					float lerpX = previousPosition.x + Time.deltaTime * (currentPosition.x - previousPosition.x) * 6;
-					float lerpY = previousPosition.y + Time.deltaTime * (currentPosition.y - previousPosition.y) * 6;
-					tankArray.at(i)->setPosition(D3DXVECTOR3(lerpX, lerpY, 0));
+					D3DXVECTOR3 previousPosition = tankArray.at(i)->getPosition();
+					D3DXVECTOR3 currentPosition = tankArray.at(i)->GetCurrentPosition();
+					if (std::abs(currentPosition.x - previousPosition.x) < 3 && std::abs(currentPosition.y - previousPosition.y) < 3) tankArray.at(i)->setPosition(currentPosition);
+					else
+					{
+						float lerpX = previousPosition.x + Time.deltaTime * (currentPosition.x - previousPosition.x) * 8;
+						float lerpY = previousPosition.y + Time.deltaTime * (currentPosition.y - previousPosition.y) * 8;
+						tankArray.at(i)->setPosition(D3DXVECTOR3(lerpX, lerpY, 0));
+					}
 				}
 			}
 		}
@@ -1636,8 +1640,15 @@ void GameManager::UpdatePlayerTankWithLatency(UINT32 _networkID, D3DXVECTOR3 pos
 				}
 			}
 			currentPosition = currentTank->getPosition();
-			if (!currentTank->IsPlayer()) currentTank->setPosition(currentPosition);
-			else currentTank->setPosition(previousPosition);
+			if (modNetClient != NULL)
+			{
+				if (!currentTank->IsPlayer()) currentTank->setPosition(currentPosition);
+				else currentTank->setPosition(previousPosition);
+			}
+			else if (modNetServer != NULL)
+			{
+				currentTank->setPosition(currentPosition);
+			}
 			currentTank->SetCurrentPosition(currentPosition);
 		}
 	}

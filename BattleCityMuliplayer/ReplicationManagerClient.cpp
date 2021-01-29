@@ -78,48 +78,10 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 					go->rotation = D3DXVECTOR3(speed.x, speed.y, 0);
 					go->speed = speed;
 					if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
-					else
-						GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
+					else GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
 					if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
-
-					if (isShooted)
-					{
-						if (networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID())
-						{
-							/*GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
-							if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
-							else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);*/
-							GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, go->lateFrames);
-						}
-					}
 				}
 			}
-
-			//bool serverSnap = false;
-			//packet >> serverSnap;
-			//if (serverSnap)
-			//{
-			//	bool Iswinning = true;
-			//	int grade = 0;
-			//	bool destroyedBricks = false;
-			//	packet >> Iswinning;
-			//	packet >> grade;
-			//	packet >> destroyedBricks;
-			//	GameManager::getInstance()->setGrade(1, grade);
-			//	if (destroyedBricks)
-			//	{
-			//		int destroyedBrickSize = 0;
-			//		packet >> destroyedBrickSize;
-			//		for (int i = 0; i < destroyedBrickSize; i++)
-			//		{
-			//			int cloneID = 0;
-			//			packet >> cloneID;
-			//			//destroyedBrickArray->push_back(cloneID);
-			//			StaticSpriteArray::getInstance()->removeStaticSpriteWithID(cloneID);
-			//		}
-			//	}
-			//	GameManager::getInstance()->SetWinning(Iswinning);
-			//}
 		}
 		else if (action == ReplicationAction::ReduceLife)
 		{
@@ -205,9 +167,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 				if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
 				if (networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID())
 				{
-					/*GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
-					if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
-					else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);*/
 					GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, go->lateFrames);
 				}
 			}

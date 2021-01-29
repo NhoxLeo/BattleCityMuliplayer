@@ -342,6 +342,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 					packet >> inputData.horizontalAxis;
 					packet >> inputData.verticalAxis;
 					packet >> inputData.shoot;
+					packet >> inputData.x;
+					packet >> inputData.y;
 					//packet >> inputData.buttonBits;
 					if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
 					{
@@ -349,6 +351,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
 						proxy->gamepad.tickcount = inputData.tickCount;
 						proxy->gamepad.shoot = inputData.shoot;
+						proxy->gamepad.x = inputData.x;
+						proxy->gamepad.y = inputData.y;
 						//unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
 						proxy->gameObject->behaviour->onInput(proxy->gamepad);
 						proxy->gameObject->tickCount = inputData.tickCount;
