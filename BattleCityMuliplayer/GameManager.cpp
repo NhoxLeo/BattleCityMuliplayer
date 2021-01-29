@@ -126,21 +126,18 @@ void GameManager::UpdateColl(Tank* tank, Bullet* bullet)
 				if (tank->getLife() == 0)
 				{
 					bullet->BigBoom();
-					if (!tank->IsPlayer())
-					{
-						if ((rand() % 3 + 1) == 2) if (GameManager::getInstance()->GetModNetServer() != nullptr) GameManager::getInstance()->GetModNetServer()->CreateAwardEvent();
-					}
-
-					tank->release();
-					TankArray::getInstance()->removeTank(tank);
 					if (GameManager::getInstance()->GetModNetServer() != NULL)
 					{
-						GameManager::getInstance()->addGrade(1);
 						GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((uint32)tank->getPlayer());
 						if (go != nullptr)
 						{
-							if (!tank->IsPlayer()) GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
-							//else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
+							if (!tank->getCamp())
+							{
+								if ((rand() % 3 + 1) == 2) GameManager::getInstance()->GetModNetServer()->CreateAwardEvent();
+								GameManager::getInstance()->addGrade(1);
+								GameManager::getInstance()->GetModNetServer()->DestroyAINetworkObject(go);
+							}
+							else GameManager::getInstance()->GetModNetServer()->DestroyPlayerNetworkObject(go);
 						}
 					}
 				}

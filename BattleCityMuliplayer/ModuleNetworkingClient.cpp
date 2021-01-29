@@ -198,8 +198,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 		else if (message == ServerMessage::Snapshot)
 		{
 			int arraysize;
-			int grade;
-			packet >> grade;
 			packet >> arraysize;
 			vector<bool>* wallList = new vector<bool>();
 			bool check = true;
@@ -343,7 +341,7 @@ void ModuleNetworkingClient::onDisconnect()
 	GameManager::getInstance()->GetModLinkingContext()->clear();
 
 	players.clear();
-	GameManager::getInstance()->DeleteAllPlayerTank();
+	//GameManager::getInstance()->DeleteAllPlayerTank();
 	//App->modUI->isPlaying = false;
 	//App->modUI->debugUI = true;
 

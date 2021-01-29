@@ -87,11 +87,11 @@ public:
 	{ 
 		for (int i = 0; i < AITanksObject->size(); i++)
 			if (AITanksObject->at(i)->networkId == gameObject->networkId) AITanksObject->erase(AITanksObject->begin() + i);
-		destroyNetworkObject(gameObject);
+		temporatyDestroyNetworkObject(gameObject);
 	}
 	void DestroyPlayerNetworkObject(GameObject* gameObject)
 	{
-		destroyNetworkObject(gameObject);
+		temporatyDestroyNetworkObject(gameObject);
 	}
 	void CreateAwardEvent();
 	void StartGameServerSide();
@@ -131,6 +131,7 @@ private:
 	//////////////////////////////////////////////////////////////////////
 
 	void destroyNetworkObject(GameObject *gameObject);
+	void temporatyDestroyNetworkObject(GameObject *gameObject);
 	friend void (NetworkDestroy)(GameObject *);
 
 	void updateNetworkObject(GameObject *gameObject, ReplicationAction updateType);

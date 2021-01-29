@@ -131,6 +131,11 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			else */
 			GameManager::getInstance()->DeletePlayerTank(networkId);
 			//GameManager::getInstance()->ReduceLife(networkId);
+			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId, true);
+			if (go != NULL)
+			{
+				if (go->isAI) GameManager::getInstance()->addGrade(1);
+			}
 		}
 		else if (action == ReplicationAction::Server_Snapshot)
 		{

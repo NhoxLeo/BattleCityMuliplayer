@@ -498,10 +498,8 @@ void ModuleNetworkingServer::onUpdate()
 					//clientProxies[i].replicationManager.server_snapshot(clientProxies[i].gameObject->networkId);
 					vector<bool>* vec = GameManager::getInstance()->GetWallEnabledArray();
 					int arraysize = vec->size();
-					int grade = GameManager::getInstance()->getGrade(1);
 					OutputMemoryStream serverSnapshot;
 					serverSnapshot << ServerMessage::Snapshot;
-					serverSnapshot << grade;
 					serverSnapshot << arraysize;
 					bool check;
 					for (int i = 0; i < vec->size(); i++)
@@ -933,6 +931,21 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject* gameObject)
 
 	// Finally, destroy the object from the server
 	Destroy(gameObject);
+}
+void ModuleNetworkingServer::temporatyDestroyNetworkObject(GameObject* gameObject)
+{
+	// Notify all client proxies' replication manager to destroy the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the destruction of this game object
+			clientProxies[i].replicationManager.destroy(gameObject->networkId);
+		}
+	}
+
+	// Assuming the message was received, unregister the network identity
+	GameManager::getInstance()->DeletePlayerTank(gameObject->networkId);
 }
 void ModuleNetworkingServer::updateNetworkObject(GameObject* gameObject, ReplicationAction updateType)
 {
