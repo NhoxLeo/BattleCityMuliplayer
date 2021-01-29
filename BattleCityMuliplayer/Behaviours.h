@@ -182,10 +182,10 @@ struct Player : public Behaviour
 		if (GameManager::getInstance()->GetModNetServer() != nullptr)
 		{
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
+			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, D3DXVECTOR3(input.x, input.y, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 			int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 			if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
 			{
-				GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, D3DXVECTOR3(input.x, input.y, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 				gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
 				if (lateFrames > 0 && lateFrames < MAX_LATE_FRAMES)
 				{
