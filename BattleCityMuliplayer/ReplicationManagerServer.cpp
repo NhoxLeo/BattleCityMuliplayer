@@ -79,9 +79,10 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
 			if (go != NULL)
 			{
-				go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
+				if(go->networkId != (*it_c).first)go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
 				go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
 				go->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)(*it_c).first);
+				go->tickCount = GetTickCount();
 				packet << go->tickCount;
 				packet << go->position.x;
 				packet << go->position.y;
