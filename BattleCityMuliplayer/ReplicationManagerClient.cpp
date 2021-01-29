@@ -181,5 +181,36 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, uint32 clie
 			if (awdType != -1 && (awdPos.x + awdPos.y != 0))
 				GameManager::getInstance()->setAward(awdType, awdPos);
 		}
+		else if (action == ReplicationAction::ShootEvent)
+		{
+			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(networkId);
+			D3DXVECTOR3 position = D3DXVECTOR3(0, 0, 0), rotation = D3DXVECTOR3(0, 0, 0), speed = D3DXVECTOR3(0, 0, 0);
+			float angle;
+			bool isShooted;
+			packet >> tickCount;
+			packet >> position.x;
+			packet >> position.y;
+			packet >> speed.x;
+			packet >> speed.y;
+			//packet >> angle;
+			if (go != nullptr)
+			{
+				go->tickCount = tickCount;
+				go->lateFrames = (int)((GetTickCount() - tickCount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
+				go->position = position;
+				go->rotation = D3DXVECTOR3(speed.x, speed.y, 0);
+				go->speed = speed;
+				//if (networkId == GameManager::getInstance()->GetModNetClient()->GetNetworkID()) GameManager::getInstance()->UpdatePlayerTank(go->networkId, go->position, go->rotation, speed);
+				//else GameManager::getInstance()->UpdatePlayerTankWithLatency(go->networkId, go->position, go->rotation, speed, go->lateFrames);
+				if ((speed.x != 0 || speed.y != 0) && (go->speed.x == 0 && go->speed.y == 0)) go->syncWaitTime = 0;
+				if (networkId != GameManager::getInstance()->GetModNetClient()->GetNetworkID())
+				{
+					/*GameManager::getInstance()->CreatePlayerBullet(go->networkId, go->position);
+					if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
+					else GameManager::getInstance()->CreatePlayerBulletWithLatency(go->networkId, go->position, lateFrames);*/
+					GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(go->networkId, CollisionCheckMethod::OneExceptAll, go->lateFrames);
+				}
+			}
+		}
 	}
 }

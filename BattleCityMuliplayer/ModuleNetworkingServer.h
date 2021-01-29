@@ -94,6 +94,7 @@ public:
 		temporatyDestroyNetworkObject(gameObject);
 	}
 	void CreateAwardEvent();
+	void CreateShootEvent(uint32 _networkID);
 	void StartGameServerSide();
 	void AIPlayerSnapshot();
 	int ClientSize();

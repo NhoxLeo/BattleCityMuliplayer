@@ -429,6 +429,22 @@ void ModuleNetworkingServer::onUpdate()
 	}
 	else if (state == ServerState::Listening)
 	{
+		if (GameManager::getInstance()->IsWinning())
+		{
+			//Update Tank Players on Server
+			GameManager::getInstance()->AITankControl();
+			GameManager::getInstance()->AllAIPlayerTankVisitAll();
+			GameManager::getInstance()->BulletVisitAll();
+			GameManager::getInstance()->UpdateAllTanks();
+			if (AITankSpawnerCounter > 5 && connectedProxies > 0 && maxAITanks > 0 && AITanksObject->size() == 0)
+			{
+				AITankSpawner(true, EnemyPosition1);
+				maxAITanks -= 1;
+			}
+			if (AITankSpawnerCounter > 6) secondsSinceLastServerSnapshot = 0.0f;
+			if (maxAITanks == 0 && AITanksObject->size() == 0) GameManager::getInstance()->SetWinning(false);
+		}
+
 		serverSnapshotCounter += Time.deltaTime;
 		secondsSinceLastPing += Time.deltaTime;
 		secondsSinceLastServerSnapshot += Time.deltaTime;
@@ -521,23 +537,8 @@ void ModuleNetworkingServer::onUpdate()
 			}
 			if (GameManager::getInstance()->GetPlayerTanksCount() == 0) GameManager::getInstance()->SetWinning(false);
 		}
-		if (GameManager::getInstance()->IsWinning())
-		{
-			//Update Tank Players on Server
-			GameManager::getInstance()->AITankControl();
-			GameManager::getInstance()->AllAIPlayerTankVisitAll();
-			GameManager::getInstance()->BulletVisitAll();
-			GameManager::getInstance()->UpdateAllTanks();
-			if (AITankSpawnerCounter > 5 && connectedProxies > 0 && maxAITanks > 0 && AITanksObject->size() == 0)
-			{
-				AITankSpawner(true, EnemyPosition1);
-				maxAITanks -= 1;
-			}
-			if (AITankSpawnerCounter > 6) secondsSinceLastServerSnapshot = 0.0f;
-			if (maxAITanks == 0 && AITanksObject->size() == 0) GameManager::getInstance()->SetWinning(false);
-		}
+		
 		GameManager::getInstance()->AddThisFrameObjects();
-
 		//Server Reset Game Objects when there are no proxies connected
 		uint16 networkGameObjectsCount;
 		GameObject* networkGameObjects[MAX_NETWORK_OBJECTS];
@@ -555,6 +556,19 @@ void ModuleNetworkingServer::onUpdate()
 				Destroy(gameObject);
 
 			}
+		}
+
+		for (ClientProxy& clientProxy : clientProxies)
+		{
+			if (clientProxy.connected)
+			{
+				GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject(clientProxy.gameObject->networkId);
+				if (go != NULL) if (go->isShooted) go->isShooted = false;
+			}
+		}
+		for (int i = 0; i < AITanksObject->size(); i++)
+		{
+			if (AITanksObject->at(i)->isShooted) AITanksObject->at(i)->isShooted = false;
 		}
 	}
 }
@@ -764,6 +778,11 @@ void ModuleNetworkingServer::CreateAwardEvent()
 	GameManager::getInstance()->setAward();
 	for (ClientProxy& clientProxy : clientProxies)
 		if (clientProxy.connected) clientProxy.replicationManager.CreateAward(clientProxy.gameObject->networkId);
+}
+void ModuleNetworkingServer::CreateShootEvent(uint32 _networkID)
+{
+	for (ClientProxy& clientProxy : clientProxies)
+		if (clientProxy.connected) clientProxy.replicationManager.ShootEvent(_networkID);
 }
 void ModuleNetworkingServer::StartGameServerSide()
 {

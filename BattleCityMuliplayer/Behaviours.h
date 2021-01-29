@@ -22,6 +22,7 @@ struct Behaviour
 		UPDATE_TEXTURE,
 		UPDATE_ALPHA,
 		UPDATE_ANIMATION,
+		SHOOT_EVENT,
 		DESTROY
 	};
 
@@ -42,6 +43,9 @@ struct Behaviour
 				break;
 			case Behaviour::UPDATE_ANIMATION:
 				NetworkUpdate(object, ReplicationAction::Update_Animation);
+				break;
+			case Behaviour::SHOOT_EVENT:
+				NetworkUpdate(object, ReplicationAction::ShootEvent);
 				break;
 			case Behaviour::DESTROY:
 				NetworkDestroy(object);
@@ -159,12 +163,13 @@ struct Player : public Behaviour
 			gameObject->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)gameObject->networkId);
 			if (GameManager::getInstance()->GetModNetServer() != nullptr)
 			{
-				gameObject->isShooted = true;
+				//gameObject->isShooted = true;
 				int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
 				/*GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 				if (lateFrames < MAX_LATE_FRAMES) GameManager::getInstance()->BulletVisitAllWithLatency(gameObject->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
 				else GameManager::getInstance()->CreatePlayerBulletWithLatency(gameObject->networkId, gameObject->position, lateFrames);*/
 				GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(gameObject->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
+				NetworkCommunication(SHOOT_EVENT, gameObject);
 			}
 			//else GameManager::getInstance()->CreatePlayerBullet(gameObject->networkId, gameObject->position);
 		}

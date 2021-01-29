@@ -1744,7 +1744,11 @@ void GameManager::AITankControl()
 	{
 		if (AItanklist.at(i)->GetShootTrigger())
 		{
-			if (GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer()) != nullptr) GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer())->isShooted = true;
+			if (GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer()) != nullptr)
+			{
+				GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer())->isShooted = true;
+				if (modNetServer != NULL) modNetServer->CreateShootEvent(GetModLinkingContext()->getNetworkGameObject(AItanklist.at(i)->getPlayer())->networkId);
+			}
 		}
 	}
 }

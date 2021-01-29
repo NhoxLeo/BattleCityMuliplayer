@@ -88,7 +88,6 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << go->speed.x;
 				packet << go->speed.y;
 				packet << go->isShooted;
-				if (go->isShooted) go->isShooted = false;
 				//packet << go->angle;
 			}
 			else
@@ -139,7 +138,28 @@ bool ReplicationManagerServer::write(OutputMemoryStream& packet)
 		}
 		else if ((*it_c).second == ReplicationAction::ShootEvent)
 		{
-
+			GameObject* go = GameManager::getInstance()->GetModLinkingContext()->getNetworkGameObject((*it_c).first);
+			if (go != NULL)
+			{
+				go->position = GameManager::getInstance()->GetPlayerTankPosition((int)(*it_c).first);
+				go->rotation = GameManager::getInstance()->GetPlayerTankRotation((int)(*it_c).first);
+				go->speed = GameManager::getInstance()->GetPlayerTankSpeed((int)(*it_c).first);
+				packet << go->tickCount;
+				packet << go->position.x;
+				packet << go->position.y;
+				packet << go->speed.x;
+				packet << go->speed.y;
+				//packet << go->angle;
+			}
+			else
+			{
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				packet << 0;
+				//packet << go->angle;
+			}
 		}
 	}
 

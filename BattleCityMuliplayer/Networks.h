@@ -42,11 +42,11 @@
 #define SCENE_TRANSITION_TIME_SECONDS                   1.0f
 #define DISCONNECT_TIMEOUT_SECONDS                      5.0f
 #define PACKET_DELIVERY_TIMEOUT_SECONDS                 0.5f
-#define PACKET_SIZE                             Kilobytes(16)
+#define PACKET_SIZE                             Kilobytes(32)
 #define PING_INTERVAL_SECONDS                           0.5f
 #define SERVER_SNAPSHOT_SECONDS                           1.0f
 #define REPLICATION_INTERVAL_SECONDS					0.128f
-#define MAX_LATE_FRAMES		20
+#define MAX_LATE_FRAMES		25
 
 ////////////////////////////////////////////////////////////////////////
 // BASIC TYPES

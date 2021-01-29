@@ -159,11 +159,11 @@ int MyWindow::MessageProc()
 	ZeroMemory(&msg, sizeof(MSG));
 
 	//OverScene* scene = OverScene::create();
-	//StartScene* scene = StartScene::create();
+	StartScene* scene = StartScene::create();
 	GameManager::getInstance()->setLevel(1);
 	//GameManager::getInstance()->setPlayer(1);
 	//GameScene* scene = GameScene::create();
-	NetworkScene* scene = NetworkScene::create();
+	//NetworkScene* scene = NetworkScene::create();
 	//LobbyScene* scene = LobbyScene::create();
 	GameManager::getInstance()->setScene(scene);
 	Controller::getInstance1()->InitControl(m_hwnd, m_hInstance);
@@ -187,7 +187,7 @@ int MyWindow::MessageProc()
 			Update(fElapsedTime);
 			dwTime = dwCurrentTime;*/
 			Input.horizontalAxis = Input.verticalAxis = 0;
-			Input.buttons[8] = ButtonState::Idle;
+			Input.buttons[7] = ButtonState::Idle;
 			Input.shoot = false;
 			shootTime += Time.deltaTime;
 			bool SpaceKeyWasDown = false;
@@ -242,7 +242,7 @@ int MyWindow::MessageProc()
 						}
 						else if (VKCode == VK_SPACE)
 						{
-							Win32ProcessKeyboardButton(&Input.buttons[8], IsDown);
+							Win32ProcessKeyboardButton(&Input.buttons[7], IsDown);
 							SpaceKeyWasDown = true;
 						}
 					}
@@ -269,7 +269,7 @@ int MyWindow::MessageProc()
 			{
 				if (SpaceKeyWasDown)
 				{
-					//Input.buttons[8] = ButtonState::Press;
+					Input.buttons[7] = ButtonState::Press;
 					Input.shoot = true;
 					shootTime = 0;
 				}
@@ -323,15 +323,17 @@ void MyWindow::Update(float ElapsedTime)
 	Text = (LPCWSTR)x.c_str();
 	RECT rect = { 0,40, 100, 90 };
 
-	
+
 	/*KeyboardInput::GetInstance()->Update();
-	Input.horizontalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D)) ? 1 : 0);
-	Input.verticalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_S)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_W)) ? 1 : 0);
+	if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A) || KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D))
+		Input.horizontalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D)) ? 1 : 0);
+	else if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_S) || KeyboardInput::GetInstance()->Keyboard_DownState(DIK_W))
+		Input.verticalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_S)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_W)) ? 1 : 0);
 	if (shootTime > 0.5f)
 	{
 		if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_SPACE))
 		{
-			Input.buttons[8] = ButtonState::Press;
+			Input.buttons[7] = ButtonState::Press;
 			Input.shoot = true;
 			shootTime = 0;
 		}
