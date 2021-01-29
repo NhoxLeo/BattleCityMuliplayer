@@ -184,6 +184,12 @@ struct Player : public Behaviour
 			GameManager::getInstance()->UpdatePlayerTankWithInput(gameObject->networkId, D3DXVECTOR3(input.horizontalAxis, input.verticalAxis, 0));
 			GameManager::getInstance()->UpdatePlayerTank(gameObject->networkId, D3DXVECTOR3(input.x, input.y, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0), D3DXVECTOR3(input.horizontalAxis, -input.verticalAxis, 0));
 			int lateFrames = (int)((GetTickCount() - input.tickcount) / 16.67f - (REPLICATION_INTERVAL_SECONDS / 0.16f));
+			if (input.shoot /*input.buttons[8] == ButtonState::Press*/)
+			{
+				//gameObject->isShooted = true;
+				GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(gameObject->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
+				NetworkCommunication(SHOOT_EVENT, gameObject);
+			}
 			if (input.horizontalAxis != 0.0f || input.verticalAxis != 0.0f)
 			{
 				gameObject->position = GameManager::getInstance()->GetPlayerTankPosition((int)gameObject->networkId);
@@ -193,13 +199,7 @@ struct Player : public Behaviour
 						GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 				}
 				else
-				GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
-			}
-			if (input.shoot /*input.buttons[8] == ButtonState::Press*/)
-			{
-				//gameObject->isShooted = true;
-				GameManager::getInstance()->CreateAndUpdatePlayerBulletWithLatency(gameObject->networkId, CollisionCheckMethod::OneExceptAll, lateFrames);
-				NetworkCommunication(SHOOT_EVENT, gameObject);
+					GameManager::getInstance()->TankVisitAll(gameObject->networkId, CollisionCheckMethod::OneExceptAll);
 			}
 		}
 		else if (GameManager::getInstance()->GetModNetClient() != nullptr)
