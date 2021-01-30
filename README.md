@@ -24,7 +24,7 @@ A Clone of Battle City with additional Multiplayer techniques
 
 - 1: chạy file "BattleCityMuliplayer.exe" trong thư mục "BattleCityMultiplayer\Release"
 - 2: đối với chương trình server, nhấn nút "Start Server" để bắt đầu chạy server
-- 3: đối với chương trình Client, địa chỉ IP của mấy tính chứa chương trình server vào mục "Server Address", sau đó nhấn nút "Connect to Server" để kết nối vào server
+- 3: đối với chương trình Client, địa chỉ IP của mấy tính chứa chương trình server vào mục "Server Address" (nếu chạy local thì giữ địa chỉ là 127.0.0.1) , sau đó nhấn nút "Connect to Server" để kết nối vào server
      (lưu ý cổng mặc định là 8888 và nếu kết nối thành công thì số lượng packet gửi và nhận biểu thị ở thanh thông tin "Packet Sent" và "Packet Received" sẽ thay đổi liên tục )
 - 4: sau khi có đủ 2 chương trình Client kết nối vào server thì dùng phìm mũi tên để di chuyển xuống mục "ON-LINE MODE", sau đó nhấn Enter để chọn
     + Lưu ý:
