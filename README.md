@@ -2,7 +2,7 @@
 A Clone of Battle City with additional Multiplayer techniques
 
 
-I: Hướng dẫn clone và build project
+#I: Hướng dẫn clone và build project
  1: Yêu cầu phần mềm:
  - Visual Studio 2019 latest update.
  - Microsoft DirectX SDK Jun 2010.
@@ -12,7 +12,7 @@ I: Hướng dẫn clone và build project
  - Sau khi mở bằng Visual Studio, thay đổi thông số configuration và môi trường thành Release và x86
  - Build game
 
-II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
+#II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 (lưu ý: ngoại trừ mục "ON-LINE MODE" là mục chọn ngoài màn hình menu, các nút bấm còn lại được định vị trong khung cửa sổ màu xanh trong chương trình)
 
 - Note: trong repository hiện có 2 nhánh là master sử dụng Input System Cũ và New_Input sử dụng Input System mới 
@@ -30,8 +30,13 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 - 5: Khi các chương trình ở màn hình Lobby,những chương trình nào là client thì nhấn nút "Client Ready" để chương trình server biết là client đã sẵn sàng, sau khi có 2 client đã           kết nối và sẵn sàng, chương trình server và client sẽ vào màn hình và bắt đầu game sau 5 giây ( lưu ý là chỉ nhấn nút "CLient Ready" sau khi đã vào màn hình lobby sau           khi chọn mục "ON-LINE MODE" ở menu )
 - 6: Chơi game (lưu ý trong lúc chơi game thì khi nhân vật chết, có thể respawn nhân vật bằng nút "Start Game" ở chương trình Server).
 
+- - Ngoài ra, trong màn hình UI của chương trình server, có thể nhấn chọn tickbox Simulation Latency/Jitter để giả lập lag, sau đó có thể quy định thời gian trễ của server theo đơn vị giây (tối đa 0.2 giây)
 
-## ScreenShot tham khảo:
+#III: Gameplay:
+ Trò chơi có main game loop là:
+ trong màn chơi, sẽ có 2 đội, đội người chơi có 2 xe tăng của người chơi, đội đối phương có 5 xe tăng, khi phả hủy 1 xe tăng thì xe tăng tiếp theo sẽ được tạo,đội người chơi sẽ thắng sau khi phá hủy toàn bộ xe tăng của đối phương và thua nếu cả 2 người chơi đều chết hoặc nhà chính đội người chơi bị phá hủy. mục tiêu chính của đội người chơi là phá hủy hết xe tăng của đội đối phương, đồng thời bảo vệ được nhà chính
+
+#IV: ScreenShot tham khảo:
 1. Visual studio config
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="400" height="100"/>
 2. Menu game
@@ -42,3 +47,5 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="600" height="200"/>
 5. màn hình ingame của server
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/servermenu.JPG" width="600" height="600"/>
+6. Điều chỉnh Latency của server
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/latency.JPG" width="600" height="600"/>
