@@ -1,8 +1,11 @@
 # BattleCityMultiplayer
 A Clone of Battle City with additional Multiplayer techniques
 
+## Một số note tham khảo:
+ - có 2 nhánh tương ứng với 2 loại InputSystem, khuyến khích sử dụng nhánh new_input do Input System của nhánh này hoặt đông ổn định và có độ trễ nhỏ hơn, tuy nhiên Input System của nhánh này sẽ chiếm quyền điều khiển bàn phím vào cửa sổ đang chạy và phải click vào các cửa sổ khác để dùng chúng chugn với bàn phím.
+ - nhánh master điều khiển nhân vật bằng các phím mũi tên, nhánh new_input điều khiển nhân vật bằng nút WASD
 
-#I: Hướng dẫn clone và build project
+## I: Hướng dẫn clone và build project
  1: Yêu cầu phần mềm:
  - Visual Studio 2019 latest update.
  - Microsoft DirectX SDK Jun 2010.
@@ -12,7 +15,7 @@ A Clone of Battle City with additional Multiplayer techniques
  - Sau khi mở bằng Visual Studio, thay đổi thông số configuration và môi trường thành Release và x86
  - Build game
 
-#II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
+## II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 (lưu ý: ngoại trừ mục "ON-LINE MODE" là mục chọn ngoài màn hình menu, các nút bấm còn lại được định vị trong khung cửa sổ màu xanh trong chương trình)
 
 - Note: trong repository hiện có 2 nhánh là master sử dụng Input System Cũ và New_Input sử dụng Input System mới 
@@ -32,11 +35,13 @@ A Clone of Battle City with additional Multiplayer techniques
 
 - - Ngoài ra, trong màn hình UI của chương trình server, có thể nhấn chọn tickbox Simulation Latency/Jitter để giả lập lag, sau đó có thể quy định thời gian trễ của server theo đơn vị giây (tối đa 0.2 giây)
 
-#III: Gameplay:
+## III: Gameplay:
  Trò chơi có main game loop là:
- trong màn chơi, sẽ có 2 đội, đội người chơi có 2 xe tăng của người chơi, đội đối phương có 5 xe tăng, khi phả hủy 1 xe tăng thì xe tăng tiếp theo sẽ được tạo,đội người chơi sẽ thắng sau khi phá hủy toàn bộ xe tăng của đối phương và thua nếu cả 2 người chơi đều chết hoặc nhà chính đội người chơi bị phá hủy. mục tiêu chính của đội người chơi là phá hủy hết xe tăng của đội đối phương, đồng thời bảo vệ được nhà chính
+ - trong màn chơi, sẽ có 2 đội, đội người chơi có 2 xe tăng của người chơi, đội đối phương có 5 xe tăng, khi phả hủy 1 xe tăng thì xe tăng tiếp theo sẽ được tạo,đội người chơi sẽ thắng sau khi phá hủy toàn bộ xe tăng của đối phương và thua nếu cả 2 người chơi đều chết hoặc nhà chính đội người chơi bị phá hủy. mục tiêu chính của đội người chơi là phá hủy hết xe tăng của đội đối phương, đồng thời bảo vệ được nhà chính.
+ - Mỗi kẻ thù tiêu diệt được sẽ giúp đội người chơi được cộng 100 điểm.
+ - khi phá hủy xe tăng của đối phương, sẽ có cơ hội tạo ra 1 booster thuộc 1 trong 5 loại, 2 trong số đó có thể sử dụng là ngưng đọng thời gian (hình đồng hồ) để xe tăng đối phương đứng yên và vụ nổ (hình lực đạn) để phá hủy 1 xe tăng đối phương.
 
-#IV: ScreenShot tham khảo:
+## IV: ScreenShot tham khảo:
 1. Visual studio config
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="400" height="100"/>
 2. Menu game
