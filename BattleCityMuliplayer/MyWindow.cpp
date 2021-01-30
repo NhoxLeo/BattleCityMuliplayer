@@ -142,7 +142,7 @@ int MyWindow::getWindowwidth()
 LRESULT CALLBACK MyWindow::WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	MyRender::getInstance()->HandleWindowsEvents(hwnd, msg, wParam, lParam);
-	KeyboardInput::GetInstance()->Create(hwnd);
+	//KeyboardInput::GetInstance()->Create(hwnd);
 	if (msg == WM_DESTROY)
 	{
 		PostQuitMessage(0);
@@ -324,7 +324,7 @@ void MyWindow::Update(float ElapsedTime)
 	RECT rect = { 0,40, 100, 90 };
 
 
-	KeyboardInput::GetInstance()->Update();
+	/*KeyboardInput::GetInstance()->Update();
 	if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A) || KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D))
 		Input.horizontalAxis = (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_A)) ? -1 : ((KeyboardInput::GetInstance()->Keyboard_DownState(DIK_D)) ? 1 : 0);
 	else if (KeyboardInput::GetInstance()->Keyboard_DownState(DIK_S) || KeyboardInput::GetInstance()->Keyboard_DownState(DIK_W))
@@ -337,7 +337,7 @@ void MyWindow::Update(float ElapsedTime)
 			Input.shoot = true;
 			shootTime = 0;
 		}
-	}
+	}*/
 
 	GameManager::getInstance()->checkclick1();
 	GameManager::getInstance()->checkclick2();

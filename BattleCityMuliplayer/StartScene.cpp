@@ -36,7 +36,7 @@ bool StartScene::init()
 
 void StartScene::Update()
 {
-	/*if (GameManager::getInstance()->getClick3() == UPBUTTON_UP)
+	if (GameManager::getInstance()->getClick3() == UPBUTTON_UP)
 	{
 		if (CursorPosition != 1)
 		{
@@ -81,10 +81,10 @@ void StartScene::Update()
 		GameManager::getInstance()->setScene(scene);
 		release();
 		return;
-	}*/
+	}
 
 
-	if (KeyboardInput::GetInstance()->Keyboard_Down(DIK_W))
+	/*if (KeyboardInput::GetInstance()->Keyboard_Down(DIK_W))
 	{
 		if (CursorPosition != 1)
 		{
@@ -129,5 +129,5 @@ void StartScene::Update()
 		GameManager::getInstance()->setScene(scene);
 		release();
 		return;
-	}
+	}*/
 }
