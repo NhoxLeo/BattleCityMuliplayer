@@ -31,6 +31,7 @@ bool GameManager::Create(HWND hwnd, HINSTANCE hInstance)
 	lastFrameObjectsInfo = new deque<std::vector<Tank*>*>();
 	win = true;
 	frametick = 0;
+	clientsReady = 0;
 
 	return true;
 }
@@ -1948,6 +1949,10 @@ void GameManager::AddThisFrameObjects()
 void GameManager::ServerSnapShotDeleteBrickID(int _cloneID)
 {
 	StaticSpriteArray::getInstance()->removeStaticSpriteWithID(_cloneID);
+}
+void GameManager::ClientSendReadyPackage()
+{
+	if (modNetClient != nullptr) modNetClient->SendReadyPackage();
 }
 void GameManager::CreateClient()
 {

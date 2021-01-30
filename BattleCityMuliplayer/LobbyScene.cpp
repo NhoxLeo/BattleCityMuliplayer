@@ -48,7 +48,8 @@ void LobbyScene::Update()
 
 	if (GameManager::getInstance()->GetModNetServer() != nullptr)
 	{
-		if (GameManager::getInstance()->GetModNetServer()->ClientSize() == 2)
+		int a = GameManager::getInstance()->GetReadyClients();
+		if (GameManager::getInstance()->GetReadyClients() == 2)
 		{
 			tank1->SetShow(true);
 			tank2->SetShow(true);
@@ -59,7 +60,15 @@ void LobbyScene::Update()
 			}
 			else if (StartGameTimer <= 4.0f) StartGameTimer += Time.deltaTime;
 		}
-		else tank1->SetShow(true);
+		else if (GameManager::getInstance()->GetReadyClients() == 1)
+		{
+			tank1->SetShow(true);
+		}
+		else
+		{
+			tank1->SetShow(false);
+			tank2->SetShow(false);
+		}
 	}
 	else if (GameManager::getInstance()->GetModNetClient() != nullptr)
 	{
@@ -74,7 +83,15 @@ void LobbyScene::Update()
 			}
 			else if (StartGameTimer <= 4.0f) StartGameTimer += Time.deltaTime;
 		}
-		else tank1->SetShow(true);
+		else if (GameManager::getInstance()->GetModNetClient()->GetNUmberofPlayers() == 1)
+		{
+			tank1->SetShow(true);
+		}
+		else
+		{
+			tank1->SetShow(false);
+			tank2->SetShow(false);
+		}
 	}
 }
 void LobbyScene::clear()

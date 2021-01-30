@@ -20,6 +20,8 @@ public:
 
 	int GetNUmberofPlayers() { return numberofPlayers; }
 
+	void SendReadyPackage();
+
 	// Replication Delay
 	float replicationPing = 0.0f;
 

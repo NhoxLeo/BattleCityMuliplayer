@@ -199,6 +199,9 @@ public:
 	deque<std::vector<Tank*>*>* GetLastFrameObjectsInfo() { return lastFrameObjectsInfo; }
 	void AddThisFrameObjects();
 	void ServerSnapShotDeleteBrickID(int _cloneID);
+	void IncreaseReadyClients() { clientsReady++; }
+	int GetReadyClients() { return clientsReady; }
+	void ClientSendReadyPackage();
 
 private:
 	int frametick = 0;
@@ -220,6 +223,7 @@ private:
 	/*Sound* award;
 	Sound* LifeAdd;
 	Sound* boom;*/
+	int clientsReady = 0;
 
 	ModuleNetworkingServer* modNetServer = nullptr;
 	ModuleNetworkingClient* modNetClient = nullptr;

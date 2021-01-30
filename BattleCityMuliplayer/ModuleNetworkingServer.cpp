@@ -219,11 +219,15 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream& packet, c
 			}
 		}
 		else if (message == ClientMessage::Ping) GameManager::getInstance()->GetDeliveryManager()->processAckdSequenceNumbers(packet);
+		else if (message == ClientMessage::Ready)
+		{
+			GameManager::getInstance()->IncreaseReadyClients();
+		}
 		if (connectedProxies > 0)
 		{
 			OutputMemoryStream clientSize;
 			clientSize << ServerMessage::ClientSize;
-			clientSize << connectedProxies;
+			clientSize << GameManager::getInstance()->GetReadyClients();
 			sendPacket(clientSize, fromAddress);
 		}
 		if (proxy != nullptr) proxy->lastPacketReceivedTime = Time.time;

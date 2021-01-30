@@ -81,6 +81,10 @@ void ModuleNetworkingClient::onGui()
 			{
 				ImGui::Text("Waiting for server response...");
 			}
+			else if (state == ClientState::Lobby)
+			{
+				if (ImGui::Button("Client Ready")) SendReadyPackage();
+			}
 			else if (state == ClientState::Playing)
 			{
 				ImGui::Text("Connected to server");
@@ -167,7 +171,6 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream& packet, c
 		else if (message == ServerMessage::ClientSize)
 		{
 			packet >> numberofPlayers;
-			int a = 1;
 		}
 	}
 	else if (state == ClientState::Playing)
@@ -416,4 +419,11 @@ void ModuleNetworkingClient::processAllInputs()
 			//playerClientGameObject->behaviour->onMouse(mouse);
 		}
 	}
+}
+
+void ModuleNetworkingClient::SendReadyPackage()
+{
+	OutputMemoryStream ping;
+	ping << ClientMessage::Ready;
+	sendPacket(ping, serverAddress);
 }
