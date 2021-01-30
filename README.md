@@ -31,9 +31,9 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 - 6: Chơi game (lưu ý trong lúc chơi game thì khi nhân vật chết, có thể respawn nhân vật bằng nút "Start Game" ở chương trình Server).
 
 
-ScreenShot:
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="230" height="305"/>
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/menu.JPG" width="230" height="305"/>
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/one_client_ready.JPG" width="230" height="305"/>
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="230" height="305"/>
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/servermenu.JPG" width="230" height="305"/>
+ScreenShot tham khảo:
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="100" height="300"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/menu.JPG" width="600" height="600"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/one_client_ready.JPG" width="200" height="600"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="200" height="600"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/servermenu.JPG" width="600" height="600"/>
