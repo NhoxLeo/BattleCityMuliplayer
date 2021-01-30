@@ -1590,7 +1590,7 @@ void GameManager::UpdateAllTanks()
 				{
 					D3DXVECTOR3 previousPosition = tankArray.at(i)->getPosition();
 					D3DXVECTOR3 currentPosition = tankArray.at(i)->GetCurrentPosition();
-					if (std::abs(currentPosition.x - previousPosition.x) < 3 && std::abs(currentPosition.y - previousPosition.y) < 3) tankArray.at(i)->setPosition(currentPosition);
+					if (std::abs(currentPosition.x - previousPosition.x) < 1 && std::abs(currentPosition.y - previousPosition.y) < 1) tankArray.at(i)->setPosition(currentPosition);
 					else
 					{
 						float lerpX = previousPosition.x + Time.deltaTime * (currentPosition.x - previousPosition.x) * 8;
