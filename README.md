@@ -23,4 +23,12 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 - 3: đối với chương trình Client, địa chỉ IP của mấy tính chứa chương trình server vào mục "Server Address", sau đó nhấn nút "Connect to Server" để kết nối vào server
      (lưu ý cổng mặc định là 8888 và nếu kết nối thành công thì số lượng packet gửi và nhận biểu thị ở thanh thông tin "Packet Sent" và "Packet Received" sẽ thay đổi liên tục )
 - 4: sau khi có đủ 2 chương trình Client kết nối vào server thì dùng phìm mũi tên để di chuyển xuống mục "ON-LINE MODE", sau đó nhấn Enter để chọn
-     (lưu ý các chương trình trong cùng một máy tính sẽ đều nhận phím enter nếu dùng Input System cũ, còn các chương trình dùng INput System mới sẽ nhận phím một cách độc lập)
+    + Lưu ý:
+     4.1: Các chương trình trong cùng một máy tính sẽ đều nhận phím enter nếu dùng Input System cũ, còn các chương trình dùng Input System mới sẽ nhận phím một cách độc lập,
+          và để chuyển giữa các chương trình trong khi dùng Input System mới thì sẽ cần dùng chuột để chọn chúng.
+     4.2: Khi nhấn nút "ON-LINE MODE" để đi vào màn hình lobby, cần phải nhấn đồng thời ( hoặc dưới 5 giây kể từ khi chọn "ON-LINE MODE" ở chương trình khác )  giữa các chương             trình với nhau để các chương trình cùng đi vào lobby, khi đó bộ đếm của chương trình server sẽ chạy đúng.
+- 5: Khi các chương trình ở màn hình Lobby, các chương trình server sẽ đếm 5 giây trước khi chuyển qua màn hình gameplay, ở màn hình gameplay, chương trình sẽ đếm 5 giây trước        khi start game.
+- 6: Chơi game.
+       
+
+      
