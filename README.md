@@ -29,3 +29,11 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
           và để chuyển giữa các chương trình trong khi dùng Input System mới thì sẽ cần dùng chuột để chọn chúng.
 - 5: Khi các chương trình ở màn hình Lobby,những chương trình nào là client thì nhấn nút "Client Ready" để chương trình server biết là client đã sẵn sàng, sau khi có 2 client đã           kết nối và sẵn sàng, chương trình server và client sẽ vào màn hình và bắt đầu game sau 5 giây ( lưu ý là chỉ nhấn nút "CLient Ready" sau khi đã vào màn hình lobby sau           khi chọn mục "ON-LINE MODE" ở menu )
 - 6: Chơi game (lưu ý trong lúc chơi game thì khi nhân vật chết, có thể respawn nhân vật bằng nút "Start Game" ở chương trình Server).
+
+
+ScreenShot:
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="230" height="305"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/menu.JPG" width="230" height="305"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/one_client_ready.JPG" width="230" height="305"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="230" height="305"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/servermenu.JPG" width="230" height="305"/>
