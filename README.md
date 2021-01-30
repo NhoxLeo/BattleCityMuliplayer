@@ -33,12 +33,12 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
 
 ## ScreenShot tham khảo:
 1. Visual studio config
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="100" height="300"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/BuildConfig.JPG" width="400" height="100"/>
 2. Menu game
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/menu.JPG" width="600" height="600"/>
 3. các nút bắm của server và client trong màn hình lobby
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/one_client_ready.JPG" width="200" height="600"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/one_client_ready.JPG" width="800" height="200"/>
 4. màn hình menu của server và client sau khi đã kết nối
-<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="200" height="600"/>
+<img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/server_and_client.JPG" width="600" height="200"/>
 5. màn hình ingame của server
 <img src="https://github.com/NhoxLeo/BattleCityMultiplayer/blob/master/Screenshot/servermenu.JPG" width="600" height="600"/>
