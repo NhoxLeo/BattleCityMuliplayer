@@ -13,10 +13,11 @@ I: Hướng dẫn clone và build project
  - Build game
 
 II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
+(lưu ý: ngoại trừ mục "ON-LINE MODE" là mục chọn ngoài màn hình menu, các nút bấm còn lại được định vị trong khung cửa sổ màu xanh trong chương trình)
 
 - Note: trong repository hiện có 2 nhánh là master sử dụng Input System Cũ và New_Input sử dụng Input System mới 
  + với Input Sytem cũ, khi nhấn một phím trên bàn phím thì các chương trình exe của project sẽ đều nhận input đó nếu chúng ở trong cùng một máy
- + với Input System mới, các chương trình sẽ nhận input từ bàn phím độc lập nhau
+ + với Input System mới, các chương trình sẽ nhận input từ bàn phím độc lập nhau, nhưng sẽ cần nhấp vào từng chương trinh để chương trình đó nhận input
 
 - 1: chạy file "BattleCityMuliplayer.exe" trong thư mục "BattleCityMultiplayer\Release"
 - 2: đối với chương trình server, nhấn nút "Start Server" để bắt đầu chạy server
@@ -26,9 +27,5 @@ II: Hướng dẫn sử dụng ( theo thứ tự đánh số ):
     + Lưu ý:
      4.1: Các chương trình trong cùng một máy tính sẽ đều nhận phím enter nếu dùng Input System cũ, còn các chương trình dùng Input System mới sẽ nhận phím một cách độc lập,
           và để chuyển giữa các chương trình trong khi dùng Input System mới thì sẽ cần dùng chuột để chọn chúng.
-     4.2: Khi nhấn nút "ON-LINE MODE" để đi vào màn hình lobby, cần phải nhấn đồng thời ( hoặc dưới 5 giây kể từ khi chọn "ON-LINE MODE" ở chương trình khác )  giữa các chương             trình với nhau để các chương trình cùng đi vào lobby, khi đó bộ đếm của chương trình server sẽ chạy đúng.
-- 5: Khi các chương trình ở màn hình Lobby, các chương trình server sẽ đếm 5 giây trước khi chuyển qua màn hình gameplay, ở màn hình gameplay, chương trình sẽ đếm 5 giây trước        khi start game.
-- 6: Chơi game.
-       
-
-      
+- 5: Khi các chương trình ở màn hình Lobby,những chương trình nào là client thì nhấn nút "Client Ready" để chương trình server biết là client đã sẵn sàng, sau khi có 2 client đã           kết nối và sẵn sàng, chương trình server và client sẽ vào màn hình và bắt đầu game sau 5 giây ( lưu ý là chỉ nhấn nút "CLient Ready" sau khi đã vào màn hình lobby sau           khi chọn mục "ON-LINE MODE" ở menu )
+- 6: Chơi game (lưu ý trong lúc chơi game thì khi nhân vật chết, có thể respawn nhân vật bằng nút "Start Game" ở chương trình Server).
